@@ -22,7 +22,7 @@ export function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     // Skip all internal paths (_next), static files, and special paths
-    "/((?!_next|favicon.ico|health|logo.webp).*)",
+    "/((?!_next|favicon.ico|health|assets).*)",
     // Optional: only run on root (/) URL
     // '/'
   ],

@@ -1,6 +1,20 @@
 {
+  "signup": {
+    "title": "Criar uma conta",
+    "welcome": "Bem-vindo ao Wayru!",
+    "facebook": "Entrar com Facebook",
+    "google": "Entrar com Google",
+    "apple": "Entrar com Apple",
+    "already": "Já tem uma conta?",
+    "alt": "Entrar"
+  },
   "login": {
-    "title": "operators-web",
-    "footer": "junte-se ao lado escuro, temos biscoitos"
+    "title": "Entrar",
+    "welcome": "Bem-vindo ao Wayru!",
+    "facebook": "Entrar com Facebook",
+    "google": "Entrar com Google",
+    "apple": "Entrar com Apple",
+    "already": "Não tem uma conta?",
+    "alt": "Registrar"
   }
 }

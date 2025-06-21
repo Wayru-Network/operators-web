@@ -1,6 +1,20 @@
 {
+  "signup": {
+    "title": "Create an account",
+    "welcome": "Welcome to Wayru!",
+    "facebook": "Sign In with Facebook",
+    "google": "Sign In with Google",
+    "apple": "Sign In with Apple",
+    "already": "Already have an account?",
+    "alt": "Log in"
+  },
   "login": {
-    "title": "operators-web",
-    "footer": "come to the dark side, we have cookies"
+    "title": "Login",
+    "welcome": "Welcome to Wayru!",
+    "facebook": "Log In with Facebook",
+    "google": "Log In with Google",
+    "apple": "Log In with Apple",
+    "already": "Don't have an account?",
+    "alt": "Sign Up"
   }
 }
