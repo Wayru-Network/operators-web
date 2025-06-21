@@ -11,11 +11,13 @@
   "dependencies": {
     "@heroui/button": "^2.2.22",
     "@heroui/card": "^2.2.21",
+    "@heroui/dropdown": "^2.3.22",
     "@heroui/link": "^2.2.19",
     "@heroui/spacer": "^2.2.16",
     "@heroui/system": "2.4.18-beta.1",
     "@heroui/theme": "2.4.18-beta.1",
     "framer-motion": "12.18.1",
+    "lucide-react": "^0.519.0",
     "next": "15.3.4",
     "next-themes": "^0.4.6",
     "react": "19.1.0",

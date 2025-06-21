@@ -21,65 +21,61 @@ export default function Auth({ type, dict }: AuthProps) {
   const altHref = type === "login" ? "/signup" : "/login";
 
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Card className="rounded-[20px] shadow-large ring-1 ring-gray-200 dark:ring-0">
-          <CardHeader className="pt-14 pb-10 justify-center">
+    <Card className="rounded-[20px] shadow-large ring-1 ring-gray-200 dark:ring-0">
+      <CardHeader className="pt-14 pb-10 justify-center">
+        <Image
+          className="dark:invert"
+          src="/assets/logo.webp"
+          alt="Wayru logo"
+          width={131}
+          height={42}
+          priority
+        />
+      </CardHeader>
+      <CardBody className="px-14 items-center">
+        <h1 className="text-[32px] font-bold">{dict.title}</h1>
+        <p className="text-[16px]">{dict.welcome}</p>
+        <Spacer y={8} />
+        <div className="flex flex-col gap-5">
+          <Button className="w-[345px] h-[54px] bg-[#1877F2] text-lg dark:text-white rounded-[10px]">
             <Image
-              className="dark:invert"
-              src="/assets/logo.webp"
-              alt="Wayru logo"
-              width={131}
-              height={42}
-              priority
+              src="/assets/facebook.svg"
+              alt="Facebook logo"
+              width={24}
+              height={24}
             />
-          </CardHeader>
-          <CardBody className="px-14 items-center">
-            <h1 className="text-[32px] font-bold">{dict.title}</h1>
-            <p className="text-[16px]">{dict.welcome}</p>
-            <Spacer y={8} />
-            <div className="flex flex-col gap-5">
-              <Button className="w-[345px] h-[54px] bg-[#1877F2] text-lg dark:text-white rounded-[10px]">
-                <Image
-                  src="/assets/facebook.svg"
-                  alt="Facebook logo"
-                  width={24}
-                  height={24}
-                />
-                <p>{dict.facebook}</p>
-              </Button>
-              <Button className="w-[345px] h-[54px] bg-white dark:bg-black dark:ring-0 ring-1 ring-gray-100 dark:shadow-none shadow-md shadow-gray-300 rounded-[10px]">
-                <Image
-                  src="/assets/google.svg"
-                  alt="Google logo"
-                  width={24}
-                  height={24}
-                />
-                <p className="text-gray-600 text-lg dark:text-white">
-                  {dict.google}
-                </p>
-              </Button>
-              <Button className="w-[345px] h-[54px] rounded-[10px]">
-                <Image
-                  src="/assets/apple.svg"
-                  alt="Apple logo"
-                  width={24}
-                  height={24}
-                  className="dark:invert"
-                />
-                <p className="text-lg">{dict.apple}</p>
-              </Button>
-            </div>
-          </CardBody>
-          <CardFooter className="pb-14 text-xs flex flex-row items-center justify-center">
-            <p>{dict.already}</p>
-            <Spacer x={1} />
-            <Link href={altHref} className="text-xs" underline="always">
-              {dict.alt}
-            </Link>
-          </CardFooter>
-        </Card>
-      </main>
-    </div>
+            <p>{dict.facebook}</p>
+          </Button>
+          <Button className="w-[345px] h-[54px] bg-white dark:bg-black dark:ring-0 ring-1 ring-gray-100 dark:shadow-none shadow-md shadow-gray-300 rounded-[10px]">
+            <Image
+              src="/assets/google.svg"
+              alt="Google logo"
+              width={24}
+              height={24}
+            />
+            <p className="text-gray-600 text-lg dark:text-white">
+              {dict.google}
+            </p>
+          </Button>
+          <Button className="w-[345px] h-[54px] rounded-[10px]">
+            <Image
+              src="/assets/apple.svg"
+              alt="Apple logo"
+              width={24}
+              height={24}
+              className="dark:invert"
+            />
+            <p className="text-lg">{dict.apple}</p>
+          </Button>
+        </div>
+      </CardBody>
+      <CardFooter className="pb-14 text-xs flex flex-row items-center justify-center">
+        <p>{dict.already}</p>
+        <Spacer x={1} />
+        <Link href={altHref} className="text-xs" underline="always">
+          {dict.alt}
+        </Link>
+      </CardFooter>
+    </Card>
   );
 }
