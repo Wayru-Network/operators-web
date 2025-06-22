@@ -36,7 +36,7 @@ function NavLink({ href, label }: { href: string; label: string }) {
     <Link href={href}>
       <Button
         fullWidth
-        className={`justify-between ${isActive ? "bg-default text-white dark:text-black" : "bg-transparent text-[#2E3132] dark:text-white hover:bg-[#F2F4F4] dark:hover:bg-[#2E3132]"}`}
+        className={`rounded-lg justify-between ${isActive ? "bg-default text-white dark:text-black" : "bg-transparent text-[#2E3132] dark:text-white hover:bg-[#F2F4F4] dark:hover:bg-[#2E3132]"}`}
       >
         <div className="flex flex-row gap-4 items-center">
           <Image

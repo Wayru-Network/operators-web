@@ -7,7 +7,7 @@ export const metadata: Metadata = {
 export default function Settings() {
   return (
     <div>
-      <h1>Settings</h1>
+      <h1 className="text-2xl font-normal">Settings</h1>
     </div>
   );
 }

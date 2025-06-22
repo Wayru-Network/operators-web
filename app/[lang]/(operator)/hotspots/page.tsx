@@ -7,7 +7,7 @@ export const metadata: Metadata = {
 export default function Hotspots() {
   return (
     <div>
-      <p>hotspots</p>
+      <h1 className="text-2xl font-normal">Hotspots</h1>
     </div>
   );
 }

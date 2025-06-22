@@ -7,7 +7,7 @@ export const metadata: Metadata = {
 export default function CaptivePortal() {
   return (
     <div>
-      <p>captive portal</p>
+      <h1 className="text-2xl font-normal">Captive portal</h1>
     </div>
   );
 }
