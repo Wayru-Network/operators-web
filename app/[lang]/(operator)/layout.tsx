@@ -1,3 +1,5 @@
+import ConnectWallet from "@/lib/components/connect-wallet";
+import LangSwitch from "@/lib/components/lang-switch";
 import RootLayout from "@/lib/components/layout/root";
 import NavMenu from "@/lib/components/navmenu";
 import { LayoutProps } from "@/lib/interfaces/page";
@@ -31,7 +33,13 @@ export default function OperatorLayout({ children }: LayoutProps) {
           <Spacer y={12} />
           <NavMenu />
         </div>
-        <div className="w-full p-11">{children}</div>
+        <div className="w-full p-11">
+          <div className="flex flex-row gap-x-4 justify-end mb-10">
+            <ConnectWallet />
+            <LangSwitch />
+          </div>
+          {children}
+        </div>
       </div>
     </RootLayout>
   );

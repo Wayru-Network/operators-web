@@ -30,7 +30,10 @@ export default function LangSwitch() {
       }}
     >
       <DropdownTrigger>
-        <Button variant="bordered" className="uppercase rounded-[10px]">
+        <Button
+          variant="bordered"
+          className="text-xs uppercase rounded-[10px] border-[#c9cecf]"
+        >
           <Globe size={15} />
           {selectedValue}
         </Button>
