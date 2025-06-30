@@ -6,6 +6,8 @@ import { LayoutProps } from "@/lib/interfaces/page";
 import { Spacer } from "@heroui/spacer";
 import { Metadata } from "next";
 import Image from "next/image";
+import { getSession } from "@/lib/session/session";
+import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
   title: "Operators - Wayru",
@@ -13,7 +15,11 @@ export const metadata: Metadata = {
     "Manage and monitor your fleet of WiFi routers. Configure, deploy, and maintain.",
 };
 
-export default function OperatorLayout({ children }: LayoutProps) {
+export default async function OperatorLayout({ children }: LayoutProps) {
+  const session = await getSession();
+  if (!session.isLoggedIn) {
+    redirect("/login");
+  }
   return (
     <RootLayout>
       <div className="h-screen flex flex-row bg-[#F8FAFA] dark:bg-[#101415]">

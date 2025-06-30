@@ -1,8 +1,10 @@
+"use client";
 import Image from "next/image";
 import { Card, CardBody, CardFooter, CardHeader } from "@heroui/card";
 import { Spacer } from "@heroui/spacer";
 import { Button } from "@heroui/button";
 import { Link } from "@heroui/link";
+import { socialLogin } from "@/app/[lang]/(auth)/_services/kc";
 
 interface AuthProps {
   type: "login" | "signup";
@@ -37,7 +39,10 @@ export default function Auth({ type, dict }: AuthProps) {
         <p className="text-[16px]">{dict.welcome}</p>
         <Spacer y={8} />
         <div className="flex flex-col gap-5">
-          <Button className="w-[345px] h-[54px] bg-[#1877F2] text-lg dark:text-white rounded-[10px]">
+          <Button
+            onPress={() => socialLogin("facebook")}
+            className="w-[345px] h-[54px] bg-[#1877F2] text-lg dark:text-white rounded-[10px]"
+          >
             <Image
               src="/assets/facebook.svg"
               alt="Facebook logo"
@@ -46,7 +51,10 @@ export default function Auth({ type, dict }: AuthProps) {
             />
             <p>{dict.facebook}</p>
           </Button>
-          <Button className="w-[345px] h-[54px] bg-white dark:bg-black dark:ring-0 ring-1 ring-gray-100 dark:shadow-none shadow-md shadow-gray-300 rounded-[10px]">
+          <Button
+            onPress={() => socialLogin("google")}
+            className="w-[345px] h-[54px] bg-white dark:bg-black dark:ring-0 ring-1 ring-gray-100 dark:shadow-none shadow-md shadow-gray-300 rounded-[10px]"
+          >
             <Image
               src="/assets/google.svg"
               alt="Google logo"
@@ -57,7 +65,10 @@ export default function Auth({ type, dict }: AuthProps) {
               {dict.google}
             </p>
           </Button>
-          <Button className="w-[345px] h-[54px] rounded-[10px]">
+          <Button
+            onPress={() => socialLogin("apple")}
+            className="w-[345px] h-[54px] rounded-[10px]"
+          >
             <Image
               src="/assets/apple.svg"
               alt="Apple logo"

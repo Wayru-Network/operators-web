@@ -5,9 +5,13 @@ import { SupportedLanguages } from "@/lib/language/language";
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  if (pathname === "/api/auth/callback") {
+    return NextResponse.next();
+  }
+
   // Check if there is any supported locale in the pathname
   const pathnameHasLocale = SupportedLanguages.some(
-    (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`,
+    (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`
   );
   if (pathnameHasLocale) return;
 
