@@ -1,5 +1,4 @@
 import type { JWTPayload } from "jose";
-
 export interface SessionPayload extends JWTPayload {
   email?: string;
   userId?: string;
