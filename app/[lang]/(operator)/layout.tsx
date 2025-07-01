@@ -6,8 +6,7 @@ import { LayoutProps } from "@/lib/interfaces/page";
 import { Spacer } from "@heroui/spacer";
 import { Metadata } from "next";
 import Image from "next/image";
-import { getSession } from "@/lib/session/session";
-import { redirect } from "next/navigation";
+import { verifySession } from "@/lib/dal/dal";
 
 export const metadata: Metadata = {
   title: "Operators - Wayru",
@@ -16,8 +15,7 @@ export const metadata: Metadata = {
 };
 
 export default async function OperatorLayout({ children }: LayoutProps) {
-  const session = await getSession();
-  if (!session.isLoggedIn) return redirect("/login");
+  const session = await verifySession();
 
   return (
     <RootLayout>
