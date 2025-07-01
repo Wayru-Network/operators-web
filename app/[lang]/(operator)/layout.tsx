@@ -17,9 +17,8 @@ export const metadata: Metadata = {
 
 export default async function OperatorLayout({ children }: LayoutProps) {
   const session = await getSession();
-  if (!session.isLoggedIn) {
-    redirect("/login");
-  }
+  if (!session.isLoggedIn) return redirect("/login");
+
   return (
     <RootLayout>
       <div className="h-screen flex flex-row bg-[#F8FAFA] dark:bg-[#101415]">

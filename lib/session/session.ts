@@ -2,7 +2,8 @@
 import "server-only";
 import { cookies } from "next/headers";
 import { SignJWT, jwtVerify } from "jose";
-import { defaultSession, SessionPayload } from "@/lib/interfaces/session";
+import type { SessionPayload } from "./session-interface";
+import { defaultSession } from "./session-interface";
 
 const secretKey = process.env.SESSION_KEY;
 const encodedKey = new TextEncoder().encode(secretKey);
