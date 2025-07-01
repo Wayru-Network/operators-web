@@ -16,7 +16,5 @@ export const authVerifySession = cache(async () => {
   const session = await getSession();
   if (session.isLoggedIn) {
     redirect("/dashboard");
-  } else {
-    redirect("/login");
   }
 });
