@@ -9,54 +9,52 @@ datasource db {
 }
 
 model hotspot {
-  id              Int             @id @default(autoincrement())
-  wayru_device_id String          @db.Uuid
-  network_configs networkConfig[]
-  portal_configs  portalConfig[]
+  id              Int              @id @default(autoincrement())
+  wayru_device_id String           @db.Uuid
+  network_configs network_config[]
+  portal_configs  portal_config[]
 }
 
-model portalConfig {
+model portal_config {
   id               Int      @id @default(autoincrement())
   hotspot_id       Int
   title            String
   description      String?
   background_color String?
-  assetId          Int
-  logo             asset    @relation("LogoAsset", fields: [assetId], references: [id], map: "portalConfig_logo_assetId_fkey")
-  banner           asset    @relation("BannerAsset", fields: [assetId], references: [id], map: "portalConfig_banner_assetId_fkey")
+  asset_id         Int
+  logo             asset    @relation("logo_asset", fields: [asset_id], references: [id], map: "portal_config_logo_assetId_fkey")
+  banner           asset    @relation("banner_asset", fields: [asset_id], references: [id], map: "portal_config_banner_assetId_fkey")
   ads              ad[]
   redirect_url     String
-  hotspot          hotspot? @relation(fields: [hotspotId], references: [id])
-  hotspotId        Int?
+  hotspot          hotspot? @relation(fields: [hotspot_id], references: [id])
 }
 
-model networkConfig {
+model network_config {
   id               Int      @id @default(autoincrement())
   device_config_id String   @db.Uuid
   device_config    Json
-  hotspot          hotspot? @relation(fields: [hotspotId], references: [id])
-  hotspotId        Int?
+  hotspot          hotspot? @relation(fields: [hotspot_id], references: [id])
+  hotspot_id       Int?
 }
 
 model ad {
-  id               Int           @id @default(autoincrement())
+  id               Int            @id @default(autoincrement())
   portal_config_id Int?
   interaction_time Int
   ad_asset_id      Int?
-  asset            asset?        @relation(fields: [ad_asset_id], references: [id])
+  asset            asset?         @relation(fields: [ad_asset_id], references: [id])
   format           adFormat
-  portalConfig     portalConfig? @relation(fields: [portalConfigId], references: [id])
-  portalConfigId   Int?
+  portal_config    portal_config? @relation(fields: [portal_config_id], references: [id])
 }
 
 model asset {
-  id                 Int            @id @default(autoincrement())
-  portal_config_id   Int?
-  ad_asset_id        Int?
-  asset_url          String
-  logoPortalConfig   portalConfig[] @relation("LogoAsset")
-  bannerPortalConfig portalConfig[] @relation("BannerAsset")
-  adAsset            ad[]
+  id                   Int             @id @default(autoincrement())
+  portal_config_id     Int?
+  ad_asset_id          Int?
+  asset_url            String
+  logo_portal_config   portal_config[] @relation("logo_asset")
+  banner_portal_config portal_config[] @relation("banner_asset")
+  ad_asset             ad[]
 }
 
 enum adFormat {
