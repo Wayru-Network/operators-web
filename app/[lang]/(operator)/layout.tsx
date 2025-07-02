@@ -19,7 +19,7 @@ export default async function OperatorLayout({ children }: LayoutProps) {
 
   return (
     <RootLayout>
-      <div className="h-screen flex flex-row bg-[#F8FAFA] dark:bg-[#101415]">
+      <div className="min-h-screen flex flex-row bg-[#F8FAFA] dark:bg-[#101415]">
         <div className="w-[306px] p-7 bg-[#ffffff] dark:bg-[#191c1d]">
           <div className="flex flex-row justify-center align-end">
             <Image

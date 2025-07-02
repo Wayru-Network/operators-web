@@ -1,0 +1,58 @@
+export default async function getCaptivePortals() {
+  return [
+    {
+      key: "1",
+      "hotspot-name": "Central-Park-AP",
+      mac: "00:1A:2B:3C:4D:5E",
+      status: "Online",
+      "assigned-portal": "Main Portal",
+      "location-name": "Central Park",
+      actions: "Edit | Delete",
+    },
+    {
+      key: "2",
+      "hotspot-name": "Library-WiFi",
+      mac: "11:22:33:44:55:66",
+      status: "Offline",
+      "assigned-portal": "Student Portal",
+      "location-name": "City Library",
+      actions: "Edit | Delete",
+    },
+    {
+      key: "3",
+      "hotspot-name": "Mall-Entrance",
+      mac: "AA:BB:CC:DD:EE:FF",
+      status: "Online",
+      "assigned-portal": "Guest Portal",
+      "location-name": "Downtown Mall",
+      actions: "Edit | Delete",
+    },
+    {
+      key: "4",
+      "hotspot-name": "Airport-Lounge",
+      mac: "12:34:56:78:9A:BC",
+      status: "Offline",
+      "assigned-portal": "VIP Portal",
+      "location-name": "International Airport",
+      actions: "Edit | Delete",
+    },
+    {
+      key: "5",
+      "hotspot-name": "Coffee-Shop",
+      mac: "FE:DC:BA:98:76:54",
+      status: "Online",
+      "assigned-portal": "Customer Portal",
+      "location-name": "Brewed Awakenings",
+      actions: "Edit | Delete",
+    },
+    {
+      key: "6",
+      "hotspot-name": "University-Hall",
+      mac: "01:23:45:67:89:AB",
+      status: "Offline",
+      "assigned-portal": "Campus-Portal",
+      "location-name": "Uni Hall",
+      actions: "Edit | Delete",
+    },
+  ];
+}
