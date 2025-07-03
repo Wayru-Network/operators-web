@@ -14,7 +14,6 @@ export default function HotspotTabs({ hotspot }: { hotspot: string }) {
       }}
       variant="underlined"
       color="primary"
-      //"w-full h-full bg-[#ffffff] dark:bg-[#191c1d] rounded-[30px] my-2 p-10"
     >
       <Tab key="device-info" title="Device Information">
         <p className="text-lg font-semibold">Device Information</p>
