@@ -1,4 +1,4 @@
-export default async function getCaptivePortals() {
+export default async function getHotspots() {
   return [
     {
       key: "1",
