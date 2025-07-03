@@ -2,6 +2,7 @@ import { KeycloakResponse } from "@/lib/interfaces/keycloak-respone";
 import { updateSession } from "@/lib/session/session";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
+import { getEmail } from "./_services/token-service";
 
 const KC_BASE = process.env.KEYCLOAK_BASE;
 const KC_REALM = process.env.KEYCLOAK_REALM;
@@ -51,11 +52,14 @@ export async function GET(req: Request) {
 
   const tokens: KeycloakResponse = await tokenRes.json();
 
+  const email = await getEmail(tokens.access_token);
+  console.log("Email from token:", email);
   await updateSession({
     accessToken: tokens.access_token,
     refreshToken: tokens.refresh_token,
     isLoggedIn: true,
     userId: tokens.session_state,
+    email: email || "",
   });
 
   cookieStore.delete("pkce_state");
