@@ -3,6 +3,7 @@ import { updateSession } from "@/lib/session/session";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { getEmail } from "./_services/token-service";
+import { request } from "https";
 
 const KC_BASE = process.env.KEYCLOAK_BASE;
 const KC_REALM = process.env.KEYCLOAK_REALM;
@@ -13,12 +14,13 @@ const TOKEN_ENDPOINT = `${KC_BASE}/realms/${KC_REALM}/protocol/openid-connect/to
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
+  const fallbackUrl = new URL("/login", req.url);
   const code = searchParams.get("code");
   const state = searchParams.get("state");
   const err = searchParams.get("error");
 
   if (err) {
-    return NextResponse.redirect(`/login?error=${err}`);
+    return NextResponse.redirect(fallbackUrl);
   }
 
   const cookieStore = await cookies();
@@ -26,7 +28,7 @@ export async function GET(req: Request) {
   const codeVerifier = cookieStore.get("pkce_verifier")?.value;
 
   if (!code || !state || state !== savedState || !codeVerifier) {
-    return NextResponse.redirect("/login?error=invalid_state");
+    return NextResponse.redirect(fallbackUrl);
   }
 
   if (!CLIENT_ID) {
@@ -47,7 +49,7 @@ export async function GET(req: Request) {
   });
 
   if (!tokenRes.ok) {
-    return NextResponse.redirect("/login?error=token_exchange_failed");
+    return NextResponse.redirect(fallbackUrl);
   }
 
   const tokens: KeycloakResponse = await tokenRes.json();
