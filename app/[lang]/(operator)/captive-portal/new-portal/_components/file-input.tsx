@@ -21,7 +21,7 @@ export default function FileInput({ onSelect }: Props) {
 
   return (
     <div
-      className={`flex flex-col items-center justify-center h-48 w-full max-w-lg rounded-[10px] bg-white ${
+      className={`flex flex-col items-center justify-center w-full h-48 max-w-lg rounded-[10px] bg-white ${
         isOver ? "ring-2 ring-blue-500" : ""
       }`}
       onDragOver={(e) => {

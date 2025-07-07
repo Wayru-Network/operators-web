@@ -5,9 +5,7 @@ type Field = "background" | "button" | "text";
 type Values = Record<Field, string>;
 
 interface ColorSettingsProps {
-  /** Colores actuales (estado manejado por el padre) */
   value: Values;
-  /** Se dispara cada vez que cambie algún color */
   onChange: (next: Values) => void;
 }
 
@@ -41,7 +39,7 @@ export default function ColorSettings({ value, onChange }: ColorSettingsProps) {
                 type="text"
                 value={value[key]}
                 onChange={handleChange(key)}
-                className="w-24 bg-transparent text-black text-sm outline-none"
+                className="w-20 bg-transparent text-black text-sm outline-none"
                 maxLength={7}
                 pattern="^#([A-Fa-f0-9]{6})$"
               />
