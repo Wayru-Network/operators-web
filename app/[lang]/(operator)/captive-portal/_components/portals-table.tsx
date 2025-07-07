@@ -17,6 +17,7 @@ import Image from "next/image";
 import StatusPill from "@/app/[lang]/(operator)/hotspots/_components/status-pill";
 import getCaptivePortals from "../_services/get-captive-portals";
 import NewPortal from "./new-portal";
+import { Search, Settings } from "lucide-react";
 
 export default function PortalsTable() {
   const [rows, setRows] = useState<any[]>([]);
@@ -91,15 +92,7 @@ export default function PortalsTable() {
               "bg-[#ffffff] dark:bg-[#191c1d] rounded-[28px] dark:text-white",
             inputWrapper: "p-0",
           }}
-          startContent={
-            <Image
-              src="/assets/search.svg"
-              alt="Search icon"
-              width={48}
-              height={48}
-              className="dark:invert"
-            />
-          }
+          startContent={<Search className="pl-2" />}
         />
         <NewPortal />
       </div>
@@ -116,7 +109,7 @@ export default function PortalsTable() {
           classNames={{
             wrapper: "bg-transparent border-none shadow-none p-0",
             th: "bg-[#ffffff] dark:bg-[#191c1d] border-b-1 border-gray-200 dark:border-gray-700 text-center pt-8 pb-3 text-lg font-semibold text-gray-900 dark:text-white",
-            td: "py-2",
+            td: "py-5",
           }}
         >
           <TableHeader columns={columns}>
@@ -142,15 +135,9 @@ export default function PortalsTable() {
                     {columnKey === "actions" ? (
                       <a
                         href={`/captive-portal/${item["assigned-portal"]}`}
-                        className="block"
+                        className="flex items-center justify-center hover:underline"
                       >
-                        <Image
-                          src="/assets/cog.svg"
-                          alt="Settings icon"
-                          width={48}
-                          height={48}
-                          className="dark:invert"
-                        />
+                        <Settings className="" />
                       </a>
                     ) : columnKey === "assigned-portal" ? (
                       <a

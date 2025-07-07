@@ -1,5 +1,5 @@
-import Image from "next/image";
 import HotspotTabs from "../_components/hotspot-tabs";
+import { ArrowLeft } from "lucide-react";
 
 export default async function HotspotPage({
   params,
@@ -10,13 +10,7 @@ export default async function HotspotPage({
   return (
     <div className="flex flex-col space-y-4">
       <a className="rounded-full bg-secondary w-fit">
-        <Image
-          src="/assets/arrow-back.svg"
-          alt="Back arrow"
-          width={43}
-          height={43}
-          className="hover:cursor-pointer"
-        />
+        <ArrowLeft className="text-black m-3" />
       </a>
       <p className="text-2xl pb-4">{hotspot}</p>
       <HotspotTabs hotspot={hotspot} />

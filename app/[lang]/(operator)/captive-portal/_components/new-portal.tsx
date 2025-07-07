@@ -5,6 +5,7 @@ import { Button } from "@heroui/button";
 import { useCallback } from "react";
 import createCaptivePortal from "../_services/create-captive-portal";
 import { redirect } from "next/navigation";
+import { Plus } from "lucide-react";
 
 export default function NewPortal() {
   const handleClick = useCallback(() => {
@@ -14,13 +15,7 @@ export default function NewPortal() {
 
   return (
     <Button onPress={handleClick}>
-      <Image
-        src="/assets/cross.svg"
-        alt="Search icon"
-        width={12}
-        height={12}
-        className="dark:invert"
-      />
+      <Plus />
       Create new portal
     </Button>
   );

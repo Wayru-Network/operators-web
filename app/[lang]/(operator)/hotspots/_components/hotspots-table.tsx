@@ -13,9 +13,9 @@ import {
 } from "@heroui/table";
 import { Input } from "@heroui/input";
 import { Pagination } from "@heroui/pagination";
-import Image from "next/image";
 import StatusPill from "@/app/[lang]/(operator)/hotspots/_components/status-pill";
 import getHotspots from "@/app/[lang]/(operator)/hotspots/_services/get-hotspots";
+import { Settings, Search } from "lucide-react";
 
 export default function HotspotsTable() {
   const [rows, setRows] = useState<any[]>([]);
@@ -85,15 +85,7 @@ export default function HotspotsTable() {
             "bg-[#ffffff] dark:bg-[#191c1d] rounded-[28px] dark:text-white",
           inputWrapper: "p-0",
         }}
-        startContent={
-          <Image
-            src="/assets/search.svg"
-            alt="Search icon"
-            width={48}
-            height={48}
-            className="dark:invert"
-          />
-        }
+        startContent={<Search className="pl-2" />}
       />
 
       <div className="bg-[#ffffff] dark:bg-[#191c1d] rounded-[30px] pb-8">
@@ -107,8 +99,8 @@ export default function HotspotsTable() {
           onSortChange={setSort}
           classNames={{
             wrapper: "bg-transparent border-none shadow-none p-0",
-            th: "bg-[#ffffff] dark:bg-[#191c1d] border-b-1 border-gray-200 dark:border-gray-700 px-10 pt-8 pb-3 text-lg font-semibold text-gray-900 dark:text-white",
-            td: "px-10 py-2",
+            th: "bg-[#ffffff] dark:bg-[#191c1d] border-b-1 border-gray-200 dark:border-gray-700 px-10 pt-8 pb-3 text-[14px] font-semibold text-gray-900 dark:text-white",
+            td: "px-10 py-5",
           }}
         >
           <TableHeader columns={columns}>
@@ -142,13 +134,7 @@ export default function HotspotsTable() {
                         href={`/captive-portal/${item["assigned-portal"]}`}
                         className="block"
                       >
-                        <Image
-                          src="/assets/cog.svg"
-                          alt="Settings icon"
-                          width={48}
-                          height={48}
-                          className="dark:invert"
-                        />
+                        <Settings />
                       </a>
                     ) : columnKey === "hotspot-name" ? (
                       <a

@@ -2,6 +2,7 @@
 
 import { useCallback, useState } from "react";
 import Image from "next/image";
+import { Upload } from "lucide-react";
 
 type Props = {
   onSelect: (file: File, url: string) => void;
@@ -49,14 +50,9 @@ export default function FileInput({ onSelect }: Props) {
     >
       <label
         htmlFor="file"
-        className="h-full w-full flex flex-col justify-center items-center bg-[#F8FAFA] text-black rounded-[10px] cursor-pointer"
+        className="h-full w-full flex flex-col justify-center items-center bg-[#F8FAFA] dark:bg-[#858585] text-black dark:text-white rounded-[10px] cursor-pointer"
       >
-        <Image
-          src="/assets/upload.svg"
-          alt="Upload icon"
-          width={20}
-          height={20}
-        />
+        <Upload className="text-black" />
         <p className="pt-4">Drag and drop your logo here or browse files</p>
         <p className="text-xs">
           Use JPG or PNG (transparent background preferred), 300 × 100 px
