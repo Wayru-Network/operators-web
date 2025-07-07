@@ -3,7 +3,6 @@ import { updateSession } from "@/lib/session/session";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { getEmail } from "./_services/token-service";
-import { request } from "https";
 
 const KC_BASE = process.env.KEYCLOAK_BASE;
 const KC_REALM = process.env.KEYCLOAK_REALM;
@@ -11,6 +10,14 @@ const CLIENT_ID = process.env.KEYCLOAK_CLIENT_ID;
 const REDIRECT = process.env.APP_URL + "/api/auth/callback";
 
 const TOKEN_ENDPOINT = `${KC_BASE}/realms/${KC_REALM}/protocol/openid-connect/token`;
+
+const valid_emails = [
+  "daniel.velasquez@wayru.org",
+  "diego@wayru.org",
+  "charvel@wayru.org",
+  "paula@wayru.org",
+  "velasmo3@gmail.com",
+];
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
@@ -55,7 +62,11 @@ export async function GET(req: Request) {
   const tokens: KeycloakResponse = await tokenRes.json();
 
   const email = await getEmail(tokens.access_token);
-  console.log("Email from token:", email);
+
+  if (!valid_emails.includes(email || "")) {
+    return NextResponse.redirect(fallbackUrl);
+  }
+
   await updateSession({
     accessToken: tokens.access_token,
     refreshToken: tokens.refresh_token,
