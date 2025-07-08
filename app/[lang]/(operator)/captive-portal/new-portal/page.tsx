@@ -7,12 +7,24 @@ import { ArrowLeft, Star } from "lucide-react";
 import Preview from "./_components/preview";
 import { Tab, Tabs } from "@heroui/tabs";
 import { Switch } from "@heroui/switch";
+import { CustomInput } from "@/lib/components/custom-input";
 
 const initial = {
   background: "#ffffff",
   button: "#0070f3",
   text: "#000000",
 };
+
+interface NewPortalConfig {
+  colors: typeof initial;
+  logoUrl: string | null;
+  bannerUrl: string | null;
+  ad: boolean;
+  voucher: boolean;
+  userInfo: boolean;
+  welcomeMessage: string;
+  successMessage: string;
+}
 
 export default function CaptivePortal() {
   const [selected, setSelected] = useState("step1");
@@ -132,14 +144,56 @@ export default function CaptivePortal() {
                   <Switch isSelected={userInfo} onValueChange={setUserInfo} />
                 </div>
               </div>
-              <div className="flex gap-2 mt-4">
+              <p className="font-semibold text-lg">Portal Text Content</p>
+              <div className="flex flex-col space-y-10 pt-4">
+                <CustomInput
+                  label="Welcome Message"
+                  placeholder="Enter welcome message..."
+                  helper="Max 50 characters"
+                />
+                <CustomInput
+                  label="Success Message"
+                  placeholder="Message shown after successful connection"
+                />
+              </div>
+              <div className="flex gap-2 mt-auto">
                 <Button
                   className="w-full text-white dark:text-black rounded-full"
                   onPress={() => setSelected("step1")}
                 >
                   Previous
                 </Button>
-                <Button className="w-full text-white dark:text-black rounded-full">
+                <Button
+                  className="w-full text-white dark:text-black rounded-full"
+                  onPress={() => setSelected("step3")}
+                >
+                  Next step
+                </Button>
+              </div>
+            </div>
+            <Preview
+              logoUrl={logoUrl ?? undefined}
+              bannerUrl={bannerUrl ?? undefined}
+              colors={colors}
+            />
+          </div>
+        </Tab>
+        <Tab key="step3" title="Create an Ad">
+          <div className="flex flex-row justify-between gap-20">
+            <div className="w-1/2 flex flex-col justify-start bg-[#ffffff] dark:bg-[#191c1d] rounded-[30px] p-8 space-y-4">
+              <p className="font-bold text-lg">Step 3: Create an Ad</p>
+              <p className="font-semibold text-lg">Ad format</p>
+              <div className="flex gap-2 mt-auto">
+                <Button
+                  className="w-full text-white dark:text-black rounded-full"
+                  onPress={() => setSelected("step1")}
+                >
+                  Previous
+                </Button>
+                <Button
+                  className="w-full text-white dark:text-black rounded-full"
+                  onPress={() => setSelected("step3")}
+                >
                   Next step
                 </Button>
               </div>
