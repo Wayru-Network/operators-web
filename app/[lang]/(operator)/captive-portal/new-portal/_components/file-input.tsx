@@ -1,23 +1,69 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import Image from "next/image";
 import { Upload } from "lucide-react";
+
+type AssetType = "logo" | "banner" | "ad";
 
 type Props = {
   onSelect: (file: File, url: string) => void;
+  label: AssetType;
 };
 
-export default function FileInput({ onSelect }: Props) {
+const ACCEPTED_TYPES: Record<AssetType, string[]> = {
+  logo: ["image/jpeg", "image/png"],
+  banner: ["image/jpeg", "image/png"],
+  ad: ["image/jpeg", "image/png", "image/gif", "video/mp4", "video/webm"],
+};
+
+const MAX_FILE_SIZE_MB = 40;
+
+export default function FileInput({ onSelect, label }: Props) {
   const [isOver, setIsOver] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const validateFile = (file: File) => {
+    const isValidType = ACCEPTED_TYPES[label].includes(file.type);
+    const isValidSize =
+      label === "ad" ? file.size <= MAX_FILE_SIZE_MB * 1024 * 1024 : true;
+
+    if (!isValidType) {
+      return `Invalid file type. Allowed: ${ACCEPTED_TYPES[label]
+        .map((t) => t.split("/")[1].toUpperCase())
+        .join(", ")}`;
+    }
+
+    if (!isValidSize) {
+      return `File too large. Max size is ${MAX_FILE_SIZE_MB}MB.`;
+    }
+
+    return null;
+  };
 
   const processFile = useCallback(
     (file: File) => {
+      const validationError = validateFile(file);
+      if (validationError) {
+        setError(validationError);
+        return;
+      }
+      setError(null);
       const blobUrl = URL.createObjectURL(file);
       onSelect(file, blobUrl);
     },
-    [onSelect]
+    [onSelect, label]
   );
+
+  const getHelperText = () => {
+    if (label === "logo" || label === "banner") {
+      return "Use JPG or PNG (transparent background preferred)";
+    }
+    return "Use JPG, PNG, GIF, MP4 or WEBM — up to 40MB";
+  };
+
+  const getDisplayLabel = () => {
+    return `Drag and drop your ${label} here or browse files`;
+  };
 
   return (
     <div
@@ -29,12 +75,9 @@ export default function FileInput({ onSelect }: Props) {
         setIsOver(true);
       }}
       onDragLeave={() => setIsOver(false)}
-      onDragEnd={() => setIsOver(false)}
       onDrop={(e) => {
         e.preventDefault();
         setIsOver(false);
-
-        /* dataTransfer.items cubre arrastre moderno */
         const items = e.dataTransfer.items;
         if (items) {
           for (const item of Array.from(items)) {
@@ -49,20 +92,21 @@ export default function FileInput({ onSelect }: Props) {
       }}
     >
       <label
-        htmlFor="file"
+        htmlFor={`file-${label}`}
         className="h-full w-full flex flex-col justify-center items-center bg-[#F8FAFA] dark:bg-[#858585] text-black dark:text-white rounded-[10px] cursor-pointer"
       >
         <Upload className="text-black" />
-        <p className="pt-4">Drag and drop your logo here or browse files</p>
-        <p className="text-xs">
-          Use JPG or PNG (transparent background preferred), 300 × 100 px
-        </p>
+        <p className="pt-4">{getDisplayLabel()}</p>
+        <p className="text-xs">{getHelperText()}</p>
+        {error && (
+          <p className="text-red-500 text-xs mt-2 px-4 text-center">{error}</p>
+        )}
       </label>
 
       <input
-        id="file"
+        id={`file-${label}`}
         type="file"
-        accept="image/*"
+        accept={ACCEPTED_TYPES[label].join(",")}
         className="hidden"
         onChange={(e) => {
           const fileList = e.target.files;
