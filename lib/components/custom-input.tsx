@@ -11,22 +11,33 @@ interface CustomInputProps {
 export function CustomInput(
   props: CustomInputProps & React.InputHTMLAttributes<HTMLInputElement>
 ) {
+  const {
+    label,
+    helper,
+    placeholder = "",
+    inputClass = "",
+    wrapperClass = "",
+    labelClass = "",
+    helperClass = "",
+    ...rest
+  } = props;
   return (
-    <div className={`relative w-full ${props.wrapperClass}`}>
+    <div className={`relative w-full ${wrapperClass}`}>
       <input
-        placeholder={props.placeholder}
+        {...rest}
+        placeholder={placeholder}
         className={`w-full rounded-[4px] border-2 border-neutral-300
                     bg-transparent px-4 pt-4 pb-4 text-lg outline-none peer
-                    focus:border-[#751CF6] ${props.inputClass}`}
+                    focus:border-[#751CF6] ${inputClass}`}
       />
       <label
-        className={`absolute bg-[#ffffff] dark:bg-[#191c1d] px-2 w-fit left-3 -top-3 peer-focus:text-[#751CF6] ${props.labelClass}`}
+        className={`absolute bg-[#ffffff] dark:bg-[#191c1d] px-2 w-fit left-3 -top-3 peer-focus:text-[#751CF6] ${labelClass}`}
       >
-        {props.label}
+        {label}
       </label>
-      {props.helper && (
-        <p className={`mt-1 text-sm text-neutral-500 ${props.helperClass}`}>
-          {props.helper}
+      {helper && (
+        <p className={`mt-1 text-sm text-neutral-500 ${helperClass}`}>
+          {helper}
         </p>
       )}
     </div>
