@@ -1,21 +1,19 @@
 "use client";
-import FileInput from "./_components/file-input";
-import ColorSettings from "./_components/color-settings";
-import { Button } from "@heroui/button";
 import { useState } from "react";
-import { ArrowLeft, Star } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import Preview from "./_components/preview";
 import { Tab, Tabs } from "@heroui/tabs";
-import { Switch } from "@heroui/switch";
-import { CustomInput } from "@/lib/components/custom-input";
-
+import Branding from "@/app/[lang]/(operator)/captive-portal/new-portal/_components/branding";
+import AccessFlows from "./_components/access-flows";
+import CreateAd from "./_components/create-ad";
+import { Button } from "@heroui/button";
 const initial = {
   background: "#ffffff",
   button: "#0070f3",
   text: "#000000",
 };
 
-interface NewPortalConfig {
+export interface NewPortalConfig {
   colors: typeof initial;
   logoUrl: string | null;
   bannerUrl: string | null;
@@ -24,6 +22,10 @@ interface NewPortalConfig {
   userInfo: boolean;
   welcomeMessage: string;
   successMessage: string;
+  adFormat: string;
+  adUrl: string | null;
+  interactionTime: string;
+  redirectUrl?: string;
 }
 
 export default function CaptivePortal() {
@@ -38,26 +40,45 @@ export default function CaptivePortal() {
   const [ad, setAd] = useState(true);
   const [voucher, setVoucher] = useState(false);
   const [userInfo, setUserInfo] = useState(false);
+  const [welcomeMessage, setWelcomeMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+
+  // Step 3 - Create an Ad states
+  const [adFormat, setAdFormat] = useState("video");
+  const [adUrl, setAdUrl] = useState<string | null>(null);
+  const [interactionTime, setInteractionTime] = useState("15s");
+  const [redirectUrl, setRedirectUrl] = useState("");
 
   const handleSelect = (
     file: File,
     url: string,
-    assetState: "logo" | "banner"
+    assetState: "logo" | "banner" | "ad"
   ) => {
     if (assetState === "logo") {
       if (logoUrl) URL.revokeObjectURL(logoUrl);
       setLogoUrl(url);
-    } else {
+    } else if (assetState === "banner") {
       if (bannerUrl) URL.revokeObjectURL(bannerUrl);
       setBannerUrl(url);
+    } else if (assetState === "ad") {
+      if (adUrl) URL.revokeObjectURL(adUrl);
+      setAdUrl(url);
     }
   };
 
-  const handleReset = () => {
-    if (logoUrl) URL.revokeObjectURL(logoUrl);
-    setLogoUrl(null);
-    if (bannerUrl) URL.revokeObjectURL(bannerUrl);
-    setBannerUrl(null);
+  const newConfig: NewPortalConfig = {
+    colors,
+    logoUrl,
+    bannerUrl,
+    ad,
+    voucher,
+    userInfo,
+    welcomeMessage,
+    successMessage,
+    adFormat,
+    adUrl,
+    interactionTime,
+    redirectUrl: redirectUrl || undefined,
   };
 
   return (
@@ -66,146 +87,73 @@ export default function CaptivePortal() {
         <ArrowLeft className="text-black m-3" />
       </a>
       <h1 className="text-2xl font-normal">Create new portal</h1>
-      <Tabs
-        classNames={{
-          tabList: "hidden",
-        }}
-        selectedKey={selected}
-        onSelectionChange={(key) => setSelected(String(key))}
-      >
-        <Tab key="step1" title="step1">
-          <div className="flex flex-row justify-between gap-20">
-            <div className="w-1/2 flex flex-col justify-start bg-[#ffffff] dark:bg-[#191c1d] rounded-[30px] p-8 space-y-4">
-              <p className="font-bold text-lg">Step 1: Branding</p>
-              <p className="font-semibold">Logo</p>
-              <FileInput
-                onSelect={(file, url) => handleSelect(file, url, "logo")}
+      <div className="flex flex-row justify-between">
+        <div className="flex flex-col min-w-[50%] min-h-full">
+          <Tabs
+            classNames={{
+              tabList: "!hidden",
+              panel: "p-0 min-h-full",
+            }}
+            selectedKey={selected}
+            onSelectionChange={(key) => setSelected(String(key))}
+          >
+            <Tab key="step1" title="Branding">
+              <Branding
+                selectedHandler={setSelected}
+                newConfig={newConfig}
+                fileHandler={handleSelect}
+                colorsHandler={setColors}
               />
-              <p className="font-semibold">Banner Image</p>
-              <FileInput
-                onSelect={(file, url) => handleSelect(file, url, "banner")}
+            </Tab>
+            <Tab key="step2" title="Access Flows">
+              <AccessFlows
+                newConfig={newConfig}
+                adHandler={setAd}
+                voucherHandler={setVoucher}
+                userInfoHandler={setUserInfo}
+                selectedHandler={setSelected}
+                welcomeMessageHandler={setWelcomeMessage}
+                successMessageHandler={setSuccessMessage}
               />
-              <p className="font-semibold">Theme settings</p>
-              <ColorSettings value={colors} onChange={setColors} />
-              <div className="flex gap-2 mt-4">
-                <Button
-                  className="w-full text-white dark:text-black rounded-full"
-                  onPress={() => setSelected("step2")}
-                >
-                  Next step
-                </Button>
-              </div>
-            </div>
-            <Preview
-              logoUrl={logoUrl ?? undefined}
-              bannerUrl={bannerUrl ?? undefined}
-              colors={colors}
-            />
-          </div>
-        </Tab>
-        <Tab key="step2" title="Access Flows">
-          <div className="flex flex-row justify-between gap-20">
-            <div className="w-1/2 flex flex-col justify-start bg-[#ffffff] dark:bg-[#191c1d] rounded-[30px] p-8 space-y-4">
-              <p className="font-bold text-lg">Step 2: Access Flows</p>
-              <p className="font-semibold text-lg">Access mechanisms</p>
-              <div className="flex flex-col space-y-4 w-full rounded-[10px] bg-[#F8FAFA] dark:bg-[#858585] p-4">
-                <div className="flex flex-row items-center">
-                  <Star className="mr-2" size={30} />
-                  <div className="flex flex-col justify-center w-full">
-                    <p className="font-semibold text-black">
-                      Watch ad to connect
-                    </p>
-                    <p className="text-sm text-black">
-                      Users watch an advertisement to gain access
-                    </p>
-                  </div>
-                  <Switch isSelected={ad} onValueChange={setAd} />
-                </div>
-                <div className="flex flex-row items-center">
-                  <Star className="mr-2" size={30} />
-                  <div className="flex flex-col justify-center w-full">
-                    <p className="font-semibold text-black">
-                      Enter voucher code
-                    </p>
-                    <p className="text-sm text-black">
-                      Users enter a valid voucher code to connect
-                    </p>
-                  </div>
-                  <Switch isSelected={voucher} onValueChange={setVoucher} />
-                </div>
-                <div className="flex flex-row items-center">
-                  <Star className="mr-2" size={30} />
-                  <div className="flex flex-col justify-center w-full">
-                    <p className="font-semibold text-black">Submit user info</p>
-                    <p className="text-sm text-black">
-                      Collect user information before granting access
-                    </p>
-                  </div>
-                  <Switch isSelected={userInfo} onValueChange={setUserInfo} />
+            </Tab>
+            <Tab key="step3" title="Create an Ad">
+              <CreateAd
+                newConfig={newConfig}
+                adFormatHandler={setAdFormat}
+                fileHandler={handleSelect}
+                interactionTimeHandler={setInteractionTime}
+                redirectUrlHandler={setRedirectUrl}
+                selectedHandler={setSelected}
+              />
+            </Tab>
+            <Tab key="step4" title="Publish">
+              <div className="h-full flex flex-col justify-start bg-[#ffffff] dark:bg-[#191c1d] rounded-[30px] p-8 space-y-4">
+                <p className="font-bold text-lg">Step 4: Publish</p>
+                <p className="font-semibold text-lg">Portal Name</p>
+                <div className="flex gap-2 mt-auto">
+                  <Button
+                    className="w-full text-white dark:text-black rounded-full"
+                    onPress={() => setSelected("step2")}
+                  >
+                    Previous
+                  </Button>
+                  <Button
+                    className="w-full text-white dark:text-black rounded-full"
+                    onPress={() => setSelected("step4")}
+                  >
+                    Next step
+                  </Button>
                 </div>
               </div>
-              <p className="font-semibold text-lg">Portal Text Content</p>
-              <div className="flex flex-col space-y-10 pt-4">
-                <CustomInput
-                  label="Welcome Message"
-                  placeholder="Enter welcome message..."
-                  helper="Max 50 characters"
-                />
-                <CustomInput
-                  label="Success Message"
-                  placeholder="Message shown after successful connection"
-                />
-              </div>
-              <div className="flex gap-2 mt-auto">
-                <Button
-                  className="w-full text-white dark:text-black rounded-full"
-                  onPress={() => setSelected("step1")}
-                >
-                  Previous
-                </Button>
-                <Button
-                  className="w-full text-white dark:text-black rounded-full"
-                  onPress={() => setSelected("step3")}
-                >
-                  Next step
-                </Button>
-              </div>
-            </div>
-            <Preview
-              logoUrl={logoUrl ?? undefined}
-              bannerUrl={bannerUrl ?? undefined}
-              colors={colors}
-            />
-          </div>
-        </Tab>
-        <Tab key="step3" title="Create an Ad">
-          <div className="flex flex-row justify-between gap-20">
-            <div className="w-1/2 flex flex-col justify-start bg-[#ffffff] dark:bg-[#191c1d] rounded-[30px] p-8 space-y-4">
-              <p className="font-bold text-lg">Step 3: Create an Ad</p>
-              <p className="font-semibold text-lg">Ad format</p>
-              <div className="flex gap-2 mt-auto">
-                <Button
-                  className="w-full text-white dark:text-black rounded-full"
-                  onPress={() => setSelected("step1")}
-                >
-                  Previous
-                </Button>
-                <Button
-                  className="w-full text-white dark:text-black rounded-full"
-                  onPress={() => setSelected("step3")}
-                >
-                  Next step
-                </Button>
-              </div>
-            </div>
-            <Preview
-              logoUrl={logoUrl ?? undefined}
-              bannerUrl={bannerUrl ?? undefined}
-              colors={colors}
-            />
-          </div>
-        </Tab>
-      </Tabs>
+            </Tab>
+          </Tabs>
+        </div>
+        <Preview
+          logoUrl={newConfig.logoUrl ?? undefined}
+          bannerUrl={newConfig.bannerUrl ?? undefined}
+          colors={newConfig.colors}
+        />
+      </div>
     </div>
   );
 }

@@ -15,7 +15,7 @@ interface PreviewProps {
 
 export default function Preview({ logoUrl, bannerUrl, colors }: PreviewProps) {
   return (
-    <div className="flex flex-col w-1/2 min-h-[51rem] max-h-[51rem] bg-[#ffffff] dark:bg-[#191c1d] rounded-[30px] p-8">
+    <div className="flex flex-col min-h-[51rem] max-h-[51rem] bg-[#ffffff] dark:bg-[#191c1d] rounded-[30px] p-8">
       <p className="font-bold text-lg pb-4">Preview</p>
       <div
         className="h-full min-w-full bg-[#F8FAFA] dark:bg-gray-600 text-black rounded-[10px] flex flex-col space-y-4 p-8"
