@@ -37,7 +37,7 @@ export default function Branding({
       <ColorSettings value={newConfig.colors} onChange={colorsHandler} />
       <div className="flex gap-2 mt-5">
         <Button
-          className="w-full text-white dark:text-black rounded-full"
+          className="w-full text-white dark:text-black rounded-[10px]"
           onPress={() => selectedHandler("step2")}
         >
           Next step

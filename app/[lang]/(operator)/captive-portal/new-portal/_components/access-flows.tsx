@@ -84,13 +84,13 @@ export default function AccessFlows({
       </div>
       <div className="flex gap-2 mt-auto">
         <Button
-          className="w-full text-white dark:text-black rounded-full"
+          className="w-full text-white dark:text-black rounded-[10px]"
           onPress={() => selectedHandler("step1")}
         >
           Previous
         </Button>
         <Button
-          className="w-full text-white dark:text-black rounded-full"
+          className="w-full text-white dark:text-black rounded-[10px]"
           onPress={() => selectedHandler("step3")}
         >
           Next step

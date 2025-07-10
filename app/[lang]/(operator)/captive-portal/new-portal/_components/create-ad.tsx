@@ -53,13 +53,13 @@ export default function CreateAd({
       />
       <div className="flex gap-2 mt-auto">
         <Button
-          className="w-full text-white dark:text-black rounded-full"
+          className="w-full text-white dark:text-black rounded-[10px]"
           onPress={() => selectedHandler("step2")}
         >
           Previous
         </Button>
         <Button
-          className="w-full text-white dark:text-black rounded-full"
+          className="w-full text-white dark:text-black rounded-[10px]"
           onPress={() => selectedHandler("step4")}
         >
           Next step

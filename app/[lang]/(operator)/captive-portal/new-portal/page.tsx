@@ -6,7 +6,9 @@ import { Tab, Tabs } from "@heroui/tabs";
 import Branding from "@/app/[lang]/(operator)/captive-portal/new-portal/_components/branding";
 import AccessFlows from "./_components/access-flows";
 import CreateAd from "./_components/create-ad";
-import { Button } from "@heroui/button";
+import Publish from "./_components/publish";
+import PortalSettings from "./_components/portal-settings";
+
 const initial = {
   background: "#ffffff",
   button: "#0070f3",
@@ -26,6 +28,8 @@ export interface NewPortalConfig {
   adUrl: string | null;
   interactionTime: string;
   redirectUrl?: string;
+  portalName: string;
+  assignedHotspot: string[]; // This will be set in the AssignHotspot component
 }
 
 export default function CaptivePortal() {
@@ -48,6 +52,10 @@ export default function CaptivePortal() {
   const [adUrl, setAdUrl] = useState<string | null>(null);
   const [interactionTime, setInteractionTime] = useState("15s");
   const [redirectUrl, setRedirectUrl] = useState("");
+
+  // Step 4 - Publish states
+  const [portalName, setPortalName] = useState("");
+  const [assignedHotspot, setAssignedHotspot] = useState(["none"]);
 
   const handleSelect = (
     file: File,
@@ -79,6 +87,8 @@ export default function CaptivePortal() {
     adUrl,
     interactionTime,
     redirectUrl: redirectUrl || undefined,
+    portalName: portalName,
+    assignedHotspot: assignedHotspot, // This will be set in the AssignHotspot component
   };
 
   return (
@@ -88,7 +98,7 @@ export default function CaptivePortal() {
       </a>
       <h1 className="text-2xl font-normal">Create new portal</h1>
       <div className="flex flex-row justify-between">
-        <div className="flex flex-col min-w-[50%] min-h-full">
+        <div className="flex flex-col min-w-[50%] max-w-[50%] min-h-full">
           <Tabs
             classNames={{
               tabList: "!hidden",
@@ -127,33 +137,29 @@ export default function CaptivePortal() {
               />
             </Tab>
             <Tab key="step4" title="Publish">
-              <div className="h-full flex flex-col justify-start bg-[#ffffff] dark:bg-[#191c1d] rounded-[30px] p-8 space-y-4">
-                <p className="font-bold text-lg">Step 4: Publish</p>
-                <p className="font-semibold text-lg">Portal Name</p>
-                <div className="flex gap-2 mt-auto">
-                  <Button
-                    className="w-full text-white dark:text-black rounded-full"
-                    onPress={() => setSelected("step2")}
-                  >
-                    Previous
-                  </Button>
-                  <Button
-                    className="w-full text-white dark:text-black rounded-full"
-                    onPress={() => setSelected("step4")}
-                  >
-                    Next step
-                  </Button>
-                </div>
-              </div>
+              <Publish
+                selectedHandler={setSelected}
+                portalConfig={newConfig}
+                nameHandler={setPortalName}
+                assignedHotspotHandler={setAssignedHotspot}
+              />
             </Tab>
           </Tabs>
         </div>
-        <Preview
-          logoUrl={newConfig.logoUrl ?? undefined}
-          bannerUrl={newConfig.bannerUrl ?? undefined}
-          colors={newConfig.colors}
-        />
+        {selected !== "step4" ? (
+          <Preview config={newConfig} />
+        ) : (
+          <PortalSettings config={newConfig} />
+        )}
       </div>
+      {/* <div className="mt-6 p-4 border rounded">
+        <h2 className="text-lg font-semibold mb-2">
+          Current Portal Configuration
+        </h2>
+        <pre className="text-xs overflow-x-auto whitespace-pre-wrap">
+          {JSON.stringify(newConfig, null, 2)}
+        </pre>
+      </div> */}
     </div>
   );
 }
