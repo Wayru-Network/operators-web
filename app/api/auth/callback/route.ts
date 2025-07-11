@@ -4,9 +4,9 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { getEmail } from "./_services/token-service";
 
-const KC_BASE = process.env.KEYCLOAK_BASE;
-const KC_REALM = process.env.KEYCLOAK_REALM;
-const CLIENT_ID = process.env.KEYCLOAK_CLIENT_ID;
+const KC_BASE = process.env.KEYCLOAK_BASE || "";
+const KC_REALM = process.env.KEYCLOAK_REALM || "";
+const CLIENT_ID = process.env.KEYCLOAK_CLIENT_ID || "";
 const REDIRECT = process.env.APP_URL + "/api/auth/callback";
 
 const TOKEN_ENDPOINT = `${KC_BASE}/realms/${KC_REALM}/protocol/openid-connect/token`;
