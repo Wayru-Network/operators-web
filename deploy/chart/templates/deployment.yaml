@@ -1,0 +1,99 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.name }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: {{ .Values.name }}
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: {{ .Values.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.name }}
+    spec:
+      volumes:
+        - name: {{ .Values.name }}-csi-volume
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: {{ .Values.name }}
+            {{- if eq .Values.env "local" }}
+            nodePublishSecretRef:
+              name: azure-keyvault-principal
+            {{- end }}
+      containers:
+        - name: {{ .Values.name }}
+          image: {{ .Values.image }}:{{ .Values.imageTag }}
+          {{- if eq .Values.env "local" }}
+          imagePullPolicy: IfNotPresent
+          {{- else }}
+          imagePullPolicy: Always
+          {{- end }}
+          ports:
+            - containerPort: {{ int .Values.port }}
+          env:
+            - name: SESSION_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.name }}
+                  key: SESSION_KEY
+            - name: KEYCLOAK_BASE
+              value: {{ .Values.keycloakBase | quote }}
+            - name: KEYCLOAK_REALM
+              value: {{ .Values.keycloakRealm | quote }}
+            - name: KEYCLOAK_CLIENT_ID
+              value: {{ .Values.keycloakClientId | quote }}
+            - name: APP_URL
+              value: {{ .Values.appUrl | quote }}
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.name }}
+                  key: DATABASE_URL
+          volumeMounts:
+            - name: {{ .Values.name }}-csi-volume
+              mountPath: /mnt/secrets
+              readOnly: true
+          resources:
+            requests:
+              cpu: {{ .Values.cpuRequest }}
+              memory: {{ .Values.memoryRequest }}
+            limits:
+              cpu: {{ .Values.cpuLimit }}
+              memory: {{ .Values.memoryLimit }}
+          livenessProbe:
+            failureThreshold: 3
+            initialDelaySeconds: 10
+            timeoutSeconds: 5
+            periodSeconds: 10
+            httpGet:
+              path: {{ .Values.healthPath }}
+              port: {{ int .Values.port }}
+              scheme: HTTP
+          readinessProbe:
+            failureThreshold: 3
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            httpGet:
+              path: {{ .Values.healthPath }}
+              port: {{ int .Values.port }}
+              scheme: HTTP
+          startupProbe:
+            failureThreshold: 3
+            initialDelaySeconds: 10
+            timeoutSeconds: 5
+            periodSeconds: 10
+            httpGet:
+              path: {{ .Values.healthPath }}
+              port: {{ int .Values.port }}
+              scheme: HTTP

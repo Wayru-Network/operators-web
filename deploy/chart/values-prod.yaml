@@ -1,0 +1,23 @@
+name: operators-web
+namespace: operators
+env: prod
+image: wayruprod.azurecr.io/operators-web
+imageTag: latest
+servicePort: 80
+port: 3000
+host: portal.wayru.tech
+
+keycloakBase: "https://kc-1.wayru.tech"
+keycloakRealm: "wayru"
+keycloakClientId: "operators-web"
+appUrl: "https://portal.wayru.tech"
+
+healthPath: /health
+cpuRequest: 200m
+memoryRequest: 256Mi
+cpuLimit: 500m
+memoryLimit: 512Mi
+
+azureCsiClientID: "a75a5340-f123-4f52-a0ec-b2c10bdaeeca"
+azureKeyvaultTenantID: "9a2e7e82-78c3-4edd-932c-90f97a3da477"
+keyvaultName: "wayruprod-operators-web"

@@ -1,0 +1,36 @@
+apiVersion: secrets-store.csi.x-k8s.io/v1
+kind: SecretProviderClass
+metadata:
+  name: {{ .Values.name }}
+  namespace: {{ .Values.namespace }}
+spec:
+  provider: azure
+  parameters:
+    usePodIdentity: "false"
+    keyvaultName: {{ .Values.keyvaultName }}
+    cloudName: ""
+    tenantId: {{ .Values.azureKeyvaultTenantID }}
+    {{- if eq .Values.env "local" }}
+    useVMManagedIdentity: "false"
+    {{- else }}
+    useVMManagedIdentity: "true"
+    userAssignedIdentityID: {{ .Values.azureCsiClientID }}
+    {{- end }}
+    objects:  |
+      array:
+        - |
+          objectName: session-key
+          objectType: secret
+          objectVersion: ""
+        - |
+          objectName: database-url
+          objectType: secret
+          objectVersion: ""
+  secretObjects:
+    - secretName: {{ .Values.name }}
+      type: Opaque
+      data:
+        - objectName: session-key
+          key: SESSION_KEY
+        - objectName: database-url
+          key: DATABASE_URL
