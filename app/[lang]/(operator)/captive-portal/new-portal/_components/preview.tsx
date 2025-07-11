@@ -7,7 +7,7 @@ import { Megaphone, SquarePen, Ticket } from "lucide-react";
 export default function Preview({ config }: { config: NewPortalConfig }) {
   const colors = config.colors;
   return (
-    <div className="flex flex-col min-w-[31rem] max-w-[31rem] min-h-[51rem] max-h-[51rem] bg-[#ffffff] dark:bg-[#191c1d] rounded-[30px] p-8">
+    <div className="flex flex-col max-w-[50%] min-h-[51rem] max-h-[51rem] bg-[#ffffff] dark:bg-[#191c1d] rounded-[30px] p-8">
       <p className="font-bold text-lg pb-4">Preview</p>
       <div
         className="h-full min-w-full bg-[#F8FAFA] dark:bg-gray-600 text-black rounded-[10px] flex flex-col items-center space-y-4 p-8"
