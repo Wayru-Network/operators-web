@@ -5,12 +5,12 @@ image: wayruprod.azurecr.io/operators-web
 imageTag: latest
 servicePort: 80
 port: 3000
-host: portal.wayru.tech
+host: portal.wayru.io
 
 keycloakBase: "https://kc-1.wayru.tech"
 keycloakRealm: "wayru"
 keycloakClientId: "operators-web"
-appUrl: "https://portal.wayru.tech"
+appUrl: "https://portal.wayru.io"
 
 healthPath: /health
 cpuRequest: 200m
