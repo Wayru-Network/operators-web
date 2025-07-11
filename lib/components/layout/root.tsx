@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import "./globals.css";
 import { Providers } from "@/lib/components/layout/providers";
 import { LayoutProps } from "@/lib/interfaces/page";

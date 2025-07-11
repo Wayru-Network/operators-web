@@ -1,5 +1,4 @@
 import { NewPortalConfig } from "../page";
-import Preview from "./preview";
 import { Switch } from "@heroui/switch";
 import { Star } from "lucide-react";
 import { CustomInput } from "@/lib/components/custom-input";

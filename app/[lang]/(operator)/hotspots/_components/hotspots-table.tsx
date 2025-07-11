@@ -14,11 +14,13 @@ import {
 import { Input } from "@heroui/input";
 import { Pagination } from "@heroui/pagination";
 import StatusPill from "@/app/[lang]/(operator)/hotspots/_components/status-pill";
-import getHotspots from "@/app/[lang]/(operator)/hotspots/_services/get-hotspots";
+import getHotspots, {
+  Hotspot,
+} from "@/app/[lang]/(operator)/hotspots/_services/get-hotspots";
 import { Settings, Search } from "lucide-react";
 
 export default function HotspotsTable() {
-  const [rows, setRows] = useState<any[]>([]);
+  const [rows, setRows] = useState<Hotspot[]>([]);
 
   useEffect(() => {
     getHotspots().then((data) => setRows(data));

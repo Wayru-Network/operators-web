@@ -13,14 +13,14 @@ import {
 } from "@heroui/table";
 import { Input } from "@heroui/input";
 import { Pagination } from "@heroui/pagination";
-import Image from "next/image";
-import StatusPill from "@/app/[lang]/(operator)/hotspots/_components/status-pill";
-import getCaptivePortals from "../_services/get-captive-portals";
+import getCaptivePortals, {
+  CaptivePortals,
+} from "../_services/get-captive-portals";
 import NewPortal from "./new-portal";
 import { Search, Settings } from "lucide-react";
 
 export default function PortalsTable() {
-  const [rows, setRows] = useState<any[]>([]);
+  const [rows, setRows] = useState<CaptivePortals[]>([]);
 
   useEffect(() => {
     getCaptivePortals().then((data) => setRows(data));
@@ -134,14 +134,14 @@ export default function PortalsTable() {
                   <TableCell className="text-center">
                     {columnKey === "actions" ? (
                       <a
-                        href={`/captive-portal/${item["assigned-portal"]}`}
+                        href={`/captive-portal/${item["assigned-hotspots"]}`}
                         className="flex items-center justify-center hover:underline"
                       >
                         <Settings className="" />
                       </a>
-                    ) : columnKey === "assigned-portal" ? (
+                    ) : columnKey === "assigned-hotspots" ? (
                       <a
-                        href={`/captive-portal/${item["assigned-portal"]}`}
+                        href={`/captive-portal/${item["assigned-hotspots"]}`}
                         className="hover:underline"
                       >
                         {getKeyValue(item, columnKey)}

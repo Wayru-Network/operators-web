@@ -36,7 +36,7 @@ export default function PortalSettings({
           <Check size={25} />
           <p className="pt-1">
             {config.adFormat.charAt(0).toUpperCase() + config.adFormat.slice(1)}{" "}
-            ad: "{config.adUrl}"
+            ad: &quot;{config.adUrl}&quot;
           </p>
         </div>
         <p className="font-bold pt-4">Duration</p>

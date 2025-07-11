@@ -1,5 +1,3 @@
-import { NextRequest } from "next/server";
-
 export const SupportedLanguages = ["en", "es", "pt"] as const;
 
 export type SupportedLanguage = (typeof SupportedLanguages)[number];

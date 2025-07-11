@@ -1,4 +1,14 @@
-export default async function getHotspots() {
+export interface Hotspot {
+  key: string;
+  "hotspot-name": string;
+  mac: string;
+  status: string;
+  "assigned-portal": string;
+  "location-name": string;
+  actions: string;
+}
+
+export default async function getHotspots(): Promise<Hotspot[]> {
   return [
     {
       key: "1",

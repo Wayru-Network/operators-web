@@ -1,9 +1,8 @@
 "use client";
 
-import Image from "next/image";
 import { Button } from "@heroui/button";
 import { useCallback } from "react";
-import createCaptivePortal from "../_services/create-captive-portal";
+// import createCaptivePortal from "../_services/create-captive-portal";
 import { redirect } from "next/navigation";
 import { Plus } from "lucide-react";
 

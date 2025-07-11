@@ -7,7 +7,7 @@ import {
 import { Button } from "@heroui/button";
 import React from "react";
 import { ChevronDown } from "lucide-react";
-import getHotspots from "../../../hotspots/_services/get-hotspots";
+import getHotspots, { Hotspot } from "../../../hotspots/_services/get-hotspots";
 import type { Selection } from "@heroui/react";
 
 interface AssignHotspotProps {
@@ -20,23 +20,9 @@ export default function AssignHotspot({
   setSelected,
 }: AssignHotspotProps) {
   const [selectedKeys, setSelectedKeys] = React.useState<Selection>(
-    new Set(selected)
+    new Set(selected),
   );
-  const [hotspots, setHotspots] = React.useState<any[]>([]);
-
-  React.useEffect(() => {
-    const currentKeysArray =
-      selectedKeys === "all" ? [] : Array.from(selectedKeys);
-    const currentKeysSet = new Set(currentKeysArray.map(String));
-
-    const isSame =
-      selected.length === currentKeysSet.size &&
-      selected.every((val) => currentKeysSet.has(val));
-
-    if (!isSame) {
-      setSelectedKeys(new Set(selected));
-    }
-  }, [selected]);
+  const [hotspots, setHotspots] = React.useState<Hotspot[]>([]);
 
   React.useEffect(() => {
     getHotspots().then((data) => setHotspots(data));
@@ -47,14 +33,8 @@ export default function AssignHotspot({
       .map(String)
       .filter((key) => key !== "none");
 
-    const isSame =
-      newSelection.length === selected.length &&
-      newSelection.every((val) => selected.includes(val));
-
-    if (!isSame) {
-      setSelected(newSelection);
-    }
-  }, [selectedKeys]);
+    setSelected(newSelection);
+  }, [selectedKeys, setSelected]);
 
   const selectedValue = React.useMemo(() => {
     const values = selectedKeys === "all" ? [] : Array.from(selectedKeys);

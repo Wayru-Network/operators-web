@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 };
 
 export default async function OperatorLayout({ children }: LayoutProps) {
-  const session = await verifySession();
+  void (await verifySession());
 
   return (
     <RootLayout>

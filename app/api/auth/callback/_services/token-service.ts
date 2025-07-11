@@ -4,10 +4,10 @@ const KC_BASE = process.env.KEYCLOAK_BASE;
 const KC_REALM = process.env.KEYCLOAK_REALM;
 
 const jwks = createRemoteJWKSet(
-  new URL(`${KC_BASE}/realms/${KC_REALM}/protocol/openid-connect/certs`)
+  new URL(`${KC_BASE}/realms/${KC_REALM}/protocol/openid-connect/certs`),
 );
 
-const clientId = process.env.KEYCLOAK_CLIENT_ID;
+// const clientId = process.env.KEYCLOAK_CLIENT_ID;
 
 export interface TokenClaims extends JWTPayload {
   email?: string;

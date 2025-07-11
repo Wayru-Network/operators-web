@@ -22,23 +22,26 @@ export default function FileInput({ onSelect, label }: Props) {
   const [isOver, setIsOver] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const validateFile = (file: File) => {
-    const isValidType = ACCEPTED_TYPES[label].includes(file.type);
-    const isValidSize =
-      label === "ad" ? file.size <= MAX_FILE_SIZE_MB * 1024 * 1024 : true;
+  const validateFile = useCallback(
+    (file: File) => {
+      const isValidType = ACCEPTED_TYPES[label].includes(file.type);
+      const isValidSize =
+        label === "ad" ? file.size <= MAX_FILE_SIZE_MB * 1024 * 1024 : true;
 
-    if (!isValidType) {
-      return `Invalid file type. Allowed: ${ACCEPTED_TYPES[label]
-        .map((t) => t.split("/")[1].toUpperCase())
-        .join(", ")}`;
-    }
+      if (!isValidType) {
+        return `Invalid file type. Allowed: ${ACCEPTED_TYPES[label]
+          .map((t) => t.split("/")[1].toUpperCase())
+          .join(", ")}`;
+      }
 
-    if (!isValidSize) {
-      return `File too large. Max size is ${MAX_FILE_SIZE_MB}MB.`;
-    }
+      if (!isValidSize) {
+        return `File too large. Max size is ${MAX_FILE_SIZE_MB}MB.`;
+      }
 
-    return null;
-  };
+      return null;
+    },
+    [label],
+  );
 
   const processFile = useCallback(
     (file: File) => {
@@ -51,7 +54,7 @@ export default function FileInput({ onSelect, label }: Props) {
       const blobUrl = URL.createObjectURL(file);
       onSelect(file, blobUrl);
     },
-    [onSelect, label]
+    [onSelect, validateFile],
   );
 
   const getHelperText = () => {

@@ -8,6 +8,7 @@ import AccessFlows from "./_components/access-flows";
 import CreateAd from "./_components/create-ad";
 import Publish from "./_components/publish";
 import PortalSettings from "./_components/portal-settings";
+import Link from "next/link";
 
 const initial = {
   background: "#ffffff",
@@ -60,7 +61,7 @@ export default function CaptivePortal() {
   const handleSelect = (
     file: File,
     url: string,
-    assetState: "logo" | "banner" | "ad"
+    assetState: "logo" | "banner" | "ad",
   ) => {
     if (assetState === "logo") {
       if (logoUrl) URL.revokeObjectURL(logoUrl);
@@ -93,9 +94,9 @@ export default function CaptivePortal() {
 
   return (
     <div className="flex flex-col space-y-2">
-      <a className="rounded-full bg-secondary w-fit" href="/captive-portal">
+      <Link className="rounded-full bg-secondary w-fit" href="/captive-portal">
         <ArrowLeft className="text-black m-3" />
-      </a>
+      </Link>
       <h1 className="text-2xl font-normal">Create new portal</h1>
       <div className="flex flex-row justify-between">
         <div className="flex flex-col min-w-[50%] max-w-[50%] min-h-full">

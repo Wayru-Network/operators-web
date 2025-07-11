@@ -4,7 +4,6 @@ import InteractionTime from "./interaction-dropdown";
 import AdFormat from "./adformat-dropdown";
 import { CustomInput } from "@/lib/components/custom-input";
 import { Button } from "@heroui/button";
-import Preview from "./preview";
 
 interface CreateAdProps {
   newConfig: NewPortalConfig;
@@ -12,7 +11,7 @@ interface CreateAdProps {
   fileHandler: (
     file: File,
     url: string,
-    assetState: "logo" | "banner" | "ad"
+    assetState: "logo" | "banner" | "ad",
   ) => void;
   interactionTimeHandler: (value: string) => void;
   redirectUrlHandler: (value: string) => void;

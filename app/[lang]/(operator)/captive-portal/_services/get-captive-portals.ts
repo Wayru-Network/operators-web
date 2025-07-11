@@ -1,3 +1,13 @@
+export interface CaptivePortals {
+  id: string;
+  "portal-name": string;
+  "flow-type": string;
+  "assigned-hotspots": number;
+  "conversion-rate": number;
+  "last-edit": string;
+  actions: string[];
+}
+
 export default async function getCaptivePortals() {
   return [
     {
