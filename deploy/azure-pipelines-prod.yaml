@@ -1,0 +1,46 @@
+trigger:
+  branches:
+    include:
+      - main
+  paths:
+    include:
+      - */*
+    exclude:
+      - README.md
+pr: none
+
+resources:
+  - repo: self
+
+variables:
+  dockerRegistryServiceConnection: "wayruprod-registry"
+  imageRepository: "wayru/operators-web"
+  containerRegistry: "wayruprod.azurecr.io"
+  dockerfilePath: "Dockerfile"
+  tag: "$(Build.BuildId)"
+  # kubernetesServiceConnection: "operators-web-prod"
+  # namespace: "operators"
+
+  # Agent VM image name
+  vmImageName: "ubuntu-latest"
+
+stages:
+  - stage: Build
+    displayName: Build stage
+    jobs:
+      - job: Build
+        displayName: Build
+        pool:
+          vmImage: $(vmImageName)
+        steps:
+          - task: Docker@2
+            displayName: Build and push an image to container registry
+            inputs:
+              command: buildAndPush
+              repository: $(imageRepository)
+              dockerfile: $(dockerfilePath)
+              containerRegistry: $(dockerRegistryServiceConnection)
+              buildContext: "$(Build.SourcesDirectory)"
+              tags: |
+                $(tag)
+                latest
