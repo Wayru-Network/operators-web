@@ -20,7 +20,7 @@ export default function AssignHotspot({
   setSelected,
 }: AssignHotspotProps) {
   const [selectedKeys, setSelectedKeys] = React.useState<Selection>(
-    new Set(selected),
+    new Set(selected)
   );
   const [hotspots, setHotspots] = React.useState<Hotspot[]>([]);
 
@@ -45,7 +45,7 @@ export default function AssignHotspot({
     <Dropdown placement="bottom-start">
       <DropdownTrigger>
         <Button
-          className="capitalize justify-between w-full max-w-xl"
+          className="capitalize justify-between max-w-full"
           variant="bordered"
         >
           <span className="truncate max-w-[92%]">{selectedValue}</span>

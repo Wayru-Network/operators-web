@@ -62,7 +62,7 @@ export async function getSession(): Promise<SessionPayload> {
 }
 
 export async function updateSession(
-  updates: Partial<SessionPayload>,
+  updates: Partial<SessionPayload>
 ): Promise<void> {
   const cookieStore = await cookies();
 

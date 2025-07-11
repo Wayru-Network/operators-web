@@ -40,7 +40,7 @@ export default function FileInput({ onSelect, label }: Props) {
 
       return null;
     },
-    [label],
+    [label]
   );
 
   const processFile = useCallback(
@@ -54,7 +54,7 @@ export default function FileInput({ onSelect, label }: Props) {
       const blobUrl = URL.createObjectURL(file);
       onSelect(file, blobUrl);
     },
-    [onSelect, validateFile],
+    [onSelect, validateFile]
   );
 
   const getHelperText = () => {
@@ -70,7 +70,7 @@ export default function FileInput({ onSelect, label }: Props) {
 
   return (
     <div
-      className={`flex flex-col items-center justify-center w-full h-48 max-w-lg rounded-[10px] bg-white ${
+      className={`flex flex-col items-center justify-center w-full h-48  rounded-[10px] bg-white ${
         isOver ? "ring-2 ring-blue-500" : ""
       }`}
       onDragOver={(e) => {

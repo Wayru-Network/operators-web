@@ -43,8 +43,8 @@ export default function CaptivePortal() {
 
   // Step 2 - Access Flows states
   const [ad, setAd] = useState(true);
-  const [voucher, setVoucher] = useState(false);
-  const [userInfo, setUserInfo] = useState(false);
+  const [voucher, setVoucher] = useState(true);
+  const [userInfo, setUserInfo] = useState(true);
   const [welcomeMessage, setWelcomeMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
 
@@ -61,7 +61,7 @@ export default function CaptivePortal() {
   const handleSelect = (
     file: File,
     url: string,
-    assetState: "logo" | "banner" | "ad",
+    assetState: "logo" | "banner" | "ad"
   ) => {
     if (assetState === "logo") {
       if (logoUrl) URL.revokeObjectURL(logoUrl);
@@ -98,8 +98,8 @@ export default function CaptivePortal() {
         <ArrowLeft className="text-black m-3" />
       </Link>
       <h1 className="text-2xl font-normal">Create new portal</h1>
-      <div className="flex flex-row justify-between">
-        <div className="flex flex-col min-w-[50%] max-w-[50%] min-h-full">
+      <div className="flex flex-row">
+        <div className="flex flex-col min-w-[50%] max-w-[50%] min-h-full pr-11">
           <Tabs
             classNames={{
               tabList: "!hidden",

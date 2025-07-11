@@ -29,6 +29,7 @@ export function CustomInput(
         className={`w-full rounded-[4px] border-2 border-neutral-300
                     bg-transparent px-4 pt-4 pb-4 text-lg outline-none peer
                     focus:border-[#751CF6] ${inputClass}`}
+        maxLength={50}
       />
       <label
         className={`absolute bg-[#ffffff] dark:bg-[#191c1d] px-2 w-fit left-3 -top-3 peer-focus:text-[#751CF6] ${labelClass}`}

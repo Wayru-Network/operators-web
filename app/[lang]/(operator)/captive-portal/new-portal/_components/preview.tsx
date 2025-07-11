@@ -26,29 +26,14 @@ export default function Preview({ config }: { config: NewPortalConfig }) {
         )}
 
         <div className="flex flex-col flex-1 w-full">
-          {config.welcomeMessage !== "" && (
-            <p
-              className="text-center py-8"
-              style={{ color: config.colors.text }}
-            >
-              {config.welcomeMessage}
-            </p>
-          )}
-          {config.bannerUrl ? (
-            <div className="flex flex-col w-full">
-              <Image
-                src={config.bannerUrl}
-                alt="Banner"
-                width={500}
-                height={500}
-              />
-            </div>
-          ) : (
-            <div className="flex items-center justify-center w-full h-72 bg-[#D9D9D9] rounded-sm">
-              Banner
-            </div>
-          )}
-          <div className="flex flex-col items-center  gap-4 my-auto">
+          <p
+            className="text-center py-8 max-w-full break-words"
+            style={{ color: config.colors.text }}
+          >
+            {config.welcomeMessage}
+          </p>
+
+          <div className="flex flex-col  gap-4 h-full">
             {config.ad && (
               <Button
                 className="flex w-full text-white dark:text-black rounded-full transition-none"
@@ -84,6 +69,20 @@ export default function Preview({ config }: { config: NewPortalConfig }) {
                 <SquarePen className="mr-1" />
                 Fill a form to connect
               </Button>
+            )}
+            {config.bannerUrl ? (
+              <div className="flex flex-col w-full mt-auto">
+                <Image
+                  src={config.bannerUrl}
+                  alt="Banner"
+                  width={500}
+                  height={500}
+                />
+              </div>
+            ) : (
+              <div className="flex items-center justify-center w-full h-72 bg-[#D9D9D9] rounded-sm mt-auto">
+                Banner
+              </div>
             )}
           </div>
         </div>
