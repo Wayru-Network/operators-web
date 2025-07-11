@@ -1,7 +1,7 @@
 name: operators-web
 namespace: operators
 env: prod
-image: wayruprod.azurecr.io/operators-web
+image: wayruprod.azurecr.io/wayru/operators-web
 imageTag: latest
 servicePort: 80
 port: 3000
