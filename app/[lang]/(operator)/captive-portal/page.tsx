@@ -1,5 +1,4 @@
 import { Metadata } from "next";
-import getCaptivePortals from "./_services/get-captive-portals";
 import PortalsTable from "./_components/portals-table";
 
 export const metadata: Metadata = {
