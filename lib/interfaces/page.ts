@@ -2,7 +2,9 @@ import { SupportedLanguage } from "@/lib/language/language";
 
 export interface PageProps {
   readonly params: Promise<{ lang: SupportedLanguage }>;
-  readonly searchParams: { [key: string]: string | string[] | undefined };
+  readonly searchParams: Promise<{
+    [key: string]: string | string[] | undefined;
+  }>;
 }
 
 export interface LayoutProps {
