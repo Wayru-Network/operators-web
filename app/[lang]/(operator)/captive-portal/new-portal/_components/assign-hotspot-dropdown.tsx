@@ -5,7 +5,7 @@ import {
   DropdownItem,
 } from "@heroui/dropdown";
 import { Button } from "@heroui/button";
-import React from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { ChevronDown } from "lucide-react";
 import getHotspots, { Hotspot } from "../../../hotspots/_services/get-hotspots";
 import type { Selection } from "@heroui/react";
@@ -19,25 +19,37 @@ export default function AssignHotspot({
   selected,
   setSelected,
 }: AssignHotspotProps) {
-  const [selectedKeys, setSelectedKeys] = React.useState<Selection>(
+  const [selectedKeys, setSelectedKeys] = useState<Selection>(
     new Set(selected)
   );
-  const [hotspots, setHotspots] = React.useState<Hotspot[]>([]);
+  const [hotspots, setHotspots] = useState<Hotspot[]>([]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     getHotspots().then((data) => setHotspots(data));
   }, []);
 
-  React.useEffect(() => {
-    const newSelection = Array.from(selectedKeys === "all" ? [] : selectedKeys)
+  useEffect(() => {
+    if (selectedKeys === "all") {
+      setSelected([]);
+      return;
+    }
+
+    const newSelection = Array.from(selectedKeys)
       .map(String)
       .filter((key) => key !== "none");
 
-    setSelected(newSelection);
-  }, [selectedKeys, setSelected]);
+    const isSame =
+      newSelection.length === selected.length &&
+      newSelection.every((val) => selected.includes(val));
 
-  const selectedValue = React.useMemo(() => {
-    const values = selectedKeys === "all" ? [] : Array.from(selectedKeys);
+    if (!isSame) {
+      setSelected(newSelection);
+    }
+  }, [selectedKeys, selected, setSelected]);
+
+  const selectedValue = useMemo(() => {
+    if (selectedKeys === "all") return "all";
+    const values = Array.from(selectedKeys).filter((key) => key !== "none");
     return values.length > 0 ? values.join(", ").replace(/_/g, "") : "none";
   }, [selectedKeys]);
 
@@ -45,10 +57,10 @@ export default function AssignHotspot({
     <Dropdown placement="bottom-start">
       <DropdownTrigger>
         <Button
-          className="capitalize justify-between max-w-full"
+          className="flex w-full capitalize justify-between"
           variant="bordered"
         >
-          <span className="truncate max-w-[92%]">{selectedValue}</span>
+          <span className="truncate">{selectedValue}</span>
           <ChevronDown />
         </Button>
       </DropdownTrigger>

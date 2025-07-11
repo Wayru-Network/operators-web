@@ -7,9 +7,9 @@ export default function PortalSettings({
   config: NewPortalConfig;
 }) {
   return (
-    <div className="flex flex-col min-w-[28rem] max-w-[28rem] bg-[#ffffff] dark:bg-[#191c1d] rounded-[30px] p-8">
+    <div className="flex flex-col max-w-[50%] bg-[#ffffff] dark:bg-[#191c1d] rounded-[30px] p-8">
       <p className="font-bold text-lg pb-4">Portal Settings</p>
-      <div className="h-full min-w-full bg-[#F8FAFA] text-black rounded-[10px] flex flex-col p-5">
+      <div className="h-full min-w-full bg-[#F8FAFA] text-black rounded-[10px] flex flex-col p-7">
         <p className="font-bold">Portal Name</p>
         <p className="pt-1">{config.portalName || "No name set"}</p>
         <p className="font-bold pt-4">Active Flows</p>
@@ -43,7 +43,7 @@ export default function PortalSettings({
         <div className="flex flex-row items-center">
           <p className="pt-1">{config.interactionTime} (Unskippable)</p>
         </div>
-        <p className="font-bold pt-4">Post-Connection Redirect URL</p>
+        <p className="font-bold pt-4">Post-Connection Redirect</p>
         <p className="pt-1">{config.redirectUrl || "No redirect URL set"}</p>
       </div>
     </div>
