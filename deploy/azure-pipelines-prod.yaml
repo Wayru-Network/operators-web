@@ -18,8 +18,11 @@ variables:
   containerRegistry: "wayruprod.azurecr.io"
   dockerfilePath: "Dockerfile"
   tag: "$(Build.BuildId)"
-  # kubernetesServiceConnection: "operators-web-prod"
-  # namespace: "operators"
+  helmChartPath: "$(Build.SourcesDirectory)/deploy/chart"
+  helmReleaseName: "operators-web"
+  environment: "operators-web-prod"
+  kubernetesServiceConnection: "operators-web-prod"
+  kubernetesClusterNamespace: "operators"
 
   # Agent VM image name
   vmImageName: "ubuntu-latest"
@@ -44,3 +47,64 @@ stages:
               tags: |
                 $(tag)
                 latest
+
+          - task: PublishPipelineArtifact@1
+            displayName: "Publish Helm Chart"
+            inputs:
+              targetPath: $(helmChartPath)
+              artifact: "chart"
+              publishLocation: "pipeline"
+
+  - stage: Deploy
+    displayName: Deploy to Kubernetes
+    dependsOn: Build
+    jobs:
+      - deployment: Deploy
+        displayName: Deploy with Helm
+        pool:
+          vmImage: $(vmImageName)
+        environment: $(environment)
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - task: DownloadPipelineArtifact@2
+                  displayName: "Download Helm Chart"
+                  inputs:
+                    artifactName: "chart"
+                    targetPath: "$(Pipeline.Workspace)/chart"
+
+                - task: HelmDeploy@0
+                  displayName: "Deploy Operators Web with Helm"
+                  inputs:
+                    connectionType: "Kubernetes Service Connection"
+                    kubernetesServiceConnection: $(kubernetesServiceConnection)
+                    namespace: $(kubernetesClusterNamespace)
+                    command: "upgrade"
+                    chartType: "FilePath"
+                    chartPath: $(Pipeline.Workspace)/chart
+                    releaseName: $(helmReleaseName)
+                    install: true
+                    waitForExecution: true
+                    arguments: "--timeout 5m0s"
+                    valueFile: "$(Pipeline.Workspace)/chart/values-prod.yaml"
+                    overrideValues: |
+                      imageTag=$(tag)
+
+                - task: Kubernetes@1
+                  displayName: "Validate Deployment"
+                  inputs:
+                    connectionType: "Kubernetes Service Connection"
+                    kubernetesServiceEndpoint: $(kubernetesServiceConnection)
+                    namespace: $(kubernetesClusterNamespace)
+                    command: "get"
+                    arguments: "pods,svc -l app=$(helmReleaseName) -o wide"
+
+                - task: Kubernetes@1
+                  displayName: "Check Deployment Status"
+                  inputs:
+                    connectionType: "Kubernetes Service Connection"
+                    kubernetesServiceEndpoint: $(kubernetesServiceConnection)
+                    namespace: $(kubernetesClusterNamespace)
+                    command: "rollout"
+                    arguments: "status deployment/$(helmReleaseName) --timeout=120s"
