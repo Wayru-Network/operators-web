@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@azure/storage-blob": "^12.27.0",
     "@heroui/button": "2.2.23-beta.0",
     "@heroui/card": "2.2.22-beta.0",
     "@heroui/dropdown": "2.3.23-beta.1",
@@ -22,6 +23,7 @@
     "@heroui/table": "2.2.22-beta.0",
     "@heroui/tabs": "2.2.19",
     "@heroui/theme": "2.4.18-beta.1",
+    "@heroui/toast": "2.0.13-beta.3",
     "@prisma/client": "^6.11.0",
     "framer-motion": "12.18.1",
     "jose": "^6.0.11",
