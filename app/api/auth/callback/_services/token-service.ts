@@ -9,17 +9,15 @@ function getJWKS() {
   if (!jwks) {
     if (!KC_BASE || !KC_REALM) {
       throw new Error(
-        "KEYCLOAK_BASE and KEYCLOAK_REALM environment variables are required",
+        "KEYCLOAK_BASE and KEYCLOAK_REALM environment variables are required"
       );
     }
     jwks = createRemoteJWKSet(
-      new URL(`${KC_BASE}/realms/${KC_REALM}/protocol/openid-connect/certs`),
+      new URL(`${KC_BASE}/realms/${KC_REALM}/protocol/openid-connect/certs`)
     );
   }
   return jwks;
 }
-
-// const clientId = process.env.KEYCLOAK_CLIENT_ID;
 
 export interface TokenClaims extends JWTPayload {
   email?: string;
@@ -29,7 +27,7 @@ export interface TokenClaims extends JWTPayload {
 export async function verifyToken(token: string): Promise<TokenClaims> {
   if (!KC_BASE || !KC_REALM) {
     throw new Error(
-      "KEYCLOAK_BASE and KEYCLOAK_REALM environment variables are required",
+      "KEYCLOAK_BASE and KEYCLOAK_REALM environment variables are required"
     );
   }
 
@@ -39,7 +37,9 @@ export async function verifyToken(token: string): Promise<TokenClaims> {
   return payload;
 }
 
-export async function getEmail(token: string): Promise<string | undefined> {
-  const { email } = await verifyToken(token);
-  return email;
+export async function getUserInfo(
+  token: string
+): Promise<{ email?: string; sub?: string }> {
+  const { email, sub } = await verifyToken(token);
+  return { email, sub };
 }
