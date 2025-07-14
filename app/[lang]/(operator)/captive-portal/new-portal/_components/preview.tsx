@@ -15,9 +15,9 @@ export default function Preview({ config }: { config: NewPortalConfig }) {
           backgroundColor: config.colors.background,
         }}
       >
-        {config.logoUrl ? (
+        {config.logo.url ? (
           <div className="flex flex-col">
-            <Image src={config.logoUrl} alt="Logo" width={50} height={50} />
+            <Image src={config.logo.url} alt="Logo" width={50} height={50} />
           </div>
         ) : (
           <div className="flex items-center justify-center h-20 bg-[#D9D9D9] rounded-sm sm:w-96">
@@ -70,10 +70,10 @@ export default function Preview({ config }: { config: NewPortalConfig }) {
                 Fill a form to connect
               </Button>
             )}
-            {config.bannerUrl ? (
+            {config.banner.url ? (
               <div className="flex flex-col w-full mt-auto">
                 <Image
-                  src={config.bannerUrl}
+                  src={config.banner.url}
                   alt="Banner"
                   width={500}
                   height={500}

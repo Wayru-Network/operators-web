@@ -18,19 +18,28 @@ const initial = {
 
 export interface NewPortalConfig {
   colors: typeof initial;
-  logoUrl: string | null;
-  bannerUrl: string | null;
+  logo: {
+    url: string | null;
+    file: File | null;
+  };
+  banner: {
+    url: string | null;
+    file: File | null;
+  };
   ad: boolean;
   voucher: boolean;
   userInfo: boolean;
   welcomeMessage: string;
   successMessage: string;
   adFormat: string;
-  adUrl: string | null;
+  adAsset?: {
+    url: string | null;
+    file: File | null;
+  };
   interactionTime: string;
   redirectUrl?: string;
   portalName: string;
-  assignedHotspot: string[]; // This will be set in the AssignHotspot component
+  assignedHotspot: string[];
 }
 
 export default function CaptivePortal() {
@@ -39,7 +48,9 @@ export default function CaptivePortal() {
   // Step 1 - Branding states
   const [colors, setColors] = useState(initial);
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  const [logoFile, setLogoFile] = useState<File | null>(null);
   const [bannerUrl, setBannerUrl] = useState<string | null>(null);
+  const [bannerFile, setBannerFile] = useState<File | null>(null);
 
   // Step 2 - Access Flows states
   const [ad, setAd] = useState(true);
@@ -51,6 +62,7 @@ export default function CaptivePortal() {
   // Step 3 - Create an Ad states
   const [adFormat, setAdFormat] = useState("video");
   const [adUrl, setAdUrl] = useState<string | null>(null);
+  const [adFile, setAdFile] = useState<File | null>(null);
   const [interactionTime, setInteractionTime] = useState("15s");
   const [redirectUrl, setRedirectUrl] = useState("");
 
@@ -66,30 +78,42 @@ export default function CaptivePortal() {
     if (assetState === "logo") {
       if (logoUrl) URL.revokeObjectURL(logoUrl);
       setLogoUrl(url);
+      setLogoFile(file);
     } else if (assetState === "banner") {
       if (bannerUrl) URL.revokeObjectURL(bannerUrl);
       setBannerUrl(url);
+      setBannerFile(file);
     } else if (assetState === "ad") {
       if (adUrl) URL.revokeObjectURL(adUrl);
       setAdUrl(url);
+      setAdFile(file);
     }
   };
 
   const newConfig: NewPortalConfig = {
     colors,
-    logoUrl,
-    bannerUrl,
-    ad,
+    logo: {
+      url: logoUrl,
+      file: logoFile,
+    },
+    banner: {
+      url: bannerUrl,
+      file: bannerFile,
+    },
+    ad: ad,
     voucher,
     userInfo,
     welcomeMessage,
     successMessage,
     adFormat,
-    adUrl,
+    adAsset: {
+      url: adUrl,
+      file: adFile,
+    },
     interactionTime,
     redirectUrl: redirectUrl || undefined,
     portalName: portalName,
-    assignedHotspot: assignedHotspot, // This will be set in the AssignHotspot component
+    assignedHotspot: assignedHotspot,
   };
 
   return (
@@ -153,14 +177,14 @@ export default function CaptivePortal() {
           <PortalSettings config={newConfig} />
         )}
       </div>
-      {/* <div className="mt-6 p-4 border rounded">
+      <div className="mt-6 p-4 border rounded">
         <h2 className="text-lg font-semibold mb-2">
           Current Portal Configuration
         </h2>
         <pre className="text-xs overflow-x-auto whitespace-pre-wrap">
           {JSON.stringify(newConfig, null, 2)}
         </pre>
-      </div> */}
+      </div>
     </div>
   );
 }
