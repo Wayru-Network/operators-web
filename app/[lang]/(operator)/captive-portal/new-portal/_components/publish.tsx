@@ -2,6 +2,8 @@ import { Button } from "@heroui/button";
 import { NewPortalConfig } from "../page";
 import { CustomInput } from "@/lib/components/custom-input";
 import AssignHotspot from "./assign-hotspot-dropdown";
+import uploadConfig from "../_services/upload_config";
+import { addToast } from "@heroui/toast";
 
 interface PublishProps {
   selectedHandler: (step: string) => void;
@@ -16,6 +18,31 @@ export default function Publish({
   nameHandler,
   assignedHotspotHandler,
 }: PublishProps) {
+  const handlePublish = async () => {
+    const result = await uploadConfig(portalConfig);
+    if (!result.success) {
+      addToast({
+        title: "Error",
+        description: result.error || "Failed to upload portal configuration",
+        color: "danger",
+      });
+      return;
+    }
+    addToast({
+      title: "Success",
+      description: "Portal configuration uploaded successfully",
+      color: "success",
+    });
+  };
+
+  const handleTest = () => {
+    addToast({
+      title: "Test Mode",
+      description: "This feature is not yet implemented.",
+      color: "danger",
+    });
+  };
+
   return (
     <div className="flex flex-col justify-start bg-[#ffffff] dark:bg-[#191c1d] rounded-[30px] p-8 space-y-4">
       <p className="font-bold text-lg">Step 4: Publish</p>
@@ -32,7 +59,10 @@ export default function Publish({
         setSelected={assignedHotspotHandler}
       />
       <div className="flex flex-col gap-4 mt-5">
-        <Button className="w-full text-white bg-black rounded-[10px]">
+        <Button
+          className="w-full text-white bg-black rounded-[10px]"
+          onPress={handlePublish}
+        >
           {portalConfig.assignedHotspot.length > 0
             ? `Save and publish to ${portalConfig.assignedHotspot.length} assigned hotspot(s)`
             : "Save new portal without assigning hotspots"}
@@ -44,7 +74,10 @@ export default function Publish({
           >
             Go back
           </Button>
-          <Button className="w-full text-white dark:text-black rounded-[10px]">
+          <Button
+            className="w-full text-white dark:text-black rounded-[10px]"
+            onPress={handleTest}
+          >
             Save for later
           </Button>
         </div>
