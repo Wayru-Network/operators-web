@@ -12,21 +12,29 @@ model hotspot {
   id              Int              @id @default(autoincrement())
   wayru_device_id String           @db.Uuid
   network_configs network_config[]
-  portal_configs  portal_config[]
+  portal_configs  portal_config[]  @relation("PortalHotspots")
 }
 
 model portal_config {
-  id               Int      @id @default(autoincrement())
-  hotspot_id       Int
-  title            String
-  description      String?
+  id               Int     @id @default(autoincrement())
+  user_id          String
+  portal_name      String
+  welcome_message  String?
+  success_message  String?
   background_color String?
-  asset_id         Int
-  logo             asset    @relation("logo_asset", fields: [asset_id], references: [id], map: "portal_config_logo_assetId_fkey")
-  banner           asset    @relation("banner_asset", fields: [asset_id], references: [id], map: "portal_config_banner_assetId_fkey")
-  ads              ad[]
+  text_color       String?
+  button_color     String?
+  logo_asset_id    Int
+  banner_asset_id  Int
+  ad_access        Boolean
+  voucher_access   Boolean
+  form_access      Boolean
   redirect_url     String
-  hotspot          hotspot? @relation(fields: [hotspot_id], references: [id])
+
+  logo     asset     @relation("logo_asset", fields: [logo_asset_id], references: [id])
+  banner   asset     @relation("banner_asset", fields: [banner_asset_id], references: [id])
+  ads      ad[]
+  hotspots hotspot[] @relation("PortalHotspots")
 }
 
 model network_config {
