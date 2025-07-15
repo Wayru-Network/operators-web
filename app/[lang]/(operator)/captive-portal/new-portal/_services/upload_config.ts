@@ -2,12 +2,14 @@
 
 import { uploadImageToBlobStorage } from "../_actions/upload_blob";
 import { NewPortalConfig } from "../page";
-import { PrismaClient } from "@/lib/generated/prisma";
+import { PrismaClient, adFormat } from "@/lib/generated/prisma";
 import { getSession } from "@/lib/session/session";
 
 const Prisma = new PrismaClient();
 
 export default async function uploadConfig(portalConfig: NewPortalConfig) {
+  // Validate user session.
+  // Must have a valid session with userId.
   const session = await getSession();
   if (!session || !session.userId) {
     return {
@@ -16,6 +18,7 @@ export default async function uploadConfig(portalConfig: NewPortalConfig) {
     };
   }
 
+  // Validate logo file
   if (!portalConfig.logo.file) {
     return {
       success: false,
@@ -23,6 +26,7 @@ export default async function uploadConfig(portalConfig: NewPortalConfig) {
     };
   }
 
+  // Validate banner file
   if (!portalConfig.banner.file) {
     return {
       success: false,
@@ -30,6 +34,7 @@ export default async function uploadConfig(portalConfig: NewPortalConfig) {
     };
   }
 
+  // Upload logo and banner images to blob storage
   const logoResult = await uploadImageToBlobStorage(portalConfig.logo.file);
   if (!logoResult.success) {
     return {
@@ -45,6 +50,7 @@ export default async function uploadConfig(portalConfig: NewPortalConfig) {
     };
   }
 
+  // Validate logo path
   if (!logoResult.path) {
     return {
       success: false,
@@ -52,12 +58,14 @@ export default async function uploadConfig(portalConfig: NewPortalConfig) {
     };
   }
 
+  // Create Logo asset in the database
   const logoAsset = await Prisma.asset.create({
     data: {
       asset_url: logoResult.path,
     },
   });
 
+  // Validate banner path
   if (!bannerResult.path) {
     return {
       success: false,
@@ -65,14 +73,18 @@ export default async function uploadConfig(portalConfig: NewPortalConfig) {
     };
   }
 
+  // Create Banner asset in the database
   const bannerAsset = await Prisma.asset.create({
     data: {
       asset_url: bannerResult.path,
     },
   });
 
+  let createdPortalConfig;
+
+  // Create portal configuration in the database
   try {
-    await Prisma.portal_config.create({
+    createdPortalConfig = await Prisma.portal_config.create({
       data: {
         user_id: session.userId,
         portal_name: portalConfig.portalName,
@@ -102,6 +114,50 @@ export default async function uploadConfig(portalConfig: NewPortalConfig) {
           ? error.message
           : "Failed to create portal config",
     };
+  }
+
+  if (portalConfig.ad && portalConfig.adAsset?.file) {
+    const adResult = await uploadImageToBlobStorage(portalConfig.adAsset.file);
+    if (!adResult.success) {
+      return {
+        success: false,
+        error: adResult.error || "Failed to upload ad",
+      };
+    }
+
+    if (!adResult.path) {
+      return {
+        success: false,
+        error: "Ad upload did not return a valid path",
+      };
+    }
+
+    // Create Ad asset in the database
+    const adAsset = await Prisma.asset.create({
+      data: {
+        asset_url: adResult.path,
+      },
+    });
+
+    const interaction_time = parseInt(portalConfig.interactionTime) || 15;
+
+    const validAdFormats = Object.values(adFormat);
+    if (!validAdFormats.includes(portalConfig.adFormat as adFormat)) {
+      return {
+        success: false,
+        error: "Invalid ad format",
+      };
+    }
+
+    // Create Ad configuration in the database
+    await Prisma.ad.create({
+      data: {
+        ad_asset_id: adAsset.id,
+        portal_config_id: createdPortalConfig.id,
+        format: portalConfig.adFormat as adFormat,
+        interaction_time: interaction_time,
+      },
+    });
   }
 
   return {
