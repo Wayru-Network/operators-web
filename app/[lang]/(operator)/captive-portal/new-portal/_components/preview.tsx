@@ -10,13 +10,13 @@ export default function Preview({ config }: { config: NewPortalConfig }) {
     <div className="flex flex-col max-w-[50%] min-h-[51rem] max-h-[51rem] bg-[#ffffff] dark:bg-[#191c1d] rounded-[30px] p-8">
       <p className="font-bold text-lg pb-4">Preview</p>
       <div
-        className="h-full min-w-full bg-[#F8FAFA] dark:bg-gray-600 text-black rounded-[10px] flex flex-col items-center space-y-4 p-8"
+        className="min-w-[50%] max-w-full h-full bg-[#F8FAFA] dark:bg-gray-600 text-black rounded-[10px] flex flex-col items-center space-y-4 p-8"
         style={{
           backgroundColor: config.colors.background,
         }}
       >
         {config.logo.url ? (
-          <div className="flex flex-col">
+          <div className="flex items-center justify-center h-20 w-96 max-w-96">
             <Image src={config.logo.url} alt="Logo" width={50} height={50} />
           </div>
         ) : (
@@ -25,15 +25,15 @@ export default function Preview({ config }: { config: NewPortalConfig }) {
           </div>
         )}
 
-        <div className="flex flex-col flex-1 w-full">
+        <div className="flex flex-col w-full max-w-full">
           <p
-            className="text-center py-8 max-w-full break-words"
+            className="text-center py-8 break-words self-center"
             style={{ color: config.colors.text }}
           >
             {config.welcomeMessage}
           </p>
 
-          <div className="flex flex-col  gap-4 h-full">
+          <div className="flex flex-col gap-4 h-full max-w-full">
             {config.ad && (
               <Button
                 className="flex w-full text-white dark:text-black rounded-full transition-none"
@@ -71,12 +71,13 @@ export default function Preview({ config }: { config: NewPortalConfig }) {
               </Button>
             )}
             {config.banner.url ? (
-              <div className="flex flex-col w-full mt-auto">
+              <div className="flex items-center justify-center w-full h-72 mt-auto">
                 <Image
                   src={config.banner.url}
                   alt="Banner"
-                  width={500}
-                  height={500}
+                  width={350}
+                  height={350}
+                  className="object-contain h-full max-w-full"
                 />
               </div>
             ) : (
