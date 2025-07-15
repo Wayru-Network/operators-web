@@ -12,7 +12,7 @@ model hotspot {
   id              Int              @id @default(autoincrement())
   wayru_device_id String           @db.Uuid
   network_configs network_config[]
-  portal_configs  portal_config[]  @relation("PortalHotspots")
+  portal_configs  portal_config[]  @relation("portal_hotspots")
 }
 
 model portal_config {
@@ -34,7 +34,7 @@ model portal_config {
   logo     asset     @relation("logo_asset", fields: [logo_asset_id], references: [id])
   banner   asset     @relation("banner_asset", fields: [banner_asset_id], references: [id])
   ads      ad[]
-  hotspots hotspot[] @relation("PortalHotspots")
+  hotspots hotspot[] @relation("portal_hotspots")
 }
 
 model network_config {
