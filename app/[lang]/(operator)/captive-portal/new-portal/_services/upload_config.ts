@@ -1,7 +1,7 @@
 "use server";
 
 import { uploadImageToBlobStorage } from "../_actions/upload_blob";
-import { NewPortalConfig } from "../page";
+import { NewPortalConfig } from "../_components/create-captive-portal";
 import { PrismaClient, adFormat } from "@/lib/generated/prisma";
 import { getSession } from "@/lib/session/session";
 
@@ -96,11 +96,6 @@ export default async function uploadConfig(portalConfig: NewPortalConfig) {
         text_color: portalConfig.colors.text,
         button_color: portalConfig.colors.button,
         success_message: portalConfig.successMessage,
-        hotspots: {
-          connect: portalConfig.assignedHotspot.map((id) => ({
-            id: parseInt(id),
-          })),
-        },
         ad_access: portalConfig.ad,
         voucher_access: portalConfig.voucher,
         form_access: portalConfig.userInfo,
@@ -139,7 +134,21 @@ export default async function uploadConfig(portalConfig: NewPortalConfig) {
       },
     });
 
-    const interaction_time = parseInt(portalConfig.interactionTime) || 15;
+    let interaction_time: number;
+
+    switch (portalConfig.interactionTime) {
+      case "15s":
+        interaction_time = 15;
+        break;
+      case "30s":
+        interaction_time = 30;
+        break;
+      case "60s":
+        interaction_time = 60;
+        break;
+      default:
+        interaction_time = 15;
+    }
 
     const validAdFormats = Object.values(adFormat);
     if (!validAdFormats.includes(portalConfig.adFormat as adFormat)) {
@@ -158,6 +167,44 @@ export default async function uploadConfig(portalConfig: NewPortalConfig) {
         interaction_time: interaction_time,
       },
     });
+  }
+
+  // Create hotspot & portal association
+  if (portalConfig.assignedHotspot.length > 0) {
+    try {
+      await Promise.all(
+        portalConfig.assignedHotspot.map((hotspot) => {
+          return Prisma.hotspot.upsert({
+            where: {
+              id: parseInt(hotspot),
+            },
+            update: {
+              portal_configs: {
+                connect: {
+                  id: createdPortalConfig.id,
+                },
+              },
+            },
+            create: {
+              wayru_device_id: hotspot, // Ensure this property exists in portalConfig
+              portal_configs: {
+                connect: {
+                  id: createdPortalConfig.id,
+                },
+              },
+            },
+          });
+        })
+      );
+    } catch (error) {
+      return {
+        success: false,
+        error:
+          error instanceof Error
+            ? error.message
+            : "Failed to associate hotspot with portal config",
+      };
+    }
   }
 
   return {

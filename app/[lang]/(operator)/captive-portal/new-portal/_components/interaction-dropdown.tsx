@@ -49,9 +49,9 @@ export default function InteractionTime({
           setSelected(key as string);
         }}
       >
-        <DropdownItem key="15">15 seconds</DropdownItem>
-        <DropdownItem key="30">30 seconds</DropdownItem>
-        <DropdownItem key="60">1 minute</DropdownItem>
+        <DropdownItem key="15 seconds">15 Seconds</DropdownItem>
+        <DropdownItem key="30 seconds">30 Seconds</DropdownItem>
+        <DropdownItem key="1 minute">1 Minute</DropdownItem>
       </DropdownMenu>
     </Dropdown>
   );
