@@ -1,4 +1,4 @@
-import { NewPortalConfig } from "../page";
+import { NewPortalConfig } from "./create-captive-portal";
 import { Check } from "lucide-react";
 
 export default function PortalSettings({

@@ -1,15 +1,17 @@
 import { Button } from "@heroui/button";
-import { NewPortalConfig } from "../page";
+import { NewPortalConfig } from "./create-captive-portal";
 import { CustomInput } from "@/lib/components/custom-input";
 import AssignHotspot from "./assign-hotspot-dropdown";
 import uploadConfig from "../_services/upload_config";
 import { addToast } from "@heroui/toast";
+import { Hotspot } from "../../../hotspots/_services/get-hotspots";
 
 interface PublishProps {
   selectedHandler: (step: string) => void;
   portalConfig: NewPortalConfig;
   nameHandler: (name: string) => void;
   assignedHotspotHandler: (hotspot: string[]) => void;
+  hotspots: Hotspot[];
 }
 
 export default function Publish({
@@ -17,6 +19,7 @@ export default function Publish({
   portalConfig,
   nameHandler,
   assignedHotspotHandler,
+  hotspots,
 }: PublishProps) {
   const handlePublish = async () => {
     const result = await uploadConfig(portalConfig);
@@ -57,6 +60,7 @@ export default function Publish({
       <AssignHotspot
         selected={portalConfig.assignedHotspot}
         setSelected={assignedHotspotHandler}
+        hotspots={hotspots}
       />
       <div className="flex flex-col gap-4 mt-5">
         <Button

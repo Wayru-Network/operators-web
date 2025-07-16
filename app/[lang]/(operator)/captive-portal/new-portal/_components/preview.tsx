@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import { Button } from "@heroui/button";
-import { NewPortalConfig } from "../page";
+import { NewPortalConfig } from "./create-captive-portal";
 import { Megaphone, SquarePen, Ticket } from "lucide-react";
 
 export default function Preview({ config }: { config: NewPortalConfig }) {

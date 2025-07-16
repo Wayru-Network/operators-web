@@ -1,4 +1,4 @@
-import { NewPortalConfig } from "../page";
+import { NewPortalConfig } from "./create-captive-portal";
 import FileInput from "./file-input";
 import InteractionTime from "./interaction-dropdown";
 import AdFormat from "./adformat-dropdown";
@@ -11,7 +11,7 @@ interface CreateAdProps {
   fileHandler: (
     file: File,
     url: string,
-    assetState: "logo" | "banner" | "ad",
+    assetState: "logo" | "banner" | "ad"
   ) => void;
   interactionTimeHandler: (value: string) => void;
   redirectUrlHandler: (value: string) => void;
