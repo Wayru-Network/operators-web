@@ -11,6 +11,7 @@ export interface rowCaptivePortal {
   _count: {
     hotspots: number;
   };
+  last_edit: string;
 }
 
 export default async function getCaptivePortals(): Promise<rowCaptivePortal[]> {
@@ -30,6 +31,7 @@ export default async function getCaptivePortals(): Promise<rowCaptivePortal[]> {
           hotspots: true,
         },
       },
+      updated_at: true,
     },
     where: {
       user_id: session?.userId,
@@ -48,6 +50,7 @@ export default async function getCaptivePortals(): Promise<rowCaptivePortal[]> {
       portal_name: row.portal_name,
       flow_type: flowTypes.join(", "),
       _count: row._count,
+      last_edit: row.updated_at.toString(), // Ensure date is in ISO format
     };
   });
 

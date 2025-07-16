@@ -67,9 +67,23 @@ export default function PortalsTable({ rows }: { rows: rowCaptivePortal[] }) {
       allowsSorting: true,
     },
     { key: "conversion-rate", label: "Conversion Rate", allowsSorting: true },
-    { key: "last-edit", label: "Last Edit", allowsSorting: true },
+    { key: "last_edit", label: "Last Edit", allowsSorting: true },
     { key: "actions", label: "Actions", allowsSorting: false },
   ];
+
+  // Format last_edit date to MM-DD-YYYY and set timezone to user's locale
+  rows.map((row) => {
+    console.log(row.last_edit);
+    const date = new Date(row.last_edit);
+    row.last_edit = date.toLocaleString(undefined, {
+      year: "numeric",
+      day: "2-digit",
+      month: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    });
+  });
 
   return (
     <div className="flex flex-col space-y-4">
@@ -116,7 +130,7 @@ export default function PortalsTable({ rows }: { rows: rowCaptivePortal[] }) {
             )}
           </TableHeader>
 
-          <TableBody items={paged}>
+          <TableBody items={paged} emptyContent="No portals found">
             {(item) => (
               <TableRow
                 key={item.id}
@@ -134,6 +148,7 @@ export default function PortalsTable({ rows }: { rows: rowCaptivePortal[] }) {
                     ) : columnKey === "assigned-hotspots" ? (
                       <>{item._count.hotspots}</>
                     ) : columnKey === "conversion-rate" ? (
+                      //@to-do: Implement conversion rate logic
                       <>{0 + "%"}</>
                     ) : (
                       getKeyValue(item, columnKey)

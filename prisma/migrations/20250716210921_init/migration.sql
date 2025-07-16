@@ -25,6 +25,8 @@ CREATE TABLE "portal_config" (
     "voucher_access" BOOLEAN NOT NULL,
     "form_access" BOOLEAN NOT NULL,
     "redirect_url" TEXT NOT NULL,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "portal_config_pkey" PRIMARY KEY ("id")
 );
