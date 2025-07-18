@@ -48,7 +48,7 @@ export default function AdFormat({ selected, setSelected }: AdFormatProps) {
       >
         <DropdownItem key="video">Video</DropdownItem>
         <DropdownItem key="static">Static</DropdownItem>
-        <DropdownItem key="GIF">GIF</DropdownItem>
+        <DropdownItem key="gif">GIF</DropdownItem>
       </DropdownMenu>
     </Dropdown>
   );
