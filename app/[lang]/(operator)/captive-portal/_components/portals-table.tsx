@@ -88,16 +88,17 @@ export default function PortalsTable({ rows }: { rows: rowCaptivePortal[] }) {
     <div className="flex flex-col space-y-4">
       <div className="flex items-center justify-between mb-4">
         <Input
+          disabled
           placeholder="Type to search..."
           value={search}
           onValueChange={setSearch}
           className="max-w-xs"
           classNames={{
             input:
-              "bg-[#ffffff] dark:bg-[#191c1d] rounded-[28px] dark:text-white",
+              "bg-[#ffffff] dark:bg-[#191c1d] rounded-[28px] disabled:placeholder:text-gray-400 dark:disabled:placeholder:text-gray-600",
             inputWrapper: "p-0",
           }}
-          startContent={<Search className="pl-2" />}
+          startContent={<Search className="pl-2 text-gray-600" />}
         />
         <NewPortal />
       </div>
