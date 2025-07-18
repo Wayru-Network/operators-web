@@ -73,7 +73,6 @@ export default function PortalsTable({ rows }: { rows: rowCaptivePortal[] }) {
 
   // Format last_edit date to MM-DD-YYYY and set timezone to user's locale
   rows.map((row) => {
-    console.log(row.last_edit);
     const date = new Date(row.last_edit);
     row.last_edit = date.toLocaleString(undefined, {
       year: "numeric",
@@ -150,6 +149,13 @@ export default function PortalsTable({ rows }: { rows: rowCaptivePortal[] }) {
                     ) : columnKey === "conversion-rate" ? (
                       //@to-do: Implement conversion rate logic
                       <>{0 + "%"}</>
+                    ) : columnKey === "portal_name" ? (
+                      <a
+                        href={`/captive-portal/${item.id}`}
+                        className="flex items-center justify-center hover:underline"
+                      >
+                        {getKeyValue(item, columnKey)}
+                      </a>
                     ) : (
                       getKeyValue(item, columnKey)
                     )}
