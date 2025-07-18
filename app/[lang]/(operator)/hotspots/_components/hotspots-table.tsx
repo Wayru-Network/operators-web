@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState, useEffect } from "react";
+import React, { useMemo, useState, useEffect, useCallback } from "react";
 import {
   Table,
   TableHeader,
@@ -16,6 +16,7 @@ import { Pagination } from "@heroui/pagination";
 import StatusPill from "@/app/[lang]/(operator)/hotspots/_components/status-pill";
 import { Hotspot } from "@/app/[lang]/(operator)/hotspots/_services/get-hotspots";
 import { Settings, Search } from "lucide-react";
+import { redirect } from "next/navigation";
 
 export default function HotspotsTable({ rows }: { rows: Hotspot[] }) {
   const [search, setSearch] = useState("");
@@ -67,19 +68,30 @@ export default function HotspotsTable({ rows }: { rows: Hotspot[] }) {
     { key: "actions", label: "Actions", allowsSorting: false },
   ];
 
+  const goto = useCallback(
+    (page: number) => {
+      setPage(page + 1);
+      redirect(`/admin/devices?page=${page}`);
+    },
+    [setPage]
+  );
+
   return (
     <div className="flex flex-col space-y-4">
       <Input
+        disabled
         placeholder="Type to search..."
         value={search}
         onValueChange={setSearch}
         className="max-w-xs"
         classNames={{
           input:
-            "bg-[#ffffff] dark:bg-[#191c1d] rounded-[28px] dark:text-white",
+            "bg-[#ffffff] dark:bg-[#191c1d] rounded-[28px] dark:text-white disabled:placeholder:text-gray-400 dark:disabled:placeholder:text-gray-600",
           inputWrapper: "p-0",
         }}
-        startContent={<Search className="pl-2" />}
+        startContent={
+          <Search className="pl-2 text-gray-400 dark:text-gray-600" />
+        }
       />
 
       <div className="bg-[#ffffff] dark:bg-[#191c1d] rounded-[30px] pb-8">
@@ -156,7 +168,7 @@ export default function HotspotsTable({ rows }: { rows: Hotspot[] }) {
         <Pagination
           total={pageCount}
           page={page}
-          onChange={setPage}
+          onChange={goto}
           showControls
           className="flex justify-center pt-5"
           classNames={{
