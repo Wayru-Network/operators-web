@@ -7,7 +7,7 @@ import {
   codeChallengeFrom,
   generateState,
 } from "@/app/[lang]/(auth)/_services/pkce";
-import { env } from "@/lib/env/env";
+import { env } from "@/lib/infra/env";
 
 const kc = {
   base: env.KEYCLOAK_BASE,

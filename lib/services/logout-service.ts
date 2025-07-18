@@ -1,7 +1,7 @@
 "use server";
 import { redirect } from "next/navigation";
 import { getSession, deleteSession } from "../session/session";
-import { env } from "@/lib/env/env";
+import { env } from "@/lib/infra/env";
 
 export default async function userLogout() {
   const kc = {

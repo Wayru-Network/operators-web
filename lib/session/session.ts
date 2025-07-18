@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 import { SignJWT, jwtVerify } from "jose";
 import type { SessionPayload } from "./session-interface";
 import { defaultSession } from "./session-interface";
-import { env } from "@/lib/env/env";
+import { env } from "@/lib/infra/env";
 
 const secretKey = env.SESSION_KEY;
 const encodedKey = new TextEncoder().encode(secretKey);

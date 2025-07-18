@@ -1,5 +1,5 @@
 import { createRemoteJWKSet, jwtVerify, JWTPayload } from "jose";
-import { env } from "@/lib/env/env";
+import { env } from "@/lib/infra/env";
 
 const KC_BASE = env.KEYCLOAK_BASE;
 const KC_REALM = env.KEYCLOAK_REALM;

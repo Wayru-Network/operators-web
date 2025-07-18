@@ -1,5 +1,5 @@
 "use server";
-import { Prisma } from "@/lib/prisma-client/prisma";
+import { Prisma } from "@/lib/infra/prisma";
 import { getSession } from "@/lib/session/session";
 import { PortalConfig } from "../_components/customize-captive-portal";
 import { getBlobImage } from "./get-blob-image";

@@ -1,5 +1,5 @@
 import { PrismaClient } from "@/lib/generated/prisma";
-import { env } from "@/lib/env/env";
+import { env } from "./env";
 
 const globalForPrisma = global as unknown as { prisma: PrismaClient };
 

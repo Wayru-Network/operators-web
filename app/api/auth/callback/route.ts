@@ -3,7 +3,7 @@ import { updateSession } from "@/lib/session/session";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { getUserInfo } from "./_services/token-service";
-import { env } from "@/lib/env/env";
+import { env } from "@/lib/infra/env";
 
 interface AddressResponse {
   walletAddress: string;

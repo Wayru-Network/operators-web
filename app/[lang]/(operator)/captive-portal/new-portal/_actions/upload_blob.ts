@@ -5,7 +5,7 @@ import {
   BlobServiceClient,
   StorageSharedKeyCredential,
 } from "@azure/storage-blob";
-import { env } from "@/lib/env/env";
+import { env } from "@/lib/infra/env";
 
 export async function uploadImageToBlobStorage(file: File) {
   if (!file) {

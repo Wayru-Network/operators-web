@@ -3,7 +3,7 @@
 import { uploadImageToBlobStorage } from "../_actions/upload_blob";
 import { NewPortalConfig } from "../_components/create-captive-portal";
 import { adFormat } from "@/lib/generated/prisma";
-import { Prisma } from "@/lib/prisma-client/prisma";
+import { Prisma } from "@/lib/infra/prisma";
 import { getSession } from "@/lib/session/session";
 
 export default async function uploadConfig(portalConfig: NewPortalConfig) {
@@ -193,7 +193,7 @@ export default async function uploadConfig(portalConfig: NewPortalConfig) {
               },
             },
           });
-        })
+        }),
       );
     } catch (error) {
       return {

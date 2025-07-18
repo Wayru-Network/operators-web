@@ -1,7 +1,7 @@
 "use server";
-import { Prisma } from "@/lib/prisma-client/prisma";
+import { Prisma } from "@/lib/infra/prisma";
 import { getSession } from "@/lib/session/session";
-import { env } from "@/lib/env/env";
+import { env } from "@/lib/infra/env";
 
 export interface Hotspot {
   id: number;

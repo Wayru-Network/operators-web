@@ -7,7 +7,7 @@ import {
   StorageSharedKeyCredential,
 } from "@azure/storage-blob";
 import { getSession } from "@/lib/session/session";
-import { env } from "@/lib/env/env";
+import { env } from "@/lib/infra/env";
 
 export async function getBlobImage(blobName: string) {
   const account = env.AZURE_STORAGE_ACCOUNT_NAME;

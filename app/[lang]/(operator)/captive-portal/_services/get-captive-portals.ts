@@ -1,6 +1,6 @@
 "use server";
 import { getSession } from "@/lib/session/session";
-import { Prisma } from "@/lib/prisma-client/prisma";
+import { Prisma } from "@/lib/infra/prisma";
 
 export interface rowCaptivePortal {
   id: number;
