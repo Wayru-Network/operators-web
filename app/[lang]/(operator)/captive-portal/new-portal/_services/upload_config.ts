@@ -2,10 +2,9 @@
 
 import { uploadImageToBlobStorage } from "../_actions/upload_blob";
 import { NewPortalConfig } from "../_components/create-captive-portal";
-import { PrismaClient, adFormat } from "@/lib/generated/prisma";
+import { adFormat } from "@/lib/generated/prisma";
+import { Prisma } from "@/lib/prisma-client/prisma";
 import { getSession } from "@/lib/session/session";
-
-const Prisma = new PrismaClient();
 
 export default async function uploadConfig(portalConfig: NewPortalConfig) {
   // Validate user session.
