@@ -1,12 +1,13 @@
 "use server";
 import { redirect } from "next/navigation";
 import { getSession, deleteSession } from "../session/session";
+import { env } from "@/lib/env/env";
 
 export default async function userLogout() {
   const kc = {
-    base: process.env.KEYCLOAK_BASE,
-    realm: process.env.KEYCLOAK_REALM,
-    clientId: process.env.KEYCLOAK_CLIENT_ID,
+    base: env.KEYCLOAK_BASE,
+    realm: env.KEYCLOAK_REALM,
+    clientId: env.KEYCLOAK_CLIENT_ID,
   };
   const session = await getSession();
   try {

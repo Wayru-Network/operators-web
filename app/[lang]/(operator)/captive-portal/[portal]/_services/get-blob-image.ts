@@ -7,11 +7,12 @@ import {
   StorageSharedKeyCredential,
 } from "@azure/storage-blob";
 import { getSession } from "@/lib/session/session";
+import { env } from "@/lib/env/env";
 
 export async function getBlobImage(blobName: string) {
-  const account = process.env.AZURE_STORAGE_ACCOUNT_NAME!;
-  const accountKey = process.env.AZURE_STORAGE_ACCOUNT_KEY!;
-  const containerName = process.env.AZURE_CONTAINER_NAME!;
+  const account = env.AZURE_STORAGE_ACCOUNT_NAME;
+  const accountKey = env.AZURE_STORAGE_ACCOUNT_KEY;
+  const containerName = env.AZURE_CONTAINER_NAME;
   const serviceUrl = `https://${account}.blob.core.windows.net`;
 
   if (!account || !accountKey || !serviceUrl) {
@@ -42,7 +43,7 @@ export async function getBlobImage(blobName: string) {
       expiresOn: expiryTime,
       protocol: SASProtocol.Https,
     },
-    credentials
+    credentials,
   ).toString();
 
   const blobUrl = `${serviceUrl}/${containerName}/${blobName}?${sasToken}`;

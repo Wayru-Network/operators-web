@@ -5,6 +5,7 @@ import {
   BlobServiceClient,
   StorageSharedKeyCredential,
 } from "@azure/storage-blob";
+import { env } from "@/lib/env/env";
 
 export async function uploadImageToBlobStorage(file: File) {
   if (!file) {
@@ -16,20 +17,20 @@ export async function uploadImageToBlobStorage(file: File) {
 
   const buffer = Buffer.from(await file.arrayBuffer());
 
-  const account = process.env.AZURE_STORAGE_ACCOUNT_NAME!;
-  const accountKey = process.env.AZURE_STORAGE_ACCOUNT_KEY!;
-  const containerName = process.env.AZURE_CONTAINER_NAME!;
+  const account = env.AZURE_STORAGE_ACCOUNT_NAME;
+  const accountKey = env.AZURE_STORAGE_ACCOUNT_KEY;
+  const containerName = env.AZURE_CONTAINER_NAME;
 
   if (!account || !accountKey || !containerName) {
     throw new Error(
-      "Azure Storage account, key, or container name is not defined in environment variables"
+      "Azure Storage account, key, or container name is not defined in environment variables",
     );
   }
 
   const credentials = new StorageSharedKeyCredential(account, accountKey);
   const blobServiceClient = new BlobServiceClient(
     `https://${account}.blob.core.windows.net`,
-    credentials
+    credentials,
   );
 
   const containerClient = blobServiceClient.getContainerClient(containerName);

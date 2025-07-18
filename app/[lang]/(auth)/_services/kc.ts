@@ -7,12 +7,13 @@ import {
   codeChallengeFrom,
   generateState,
 } from "@/app/[lang]/(auth)/_services/pkce";
+import { env } from "@/lib/env/env";
 
 const kc = {
-  base: process.env.KEYCLOAK_BASE,
-  realm: process.env.KEYCLOAK_REALM,
-  clientId: process.env.KEYCLOAK_CLIENT_ID,
-  redirectUri: process.env.APP_URL + "/api/auth/callback",
+  base: env.KEYCLOAK_BASE,
+  realm: env.KEYCLOAK_REALM,
+  clientId: env.KEYCLOAK_CLIENT_ID,
+  redirectUri: env.APP_URL + "/api/auth/callback",
 };
 
 const ALLOWED_PROVIDERS = ["facebook", "google", "apple"] as const;
@@ -28,7 +29,7 @@ export async function socialLogin(provider: Provider) {
   const state = generateState();
 
   const authUrl = new URL(
-    `${kc.base}/realms/${kc.realm}/protocol/openid-connect/auth`
+    `${kc.base}/realms/${kc.realm}/protocol/openid-connect/auth`,
   );
   authUrl.search = new URLSearchParams({
     client_id: kc.clientId ?? "",

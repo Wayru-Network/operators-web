@@ -4,8 +4,9 @@ import { cookies } from "next/headers";
 import { SignJWT, jwtVerify } from "jose";
 import type { SessionPayload } from "./session-interface";
 import { defaultSession } from "./session-interface";
+import { env } from "@/lib/env/env";
 
-const secretKey = process.env.SESSION_KEY;
+const secretKey = env.SESSION_KEY;
 const encodedKey = new TextEncoder().encode(secretKey);
 
 export async function encrypt(payload: SessionPayload) {
@@ -62,7 +63,7 @@ export async function getSession(): Promise<SessionPayload> {
 }
 
 export async function updateSession(
-  updates: Partial<SessionPayload>
+  updates: Partial<SessionPayload>,
 ): Promise<void> {
   const cookieStore = await cookies();
 

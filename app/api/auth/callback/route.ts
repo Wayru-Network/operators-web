@@ -3,15 +3,16 @@ import { updateSession } from "@/lib/session/session";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { getUserInfo } from "./_services/token-service";
+import { env } from "@/lib/env/env";
 
 interface AddressResponse {
   walletAddress: string;
 }
 
-const KC_BASE = process.env.KEYCLOAK_BASE || "";
-const KC_REALM = process.env.KEYCLOAK_REALM || "";
-const CLIENT_ID = process.env.KEYCLOAK_CLIENT_ID || "";
-const REDIRECT = process.env.APP_URL + "/api/auth/callback";
+const KC_BASE = env.KEYCLOAK_BASE;
+const KC_REALM = env.KEYCLOAK_REALM;
+const CLIENT_ID = env.KEYCLOAK_CLIENT_ID;
+const REDIRECT = env.APP_URL + "/api/auth/callback";
 
 const TOKEN_ENDPOINT = `${KC_BASE}/realms/${KC_REALM}/protocol/openid-connect/token`;
 
@@ -76,13 +77,13 @@ export async function GET(req: Request) {
   if (email === "velasmo3@gmail.com") email = "danvelc6@gmail.com";
 
   const data = await fetch(
-    `${process.env.BACKEND_URL}/api/wallet/main/by-email/${email}`,
+    `${env.BACKEND_URL}/api/wallet/main/by-email/${email}`,
     {
       headers: {
         "Content-Type": "application/json",
-        "X-API-KEY": process.env.BACKEND_KEY || "",
+        "X-API-KEY": env.BACKEND_KEY,
       },
-    }
+    },
   );
 
   const { walletAddress } = (await data.json()) as AddressResponse;
@@ -104,5 +105,5 @@ export async function GET(req: Request) {
   cookieStore.delete("pkce_state");
   cookieStore.delete("pkce_verifier");
 
-  return NextResponse.redirect(process.env.APP_URL + "/dashboard");
+  return NextResponse.redirect(env.APP_URL + "/dashboard");
 }

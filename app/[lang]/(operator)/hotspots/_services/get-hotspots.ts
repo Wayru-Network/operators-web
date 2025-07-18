@@ -1,6 +1,7 @@
 "use server";
 import { Prisma } from "@/lib/prisma-client/prisma";
 import { getSession } from "@/lib/session/session";
+import { env } from "@/lib/env/env";
 
 export interface Hotspot {
   id: number;
@@ -22,13 +23,13 @@ export async function getHotspots(): Promise<Hotspot[]> {
   const { wallet } = await getSession();
 
   const hotspotsData = await fetch(
-    `${process.env.BACKEND_URL}/api/nfnode/miners-by-address/${wallet}?page=1&limit=50`,
+    `${env.BACKEND_URL}/api/nfnode/miners-by-address/${wallet}?page=1&limit=50`,
     {
       headers: {
         "Content-Type": "application/json",
-        "X-API-KEY": process.env.BACKEND_KEY || "",
+        "X-API-KEY": env.BACKEND_KEY,
       },
-    }
+    },
   );
 
   const hotspots = (await hotspotsData.json()) as MinersByAddressResponse;
@@ -37,7 +38,7 @@ export async function getHotspots(): Promise<Hotspot[]> {
   }
 
   const wayruDeviceIds = hotspots.data.map(
-    (hotspot) => hotspot.wayru_device_id
+    (hotspot) => hotspot.wayru_device_id,
   );
 
   const portals = await Prisma.hotspot.findMany({
@@ -56,7 +57,7 @@ export async function getHotspots(): Promise<Hotspot[]> {
     if (hotspot.portal_configs && hotspot.portal_configs.length > 0) {
       portalMap.set(
         hotspot.wayru_device_id,
-        hotspot.portal_configs[0].portal_name
+        hotspot.portal_configs[0].portal_name,
       );
     }
   });
