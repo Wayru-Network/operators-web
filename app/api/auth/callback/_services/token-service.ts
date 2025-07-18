@@ -1,7 +1,8 @@
 import { createRemoteJWKSet, jwtVerify, JWTPayload } from "jose";
+import { env } from "@/lib/infra/env";
 
-const KC_BASE = process.env.KEYCLOAK_BASE;
-const KC_REALM = process.env.KEYCLOAK_REALM;
+const KC_BASE = env.KEYCLOAK_BASE;
+const KC_REALM = env.KEYCLOAK_REALM;
 
 let jwks: ReturnType<typeof createRemoteJWKSet> | null = null;
 
@@ -18,8 +19,6 @@ function getJWKS() {
   }
   return jwks;
 }
-
-// const clientId = process.env.KEYCLOAK_CLIENT_ID;
 
 export interface TokenClaims extends JWTPayload {
   email?: string;
@@ -39,7 +38,9 @@ export async function verifyToken(token: string): Promise<TokenClaims> {
   return payload;
 }
 
-export async function getEmail(token: string): Promise<string | undefined> {
-  const { email } = await verifyToken(token);
-  return email;
+export async function getUserInfo(
+  token: string,
+): Promise<{ email?: string; sub?: string }> {
+  const { email, sub } = await verifyToken(token);
+  return { email, sub };
 }

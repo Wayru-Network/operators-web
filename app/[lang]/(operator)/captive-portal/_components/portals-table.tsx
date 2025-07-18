@@ -13,19 +13,11 @@ import {
 } from "@heroui/table";
 import { Input } from "@heroui/input";
 import { Pagination } from "@heroui/pagination";
-import getCaptivePortals, {
-  CaptivePortals,
-} from "../_services/get-captive-portals";
 import NewPortal from "./new-portal";
 import { Search, Settings } from "lucide-react";
+import { rowCaptivePortal } from "../_services/get-captive-portals";
 
-export default function PortalsTable() {
-  const [rows, setRows] = useState<CaptivePortals[]>([]);
-
-  useEffect(() => {
-    getCaptivePortals().then((data) => setRows(data));
-  }, []);
-
+export default function PortalsTable({ rows }: { rows: rowCaptivePortal[] }) {
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState<SortDescriptor>({
     column: "name",
@@ -40,10 +32,10 @@ export default function PortalsTable() {
     let data = rows;
 
     if (text) {
-      data = data.filter((r) => r["portal-name"].toLowerCase().includes(text));
+      data = data.filter((r) => r["portal_name"].toLowerCase().includes(text));
     }
 
-    if (sort.column) {
+    if (sort.column && Array.isArray(data)) {
       data = [...data].sort((a, b) => {
         const aVal = getKeyValue(a, sort.column!);
         const bVal = getKeyValue(b, sort.column!);
@@ -67,17 +59,30 @@ export default function PortalsTable() {
   }, [filtered, page]);
 
   const columns = [
-    { key: "portal-name", label: "Portal Name", allowsSorting: true },
-    { key: "flow-type", label: "Flow Type" },
+    { key: "portal_name", label: "Portal Name", allowsSorting: true },
+    { key: "flow_type", label: "Flow Type" },
     {
       key: "assigned-hotspots",
       label: "Assigned Hotspots",
       allowsSorting: true,
     },
     { key: "conversion-rate", label: "Conversion Rate", allowsSorting: true },
-    { key: "last-edit", label: "Last Edit", allowsSorting: true },
+    { key: "last_edit", label: "Last Edit", allowsSorting: true },
     { key: "actions", label: "Actions", allowsSorting: false },
   ];
+
+  // Format last_edit date to MM-DD-YYYY and set timezone to user's locale
+  rows.map((row) => {
+    const date = new Date(row.last_edit);
+    row.last_edit = date.toLocaleString(undefined, {
+      year: "numeric",
+      day: "2-digit",
+      month: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    });
+  });
 
   return (
     <div className="flex flex-col space-y-4">
@@ -124,7 +129,7 @@ export default function PortalsTable() {
             )}
           </TableHeader>
 
-          <TableBody items={paged}>
+          <TableBody items={paged} emptyContent="No portals found">
             {(item) => (
               <TableRow
                 key={item.id}
@@ -134,20 +139,23 @@ export default function PortalsTable() {
                   <TableCell className="text-center">
                     {columnKey === "actions" ? (
                       <a
-                        href={`/captive-portal/${item["assigned-hotspots"]}`}
+                        href={`/captive-portal/${item.id}`}
                         className="flex items-center justify-center hover:underline"
                       >
                         <Settings className="" />
                       </a>
                     ) : columnKey === "assigned-hotspots" ? (
+                      <>{item._count.hotspots}</>
+                    ) : columnKey === "conversion-rate" ? (
+                      //@to-do: Implement conversion rate logic
+                      <>{0 + "%"}</>
+                    ) : columnKey === "portal_name" ? (
                       <a
-                        href={`/captive-portal/${item["assigned-hotspots"]}`}
-                        className="hover:underline"
+                        href={`/captive-portal/${item.id}`}
+                        className="flex items-center justify-center hover:underline"
                       >
                         {getKeyValue(item, columnKey)}
                       </a>
-                    ) : columnKey === "conversion-rate" ? (
-                      <>{getKeyValue(item, columnKey) + "%"}</>
                     ) : (
                       getKeyValue(item, columnKey)
                     )}

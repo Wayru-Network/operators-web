@@ -1,10 +1,10 @@
-import { NewPortalConfig } from "./create-captive-portal";
+import { PortalConfig } from "./customize-captive-portal";
 import { Check } from "lucide-react";
 
-export default function PortalSettings({
+export default function CustomizePortalSettings({
   config,
 }: {
-  config: NewPortalConfig;
+  config: PortalConfig;
 }) {
   return (
     <div className="flex flex-col max-w-[50%] bg-[#ffffff] dark:bg-[#191c1d] rounded-[30px] p-8">

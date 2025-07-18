@@ -12,12 +12,21 @@ CREATE TABLE "hotspot" (
 -- CreateTable
 CREATE TABLE "portal_config" (
     "id" SERIAL NOT NULL,
-    "hotspot_id" INTEGER NOT NULL,
-    "title" TEXT NOT NULL,
-    "description" TEXT,
+    "user_id" TEXT NOT NULL,
+    "portal_name" TEXT NOT NULL,
+    "welcome_message" TEXT,
+    "success_message" TEXT,
     "background_color" TEXT,
-    "asset_id" INTEGER NOT NULL,
+    "text_color" TEXT,
+    "button_color" TEXT,
+    "logo_asset_id" INTEGER NOT NULL,
+    "banner_asset_id" INTEGER NOT NULL,
+    "ad_access" BOOLEAN NOT NULL,
+    "voucher_access" BOOLEAN NOT NULL,
+    "form_access" BOOLEAN NOT NULL,
     "redirect_url" TEXT NOT NULL,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "portal_config_pkey" PRIMARY KEY ("id")
 );
@@ -53,14 +62,22 @@ CREATE TABLE "asset" (
     CONSTRAINT "asset_pkey" PRIMARY KEY ("id")
 );
 
--- AddForeignKey
-ALTER TABLE "portal_config" ADD CONSTRAINT "portal_config_logo_assetId_fkey" FOREIGN KEY ("asset_id") REFERENCES "asset"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+-- CreateTable
+CREATE TABLE "_portal_hotspots" (
+    "A" INTEGER NOT NULL,
+    "B" INTEGER NOT NULL,
+
+    CONSTRAINT "_portal_hotspots_AB_pkey" PRIMARY KEY ("A","B")
+);
+
+-- CreateIndex
+CREATE INDEX "_portal_hotspots_B_index" ON "_portal_hotspots"("B");
 
 -- AddForeignKey
-ALTER TABLE "portal_config" ADD CONSTRAINT "portal_config_banner_assetId_fkey" FOREIGN KEY ("asset_id") REFERENCES "asset"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "portal_config" ADD CONSTRAINT "portal_config_logo_asset_id_fkey" FOREIGN KEY ("logo_asset_id") REFERENCES "asset"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "portal_config" ADD CONSTRAINT "portal_config_hotspot_id_fkey" FOREIGN KEY ("hotspot_id") REFERENCES "hotspot"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "portal_config" ADD CONSTRAINT "portal_config_banner_asset_id_fkey" FOREIGN KEY ("banner_asset_id") REFERENCES "asset"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "network_config" ADD CONSTRAINT "network_config_hotspot_id_fkey" FOREIGN KEY ("hotspot_id") REFERENCES "hotspot"("id") ON DELETE SET NULL ON UPDATE CASCADE;
@@ -70,3 +87,9 @@ ALTER TABLE "ad" ADD CONSTRAINT "ad_ad_asset_id_fkey" FOREIGN KEY ("ad_asset_id"
 
 -- AddForeignKey
 ALTER TABLE "ad" ADD CONSTRAINT "ad_portal_config_id_fkey" FOREIGN KEY ("portal_config_id") REFERENCES "portal_config"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "_portal_hotspots" ADD CONSTRAINT "_portal_hotspots_A_fkey" FOREIGN KEY ("A") REFERENCES "hotspot"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "_portal_hotspots" ADD CONSTRAINT "_portal_hotspots_B_fkey" FOREIGN KEY ("B") REFERENCES "portal_config"("id") ON DELETE CASCADE ON UPDATE CASCADE;

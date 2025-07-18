@@ -1,3 +1,4 @@
+"use client";
 import {
   Dropdown,
   DropdownTrigger,
@@ -7,26 +8,23 @@ import {
 import { Button } from "@heroui/button";
 import React, { useEffect, useMemo, useState } from "react";
 import { ChevronDown } from "lucide-react";
-import getHotspots, { Hotspot } from "../../../hotspots/_services/get-hotspots";
 import type { Selection } from "@heroui/react";
+import { Hotspot } from "../../../hotspots/_services/get-hotspots";
 
 interface AssignHotspotProps {
   selected: string[];
   setSelected: (value: string[]) => void;
+  hotspots: Hotspot[];
 }
 
 export default function AssignHotspot({
   selected,
   setSelected,
+  hotspots,
 }: AssignHotspotProps) {
   const [selectedKeys, setSelectedKeys] = useState<Selection>(
     new Set(selected)
   );
-  const [hotspots, setHotspots] = useState<Hotspot[]>([]);
-
-  useEffect(() => {
-    getHotspots().then((data) => setHotspots(data));
-  }, []);
 
   useEffect(() => {
     if (selectedKeys === "all") {
@@ -49,13 +47,21 @@ export default function AssignHotspot({
 
   const selectedValue = useMemo(() => {
     if (selectedKeys === "all") return "all";
-    const values = Array.from(selectedKeys).filter((key) => key !== "none");
-    return values.length > 0 ? values.join(", ").replace(/_/g, "") : "none";
-  }, [selectedKeys]);
+    const keysArray = Array.from(selectedKeys).filter(
+      (key) => key !== "none"
+    ) as string[];
+    if (keysArray.length === 0) return "none";
+
+    const names = keysArray
+      .map((k) => hotspots.find((h) => h.wayru_device_id === k)?.name)
+      .filter((n): n is string => !!n);
+
+    return names.join(", ");
+  }, [selectedKeys, hotspots]);
 
   return (
     <Dropdown placement="bottom-start">
-      <DropdownTrigger>
+      <DropdownTrigger asChild>
         <Button
           className="flex w-full capitalize justify-between"
           variant="bordered"
@@ -65,7 +71,7 @@ export default function AssignHotspot({
         </Button>
       </DropdownTrigger>
       <DropdownMenu
-        aria-label="Multiple selection example"
+        aria-label="Assign Hotspot"
         closeOnSelect={false}
         disallowEmptySelection={false}
         selectionMode="multiple"
@@ -74,8 +80,11 @@ export default function AssignHotspot({
         variant="flat"
       >
         {hotspots.map((hotspot) => (
-          <DropdownItem key={hotspot["hotspot-name"]}>
-            {hotspot["hotspot-name"]}
+          <DropdownItem
+            key={hotspot.wayru_device_id}
+            value={hotspot.wayru_device_id}
+          >
+            {hotspot.name}
           </DropdownItem>
         ))}
       </DropdownMenu>

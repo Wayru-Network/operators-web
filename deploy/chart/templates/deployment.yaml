@@ -60,6 +60,22 @@ spec:
                 secretKeyRef:
                   name: {{ .Values.name }}
                   key: DATABASE_URL
+            - name: AZURE_STORAGE_ACCOUNT_NAME
+              value: {{ .Values.azureStorageAccountName | quote }}
+            - name: AZURE_STORAGE_ACCOUNT_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.name }}
+                  key: AZURE_STORAGE_ACCOUNT_KEY
+            - name: AZURE_CONTAINER_NAME
+              value: {{ .Values.azureStorageContainerName | quote }}
+            - name: BACKEND_URL
+              value: {{ .Values.backendUrl | quote }}
+            - name: BACKEND_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.name }}
+                  key: BACKEND_KEY
           volumeMounts:
             - name: {{ .Values.name }}-csi-volume
               mountPath: /mnt/secrets

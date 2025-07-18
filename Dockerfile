@@ -7,13 +7,14 @@ RUN apk add --no-cache libc6-compat
 WORKDIR /app
 COPY package.json pnpm-lock.yaml ./
 RUN corepack enable pnpm && pnpm i --frozen-lockfile
-COPY . .
 
 # Rebuild the source code only when needed
 FROM base AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+# Generate Prisma client
+RUN corepack enable pnpm && pnpm generate
 RUN corepack enable pnpm && pnpm run build
 
 FROM base AS runner

@@ -1,4 +1,4 @@
-import { NewPortalConfig } from "../page";
+import { NewPortalConfig } from "./create-captive-portal";
 import { Switch } from "@heroui/switch";
 import { Star } from "lucide-react";
 import { CustomInput } from "@/lib/components/custom-input";

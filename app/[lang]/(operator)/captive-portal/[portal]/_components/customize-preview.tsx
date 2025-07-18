@@ -1,10 +1,10 @@
 "use client";
 import Image from "next/image";
 import { Button } from "@heroui/button";
-import { NewPortalConfig } from "./create-captive-portal";
+import { PortalConfig } from "./customize-captive-portal";
 import { Megaphone, SquarePen, Ticket } from "lucide-react";
 
-export default function Preview({ config }: { config: NewPortalConfig }) {
+export default function Preview({ config }: { config: PortalConfig }) {
   const colors = config.colors;
   return (
     <div className="flex flex-col max-w-[50%] min-h-[51rem] max-h-[51rem] bg-[#ffffff] dark:bg-[#191c1d] rounded-[30px] p-8">

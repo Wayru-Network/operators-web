@@ -1,7 +1,7 @@
 import FileInput from "./file-input";
 import ColorSettings from "./color-settings";
 import { Button } from "@heroui/button";
-import { NewPortalConfig } from "../page";
+import { NewPortalConfig } from "./create-captive-portal";
 
 interface BrandingProps {
   newConfig: NewPortalConfig;
