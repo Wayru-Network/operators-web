@@ -1,10 +1,10 @@
 import FileInput from "@/lib/components/file-input";
 import ColorSettings from "@/lib/components/color-settings";
 import { Button } from "@heroui/button";
-import { NewPortalConfig } from "./create-captive-portal";
+import { PortalConfig } from "./customize-captive-portal";
 
 interface BrandingProps {
-  newConfig: NewPortalConfig;
+  newConfig: PortalConfig;
   selectedHandler: (value: string) => void;
   fileHandler: (file: File, url: string, assetState: "logo" | "banner") => void;
   colorsHandler: (value: {
@@ -35,6 +35,7 @@ export default function Branding({
         onSelect={(file, url) => fileHandler(file, url, "banner")}
         existingUrl={newConfig.banner.url || ""}
       />
+
       <p className="font-semibold">Theme settings</p>
       <ColorSettings value={newConfig.colors} onChange={colorsHandler} />
       <div className="flex gap-2 mt-5">

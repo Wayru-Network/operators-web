@@ -1,4 +1,4 @@
-import { NewPortalConfig } from "./create-captive-portal";
+import { PortalConfig } from "./customize-captive-portal";
 import FileInput from "@/lib/components/file-input";
 import InteractionTime from "@/lib/components/interaction-dropdown";
 import AdFormat from "@/lib/components/adformat-dropdown";
@@ -6,7 +6,7 @@ import { CustomInput } from "@/lib/components/custom-input";
 import { Button } from "@heroui/button";
 
 interface CreateAdProps {
-  newConfig: NewPortalConfig;
+  newConfig: PortalConfig;
   adFormatHandler: (value: string) => void;
   fileHandler: (
     file: File,

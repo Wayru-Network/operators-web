@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { Tab, Tabs } from "@heroui/tabs";
-import Branding from "@/app/[lang]/(operator)/captive-portal/new-portal/_components/branding";
+import Branding from "./customize-branding";
 import AccessFlows from "@/app/[lang]/(operator)/captive-portal/new-portal/_components/access-flows";
 import CreateAd from "@/app/[lang]/(operator)/captive-portal/new-portal/_components/create-ad";
 import { Hotspot } from "@/app/[lang]/(operator)/hotspots/_services/get-hotspots";
@@ -195,14 +195,14 @@ export default function CustomizeCaptivePortal({
           <CustomizePortalSettings config={Config} />
         )}
       </div>
-      {/* <div className="mt-6 p-4 border rounded">
+      <div className="mt-6 p-4 border rounded">
         <h2 className="text-lg font-semibold mb-2">
           Current Portal Configuration
         </h2>
         <pre className="text-xs overflow-x-auto whitespace-pre-wrap">
           {JSON.stringify(Config, null, 2)}
         </pre>
-      </div> */}
+      </div>
     </div>
   );
 }

@@ -19,17 +19,17 @@ export interface MinersByAddressResponse {
   data: Hotspot[];
 }
 
-export async function getHotspots(): Promise<Hotspot[]> {
+export async function getHotspots(page = 1, limit = 10): Promise<Hotspot[]> {
   const { wallet } = await getSession();
 
   const hotspotsData = await fetch(
-    `${env.BACKEND_URL}/api/nfnode/miners-by-address/${wallet}?page=1&limit=50`,
+    `${env.BACKEND_URL}/api/nfnode/miners-by-address/${wallet}?page=${page}&limit=${limit}`,
     {
       headers: {
         "Content-Type": "application/json",
         "X-API-KEY": env.BACKEND_KEY,
       },
-    },
+    }
   );
 
   const hotspots = (await hotspotsData.json()) as MinersByAddressResponse;
@@ -38,7 +38,7 @@ export async function getHotspots(): Promise<Hotspot[]> {
   }
 
   const wayruDeviceIds = hotspots.data.map(
-    (hotspot) => hotspot.wayru_device_id,
+    (hotspot) => hotspot.wayru_device_id
   );
 
   const portals = await Prisma.hotspot.findMany({
@@ -57,7 +57,7 @@ export async function getHotspots(): Promise<Hotspot[]> {
     if (hotspot.portal_configs && hotspot.portal_configs.length > 0) {
       portalMap.set(
         hotspot.wayru_device_id,
-        hotspot.portal_configs[0].portal_name,
+        hotspot.portal_configs[0].portal_name
       );
     }
   });
@@ -67,6 +67,32 @@ export async function getHotspots(): Promise<Hotspot[]> {
   });
 
   return hotspots.data;
+}
+
+export async function getHotspotsMock(page = 1, limit = 6): Promise<Hotspot[]> {
+  const totalItems = 20;
+  const allHotspots: Hotspot[] = [];
+
+  for (let i = 1; i <= totalItems; i++) {
+    allHotspots.push({
+      id: i,
+      name: `Hotspot-${i}`,
+      status: i % 2 === 0 ? "active" : "inactive",
+      mac: `00:11:22:33:44:${(10 + i).toString(16).padStart(2, "0")}`,
+      latitude: (10 + i * 0.01).toFixed(5),
+      longitude: (-75 - i * 0.01).toFixed(5),
+      solana_asset_id: `asset-${i}`,
+      nfnode_type: "type-A",
+      wayru_device_id: `device-${i}`,
+      assigned_portal: `Portal-${(i % 3) + 1}`,
+    });
+  }
+
+  // Paginar slice
+  const start = (page - 1) * limit;
+  const end = start + limit;
+
+  return allHotspots.slice(start, end);
 }
 
 export async function getDefaultHotspots(): Promise<Hotspot[]> {
