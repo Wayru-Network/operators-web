@@ -100,31 +100,34 @@ export async function GET(req: Request) {
 
   if (email === "velasmo3@gmail.com") email = "danvelc6@gmail.com";
 
-  const data = await fetch(
-    `${env.BACKEND_URL}/api/wallet/main/by-email/${email}`,
-    {
-      headers: {
-        "Content-Type": "application/json",
-        "X-API-KEY": env.BACKEND_KEY,
+  let walletAddress = "";
+
+  try {
+    const data = await fetch(
+      `${env.BACKEND_URL}/api/wallet/main/by-email/${email}`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "X-API-KEY": env.BACKEND_KEY,
+        },
       },
-    },
-  );
+    );
 
-  if (!data.ok) {
-    console.log("auth failure: Wallet API request failed");
-    console.log("- Status:", data.status);
-    console.log("- Status text:", data.statusText);
-    const errorText = await data.text();
-    console.log("- Error response:", errorText);
-    return NextResponse.redirect(fallbackUrl);
-  }
-
-  const { walletAddress } = (await data.json()) as AddressResponse;
-  if (!walletAddress) {
-    console.log("auth failure: No wallet address found");
-    console.log("- Email:", email);
-    console.log("- Response:", { walletAddress });
-    return NextResponse.redirect(fallbackUrl);
+    if (data.ok) {
+      const response = (await data.json()) as AddressResponse;
+      walletAddress = response.walletAddress || "";
+    } else {
+      console.log(
+        "Warning: Wallet API request failed, proceeding without wallet",
+      );
+      console.log("- Status:", data.status);
+      console.log("- Status text:", data.statusText);
+    }
+  } catch (error) {
+    console.log(
+      "Warning: Wallet API request error, proceeding without wallet:",
+      error,
+    );
   }
 
   await updateSession({

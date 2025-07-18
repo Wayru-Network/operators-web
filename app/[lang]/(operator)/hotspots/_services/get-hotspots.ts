@@ -22,6 +22,10 @@ export interface MinersByAddressResponse {
 export async function getHotspots(page = 1, limit = 10): Promise<Hotspot[]> {
   const { wallet } = await getSession();
 
+  if (!wallet) {
+    return [];
+  }
+
   const hotspotsData = await fetch(
     `${env.BACKEND_URL}/api/nfnode/miners-by-address/${wallet}?page=${page}&limit=${limit}`,
     {
@@ -29,7 +33,7 @@ export async function getHotspots(page = 1, limit = 10): Promise<Hotspot[]> {
         "Content-Type": "application/json",
         "X-API-KEY": env.BACKEND_KEY,
       },
-    }
+    },
   );
 
   const hotspots = (await hotspotsData.json()) as MinersByAddressResponse;
@@ -38,7 +42,7 @@ export async function getHotspots(page = 1, limit = 10): Promise<Hotspot[]> {
   }
 
   const wayruDeviceIds = hotspots.data.map(
-    (hotspot) => hotspot.wayru_device_id
+    (hotspot) => hotspot.wayru_device_id,
   );
 
   const portals = await Prisma.hotspot.findMany({
@@ -57,7 +61,7 @@ export async function getHotspots(page = 1, limit = 10): Promise<Hotspot[]> {
     if (hotspot.portal_configs && hotspot.portal_configs.length > 0) {
       portalMap.set(
         hotspot.wayru_device_id,
-        hotspot.portal_configs[0].portal_name
+        hotspot.portal_configs[0].portal_name,
       );
     }
   });
