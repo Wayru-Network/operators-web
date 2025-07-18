@@ -26,6 +26,14 @@ spec:
           objectName: database-url
           objectType: secret
           objectVersion: ""
+        - |
+          objectName: azure-storage-account-key
+          objectType: secret
+          objectVersion: ""
+        - |
+          objectName: backend-key
+          objectType: secret
+          objectVersion: ""
   secretObjects:
     - secretName: {{ .Values.name }}
       type: Opaque
@@ -34,3 +42,7 @@ spec:
           key: SESSION_KEY
         - objectName: database-url
           key: DATABASE_URL
+        - objectName: azure-storage-account-key
+          key: AZURE_STORAGE_ACCOUNT_KEY
+        - objectName: backend-key
+          key: BACKEND_KEY
