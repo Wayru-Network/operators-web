@@ -5,6 +5,7 @@ import AssignHotspot from "./assign-hotspot-dropdown";
 import uploadConfig from "../_services/upload_config";
 import { addToast } from "@heroui/toast";
 import { Hotspot } from "../../../hotspots/_services/get-hotspots";
+import { redirect } from "next/navigation";
 
 interface PublishProps {
   selectedHandler: (step: string) => void;
@@ -36,6 +37,7 @@ export default function Publish({
       description: "Portal configuration uploaded successfully",
       color: "success",
     });
+    redirect("/captive-portal");
   };
 
   const handleTest = () => {
