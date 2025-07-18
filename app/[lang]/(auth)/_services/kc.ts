@@ -28,6 +28,11 @@ export async function socialLogin(provider: Provider) {
   const challenge = codeChallengeFrom(verifier);
   const state = generateState();
 
+  console.log("base", kc.base);
+  console.log("realm", kc.realm);
+  console.log("clientId", kc.clientId);
+  console.log("app URL", env.APP_URL);
+
   const authUrl = new URL(
     `${kc.base}/realms/${kc.realm}/protocol/openid-connect/auth`,
   );
