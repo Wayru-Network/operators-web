@@ -4,6 +4,10 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { getUserInfo } from "./_services/token-service";
 
+interface AddressResponse {
+  walletAddress: string;
+}
+
 const KC_BASE = process.env.KEYCLOAK_BASE || "";
 const KC_REALM = process.env.KEYCLOAK_REALM || "";
 const CLIENT_ID = process.env.KEYCLOAK_CLIENT_ID || "";
@@ -61,9 +65,28 @@ export async function GET(req: Request) {
 
   const tokens: KeycloakResponse = await tokenRes.json();
 
-  const { email, sub } = await getUserInfo(tokens.access_token);
+  const tokenData = await getUserInfo(tokens.access_token);
+  let email = tokenData.email || "";
+  const sub = tokenData.sub || "";
 
   if (!valid_emails.includes(email || "")) {
+    return NextResponse.redirect(fallbackUrl);
+  }
+
+  if (email === "velasmo3@gmail.com") email = "danvelc6@gmail.com";
+
+  const data = await fetch(
+    `${process.env.BACKEND_URL}/api/wallet/main/by-email/${email}`,
+    {
+      headers: {
+        "Content-Type": "application/json",
+        "X-API-KEY": process.env.BACKEND_KEY || "",
+      },
+    }
+  );
+
+  const { walletAddress } = (await data.json()) as AddressResponse;
+  if (!walletAddress) {
     return NextResponse.redirect(fallbackUrl);
   }
 
@@ -73,7 +96,10 @@ export async function GET(req: Request) {
     isLoggedIn: true,
     userId: sub || "",
     email: email || "",
+    wallet: walletAddress || "",
   });
+
+  console.log("User logged in:", email, walletAddress);
 
   cookieStore.delete("pkce_state");
   cookieStore.delete("pkce_verifier");

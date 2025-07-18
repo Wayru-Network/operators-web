@@ -1,40 +1,47 @@
 import { Button } from "@heroui/button";
-import { NewPortalConfig } from "./create-captive-portal";
+import { PortalConfig } from "./customize-captive-portal";
 import { CustomInput } from "@/lib/components/custom-input";
-import AssignHotspot from "./assign-hotspot-dropdown";
-import uploadConfig from "../_services/upload_config";
+import AssignHotspot from "@/app/[lang]/(operator)/captive-portal/new-portal/_components/assign-hotspot-dropdown";
+// import uploadConfig from "../_services/upload_config";
 import { addToast } from "@heroui/toast";
 import { Hotspot } from "../../../hotspots/_services/get-hotspots";
 import { redirect } from "next/navigation";
 
 interface PublishProps {
   selectedHandler: (step: string) => void;
-  portalConfig: NewPortalConfig;
+  portalConfig: PortalConfig;
   nameHandler: (name: string) => void;
   assignedHotspotHandler: (hotspot: string[]) => void;
   hotspots: Hotspot[];
 }
 
-export default function Publish({
+export default function UpdatePortal({
   selectedHandler,
   portalConfig,
   nameHandler,
   assignedHotspotHandler,
   hotspots,
 }: PublishProps) {
-  const handlePublish = async () => {
-    const result = await uploadConfig(portalConfig);
-    if (!result.success) {
-      addToast({
-        title: "Error",
-        description: result.error || "Failed to upload portal configuration",
-        color: "danger",
-      });
-      return;
-    }
+  // const handlePublish = async () => {
+  //   const result = await uploadConfig(portalConfig);
+  //   if (!result.success) {
+  //     addToast({
+  //       title: "Error",
+  //       description: result.error || "Failed to upload portal configuration",
+  //       color: "danger",
+  //     });
+  //     return;
+  //   }
+  //   addToast({
+  //     title: "Success",
+  //     description: "Portal configuration uploaded successfully",
+  //     color: "success",
+  //   });
+  // };
+  const handlePublish = () => {
     addToast({
-      title: "Success",
-      description: "Portal configuration uploaded successfully",
+      title: "Success - Demo",
+      description: "Portal configuration updated successfully",
       color: "success",
     });
     redirect("/captive-portal");
@@ -71,7 +78,7 @@ export default function Publish({
         >
           {portalConfig.assignedHotspot.length > 0
             ? `Save and publish to ${portalConfig.assignedHotspot.length} assigned hotspot(s)`
-            : "Save new portal without assigning hotspots"}
+            : "Update portal without assigning hotspots"}
         </Button>
         <div className="flex flex-row gap-2">
           <Button

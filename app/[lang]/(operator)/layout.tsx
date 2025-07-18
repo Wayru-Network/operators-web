@@ -8,6 +8,7 @@ import { Metadata } from "next";
 import Image from "next/image";
 import { verifySession } from "@/lib/dal/dal";
 import { ToastProvider } from "@heroui/toast";
+import LogoutButton from "@/lib/components/logout";
 
 export const metadata: Metadata = {
   title: "Operators - Wayru",
@@ -49,6 +50,7 @@ export default async function OperatorLayout({ children }: LayoutProps) {
           <div className="flex flex-row gap-x-4 justify-end mb-10">
             <ConnectWallet />
             <LangSwitch />
+            <LogoutButton />
           </div>
           {children}
         </div>

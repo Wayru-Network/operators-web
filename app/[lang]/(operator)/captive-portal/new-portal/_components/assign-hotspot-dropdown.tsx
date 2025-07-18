@@ -53,7 +53,7 @@ export default function AssignHotspot({
     if (keysArray.length === 0) return "none";
 
     const names = keysArray
-      .map((k) => hotspots.find((h) => h.key === k)?.["hotspot-name"])
+      .map((k) => hotspots.find((h) => h.wayru_device_id === k)?.name)
       .filter((n): n is string => !!n);
 
     return names.join(", ");
@@ -80,8 +80,11 @@ export default function AssignHotspot({
         variant="flat"
       >
         {hotspots.map((hotspot) => (
-          <DropdownItem key={hotspot.key} value={hotspot.key}>
-            {hotspot["hotspot-name"]}
+          <DropdownItem
+            key={hotspot.wayru_device_id}
+            value={hotspot.wayru_device_id}
+          >
+            {hotspot.name}
           </DropdownItem>
         ))}
       </DropdownMenu>

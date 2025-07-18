@@ -14,18 +14,10 @@ import {
 import { Input } from "@heroui/input";
 import { Pagination } from "@heroui/pagination";
 import StatusPill from "@/app/[lang]/(operator)/hotspots/_components/status-pill";
-import getHotspots, {
-  Hotspot,
-} from "@/app/[lang]/(operator)/hotspots/_services/get-hotspots";
+import { Hotspot } from "@/app/[lang]/(operator)/hotspots/_services/get-hotspots";
 import { Settings, Search } from "lucide-react";
 
-export default function HotspotsTable() {
-  const [rows, setRows] = useState<Hotspot[]>([]);
-
-  useEffect(() => {
-    getHotspots().then((data) => setRows(data));
-  }, []);
-
+export default function HotspotsTable({ rows }: { rows: Hotspot[] }) {
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState<SortDescriptor>({
     column: "name",
@@ -40,7 +32,7 @@ export default function HotspotsTable() {
     let data = rows;
 
     if (text) {
-      data = data.filter((r) => r["hotspot-name"].toLowerCase().includes(text));
+      data = data.filter((r) => r.name.toLowerCase().includes(text));
     }
 
     if (sort.column) {
@@ -67,11 +59,11 @@ export default function HotspotsTable() {
   }, [filtered, page]);
 
   const columns = [
-    { key: "hotspot-name", label: "Hotspot Name", allowsSorting: true },
+    { key: "name", label: "Hotspot Name", allowsSorting: true },
     { key: "mac", label: "MAC" },
     { key: "status", label: "Status" },
-    { key: "assigned-portal", label: "Assigned Portal" },
-    { key: "location-name", label: "Location Name" },
+    { key: "assigned_portal", label: "Assigned Portal" },
+    { key: "location_name", label: "Location Name" },
     { key: "actions", label: "Actions", allowsSorting: false },
   ];
 
@@ -117,10 +109,10 @@ export default function HotspotsTable() {
             )}
           </TableHeader>
 
-          <TableBody items={paged}>
+          <TableBody items={paged} emptyContent="No hotspots found">
             {(item) => (
               <TableRow
-                key={item.key}
+                key={item.name}
                 className="hover:bg-gray-100 dark:hover:bg-gray-500"
               >
                 {(columnKey) => (
@@ -128,26 +120,26 @@ export default function HotspotsTable() {
                     {columnKey === "status" ? (
                       <StatusPill
                         status={
-                          getKeyValue(item, columnKey) as "Online" | "Offline"
+                          getKeyValue(item, columnKey) as "active" | "inactive"
                         }
                       />
                     ) : columnKey === "actions" ? (
                       <a
-                        href={`/captive-portal/${item["assigned-portal"]}`}
+                        href={`/captive-portal/${item.assigned_portal}`}
                         className="block"
                       >
                         <Settings />
                       </a>
-                    ) : columnKey === "hotspot-name" ? (
+                    ) : columnKey === "name" ? (
                       <a
-                        href={`/hotspots/${item["hotspot-name"]}`}
+                        href={`/hotspots/${item.name}`}
                         className="hover:underline"
                       >
                         {getKeyValue(item, columnKey)}
                       </a>
                     ) : columnKey === "assigned-portal" ? (
                       <a
-                        href={`/captive-portal/${item["assigned-portal"]}`}
+                        href={`/captive-portal/${item.assigned_portal}`}
                         className="hover:underline"
                       >
                         {getKeyValue(item, columnKey)}

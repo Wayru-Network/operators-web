@@ -1,8 +1,6 @@
 "use server";
-import { PrismaClient } from "@/lib/generated/prisma";
 import { getSession } from "@/lib/session/session";
-
-const prisma = new PrismaClient();
+import { Prisma } from "@/lib/prisma-client/prisma";
 
 export interface rowCaptivePortal {
   id: number;
@@ -16,7 +14,8 @@ export interface rowCaptivePortal {
 
 export default async function getCaptivePortals(): Promise<rowCaptivePortal[]> {
   const session = await getSession();
-  const rows = await prisma.portal_config.findMany({
+  console.log("Session:", session.userId);
+  const rows = await Prisma.portal_config.findMany({
     orderBy: {
       portal_name: "asc",
     },
