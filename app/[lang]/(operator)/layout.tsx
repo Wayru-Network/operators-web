@@ -1,4 +1,4 @@
-import ConnectWallet from "@/lib/components/connect-wallet";
+import WalletStatus from "@/lib/components/wallet-status";
 import LangSwitch from "@/lib/components/lang-switch";
 import RootLayout from "@/lib/components/layout/root";
 import NavMenu from "@/lib/components/navmenu";
@@ -48,7 +48,7 @@ export default async function OperatorLayout({ children }: LayoutProps) {
         </div>
         <div className="w-full p-11">
           <div className="flex flex-row gap-x-4 justify-end mb-10">
-            <ConnectWallet />
+            <WalletStatus />
             <LangSwitch />
             <LogoutButton />
           </div>
