@@ -19,6 +19,7 @@ const TOKEN_ENDPOINT = `${KC_BASE}/realms/${KC_REALM}/protocol/openid-connect/to
 const valid_emails = [
   "daniel.velasquez@wayru.org",
   "diego@wayru.org",
+  "diegoserranor@gmail.com",
   "charvel@wayru.org",
   "paula@wayru.org",
   "velasmo3@gmail.com",
@@ -36,6 +37,7 @@ export async function GET(req: Request) {
   console.log("err:", err);
 
   if (err) {
+    console.log("AUTH FAILURE: Error parameter present:", err);
     return NextResponse.redirect(fallbackUrl);
   }
 
@@ -44,6 +46,12 @@ export async function GET(req: Request) {
   const codeVerifier = cookieStore.get("pkce_verifier")?.value;
 
   if (!code || !state || state !== savedState || !codeVerifier) {
+    console.log("auth failure: PKCE validation failed");
+    console.log("- code present:", !!code);
+    console.log("- state present:", !!state);
+    console.log("- savedState present:", !!savedState);
+    console.log("- state matches savedState:", state === savedState);
+    console.log("- codeVerifier present:", !!codeVerifier);
     return NextResponse.redirect(fallbackUrl);
   }
 
@@ -69,6 +77,11 @@ export async function GET(req: Request) {
   });
 
   if (!tokenRes.ok) {
+    console.log("auth failure: Token exchange failed");
+    console.log("- Status:", tokenRes.status);
+    console.log("- Status text:", tokenRes.statusText);
+    const errorText = await tokenRes.text();
+    console.log("- Error response:", errorText);
     return NextResponse.redirect(fallbackUrl);
   }
 
@@ -79,6 +92,9 @@ export async function GET(req: Request) {
   const sub = tokenData.sub || "";
 
   if (!valid_emails.includes(email || "")) {
+    console.log("auth failure: Email not in valid list");
+    console.log("- Email:", email);
+    console.log("- Valid emails:", valid_emails);
     return NextResponse.redirect(fallbackUrl);
   }
 
@@ -94,8 +110,20 @@ export async function GET(req: Request) {
     },
   );
 
+  if (!data.ok) {
+    console.log("auth failure: Wallet API request failed");
+    console.log("- Status:", data.status);
+    console.log("- Status text:", data.statusText);
+    const errorText = await data.text();
+    console.log("- Error response:", errorText);
+    return NextResponse.redirect(fallbackUrl);
+  }
+
   const { walletAddress } = (await data.json()) as AddressResponse;
   if (!walletAddress) {
+    console.log("auth failure: No wallet address found");
+    console.log("- Email:", email);
+    console.log("- Response:", { walletAddress });
     return NextResponse.redirect(fallbackUrl);
   }
 
