@@ -31,6 +31,10 @@ export async function GET(req: Request) {
   const state = searchParams.get("state");
   const err = searchParams.get("error");
 
+  console.log("code:", code);
+  console.log("state:", state);
+  console.log("err:", err);
+
   if (err) {
     return NextResponse.redirect(fallbackUrl);
   }
@@ -46,6 +50,10 @@ export async function GET(req: Request) {
   if (!CLIENT_ID) {
     throw new Error("KEYCLOAK_CLIENT_ID is not defined");
   }
+
+  console.log("CLIENT_ID:", CLIENT_ID);
+  console.log("REDIRECT:", REDIRECT);
+
   const body = new URLSearchParams({
     grant_type: "authorization_code",
     client_id: CLIENT_ID,
