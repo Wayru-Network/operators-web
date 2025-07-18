@@ -1,7 +1,16 @@
 "use client";
-import { Tab, Tabs } from "@heroui/tabs";
 
-export default function HotspotTabs({ hotspot }: { hotspot: string }) {
+import { Tab, Tabs } from "@heroui/tabs";
+import HotspotDeviceInfo, { DeviceInfoProps } from "./hotspot-device-info";
+import HotspotNetworks, { HotspotNetworksProps } from "./hotspot-networks";
+import HotspotCaptivePortal from "./hotspot-captive-portal";
+
+export interface HotspotTabsProps {
+  info: DeviceInfoProps;
+  networks: HotspotNetworksProps;
+}
+
+export default function HotspotTabs({ info, networks }: HotspotTabsProps) {
   return (
     <Tabs
       fullWidth
@@ -16,29 +25,13 @@ export default function HotspotTabs({ hotspot }: { hotspot: string }) {
       color="primary"
     >
       <Tab key="device-info" title="Device Information">
-        <p className="text-lg font-semibold">Device Information</p>
-        <div className="mt-4">
-          <p>Hotspot Name: {hotspot}</p>
-          <p>MAC Address: 00:1A:2B:3C:4D:5E</p>
-          <p>Status: Online</p>
-          <p>Assigned Portal: Main Portal</p>
-        </div>
+        <HotspotDeviceInfo {...info} />
       </Tab>
       <Tab key="networks" title="Networks">
-        <p className="text-lg font-semibold">Network Information</p>
-        <div className="mt-4">
-          <p>SSID: MyHotspot</p>
-          <p>IP Address: 192.168.1.1</p>
-          <p>Connected Clients: 10</p>
-        </div>
+        <HotspotNetworks {...networks} />
       </Tab>
       <Tab key="captive-portal" title="Captive Portal">
-        <p className="text-lg font-semibold">Captive Portal</p>
-        <div className="mt-4">
-          <p>Portal URL: https://portal.wayru.com</p>
-          <p>Login Required: Yes</p>
-          <p>Terms of Service: Accepted</p>
-        </div>
+        <HotspotCaptivePortal />
       </Tab>
     </Tabs>
   );
