@@ -18,11 +18,13 @@ const TOKEN_ENDPOINT = `${KC_BASE}/realms/${KC_REALM}/protocol/openid-connect/to
 
 const valid_emails = [
   "daniel.velasquez@wayru.org",
+  "velasmo3@gmail.com",
   "diego@wayru.org",
   "diegoserranor@gmail.com",
   "charvel@wayru.org",
+  "wayru.deployer.ecuador@gmail.com",
+  "charvel.chedraui@gmail.com",
   "paula@wayru.org",
-  "velasmo3@gmail.com",
 ];
 
 export async function GET(req: Request) {
