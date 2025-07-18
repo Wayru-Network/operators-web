@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 
-const accountName = process.env.AZURE_STORAGE_ACCOUNT_NAME!;
+const devAssetsHostname = "firmwarebuilds.blob.core.windows.net";
+const prodAssetsHostname = "wayruosimages.blob.core.windows.net";
 
 const nextConfig: NextConfig = {
   output: "standalone",
@@ -13,7 +14,13 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: `${accountName}.blob.core.windows.net`,
+        hostname: devAssetsHostname,
+        port: "",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: prodAssetsHostname,
         port: "",
         pathname: "/**",
       },
