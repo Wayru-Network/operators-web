@@ -1,9 +1,10 @@
 "use server";
 
-import { hotspot } from "@/lib/generated/prisma";
+// import { hotspot } from "@/lib/generated/prisma";
 // import { Prisma } from "@/lib/prisma-client/prisma";
 
 export async function getHotspotDetail(id: string): Promise<HotspotDetail> {
+  console.log("id", id);
   return detailPlaceholder;
 }
 

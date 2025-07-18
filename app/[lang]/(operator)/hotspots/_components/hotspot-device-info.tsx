@@ -28,8 +28,8 @@ export interface DeviceInfoProps {
 
 export default function HotspotDeviceInfo({
   basic,
-  network,
-  ownership,
+  // network,
+  // ownership,
 }: DeviceInfoProps) {
   return (
     <div>
