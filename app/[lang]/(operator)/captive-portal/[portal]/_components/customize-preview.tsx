@@ -1,0 +1,93 @@
+"use client";
+import Image from "next/image";
+import { Button } from "@heroui/button";
+import { PortalConfig } from "./customize-captive-portal";
+import { Megaphone, SquarePen, Ticket } from "lucide-react";
+
+export default function Preview({ config }: { config: PortalConfig }) {
+  const colors = config.colors;
+  return (
+    <div className="flex flex-col max-w-[50%] min-h-[51rem] max-h-[51rem] bg-[#ffffff] dark:bg-[#191c1d] rounded-[30px] p-8">
+      <p className="font-bold text-lg pb-4">Preview</p>
+      <div
+        className="min-w-[50%] max-w-full h-full bg-[#F8FAFA] dark:bg-gray-600 text-black rounded-[10px] flex flex-col items-center space-y-4 p-8"
+        style={{
+          backgroundColor: config.colors.background,
+        }}
+      >
+        {config.logo.url ? (
+          <div className="flex items-center justify-center h-20 w-96 max-w-96">
+            <Image src={config.logo.url} alt="Logo" width={50} height={50} />
+          </div>
+        ) : (
+          <div className="flex items-center justify-center h-20 bg-[#D9D9D9] rounded-sm sm:w-96">
+            Logo
+          </div>
+        )}
+
+        <div className="flex flex-col w-full max-w-full">
+          <p
+            className="text-center py-8 break-words self-center"
+            style={{ color: config.colors.text }}
+          >
+            {config.welcomeMessage}
+          </p>
+
+          <div className="flex flex-col gap-4 h-full max-w-full">
+            {config.ad && (
+              <Button
+                className="flex w-full text-white dark:text-black rounded-full transition-none"
+                style={{
+                  backgroundColor: colors.button,
+                  color: colors.text,
+                }}
+              >
+                <Megaphone className="mr-1" />
+                Watch an Ad to connect
+              </Button>
+            )}
+            {config.voucher && (
+              <Button
+                className="w-full text-white dark:text-black rounded-full transition-none"
+                style={{
+                  backgroundColor: colors.button,
+                  color: colors.text,
+                }}
+              >
+                <Ticket className="mr-1" />
+                Enter voucher code to connect
+              </Button>
+            )}
+            {config.userInfo && (
+              <Button
+                className="w-full text-white dark:text-black rounded-full transition-none"
+                style={{
+                  backgroundColor: colors.button,
+                  color: colors.text,
+                }}
+              >
+                <SquarePen className="mr-1" />
+                Fill a form to connect
+              </Button>
+            )}
+            {config.banner.url ? (
+              <div className="flex items-center justify-center w-full h-72 mt-auto">
+                <Image
+                  src={config.banner.url}
+                  alt="Banner"
+                  width={350}
+                  height={350}
+                  className="object-contain h-full max-w-full"
+                />
+              </div>
+            ) : (
+              <div className="flex items-center justify-center w-full h-72 bg-[#D9D9D9] rounded-sm mt-auto">
+                Banner
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
