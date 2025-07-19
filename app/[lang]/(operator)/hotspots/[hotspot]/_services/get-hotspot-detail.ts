@@ -1,6 +1,5 @@
 "use server";
 
-import { env } from "@/lib/infra/env";
 import getNFNodeByName from "@/lib/nfnode/get-nfnode-by-name";
 
 // import { hotspot } from "@/lib/generated/prisma";
