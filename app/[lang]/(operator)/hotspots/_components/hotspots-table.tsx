@@ -73,7 +73,7 @@ export default function HotspotsTable({ rows }: { rows: Hotspot[] }) {
       setPage(page + 1);
       redirect(`/admin/devices?page=${page}`);
     },
-    [setPage]
+    [setPage],
   );
 
   return (
@@ -136,10 +136,7 @@ export default function HotspotsTable({ rows }: { rows: Hotspot[] }) {
                         }
                       />
                     ) : columnKey === "actions" ? (
-                      <a
-                        href={`/captive-portal/${item.assigned_portal}`}
-                        className="block"
-                      >
+                      <a href={`/hotspots/${item.name}`} className="block">
                         <Settings />
                       </a>
                     ) : columnKey === "name" ? (

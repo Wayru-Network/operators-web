@@ -45,6 +45,7 @@ export default async function getNFNodeByName(
 
     return nfNode;
   } catch (error) {
+    console.log("error fetching NFNode by name", error);
     return null;
   }
 }
