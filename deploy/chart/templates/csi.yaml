@@ -34,6 +34,10 @@ spec:
           objectName: backend-key
           objectType: secret
           objectVersion: ""
+        - |
+          objectName: wifi-api-key
+          objectType: secret
+          objectVersion: ""
   secretObjects:
     - secretName: {{ .Values.name }}
       type: Opaque
@@ -46,3 +50,5 @@ spec:
           key: AZURE_STORAGE_ACCOUNT_KEY
         - objectName: backend-key
           key: BACKEND_KEY
+        - objectName: wifi-api-key
+          key: WIFI_API_KEY

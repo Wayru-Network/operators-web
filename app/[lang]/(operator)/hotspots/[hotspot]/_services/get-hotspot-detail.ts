@@ -1,5 +1,6 @@
 "use server";
 
+import getDeviceBrief from "@/lib/device/get-device-brief";
 import getNFNodeByName from "@/lib/nfnode/get-nfnode-by-name";
 
 // import { hotspot } from "@/lib/generated/prisma";
@@ -9,6 +10,11 @@ export async function getHotspotDetail(name: string): Promise<HotspotDetail> {
   const nfnode = await getNFNodeByName(name);
   if (nfnode) {
     console.log(nfnode);
+  }
+
+  if (nfnode && nfnode.wayru_device_id) {
+    const device = await getDeviceBrief(nfnode.wayru_device_id);
+    console.log(device);
   }
 
   const detail: HotspotDetail = {

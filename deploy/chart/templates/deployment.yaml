@@ -76,6 +76,13 @@ spec:
                 secretKeyRef:
                   name: {{ .Values.name }}
                   key: BACKEND_KEY
+            - name: WIFI_API_URL
+              value: {{ .Values.wifiApiUrl | quote }}
+            - name: WIFI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.name }}
+                  key: WIFI_API_KEY
           volumeMounts:
             - name: {{ .Values.name }}-csi-volume
               mountPath: /mnt/secrets
