@@ -8,13 +8,10 @@ import getNFNodeByName from "@/lib/nfnode/get-nfnode-by-name";
 
 export async function getHotspotDetail(name: string): Promise<HotspotDetail> {
   const nfnode = await getNFNodeByName(name);
-  if (nfnode) {
-    console.log(nfnode);
-  }
+  let device = null;
 
   if (nfnode && nfnode.wayru_device_id) {
-    const device = await getDeviceBrief(nfnode.wayru_device_id);
-    console.log(device);
+    device = await getDeviceBrief(nfnode.wayru_device_id);
   }
 
   const detail: HotspotDetail = {
@@ -22,15 +19,15 @@ export async function getHotspotDetail(name: string): Promise<HotspotDetail> {
       basic: {
         name: name,
         locationName: "",
-        model: "",
-        brand: "",
-        osName: "",
-        osVersion: "",
-        osServicesVersion: "",
-        publicIP: "",
+        model: device?.model || nfnode?.model || "",
+        brand: device?.brand || "",
+        osName: device?.os_name || "",
+        osVersion: device?.os_version || "",
+        osServicesVersion: device?.os_services_version || "",
+        publicIP: device?.public_ip || "",
       },
       network: {
-        mac: "",
+        mac: device?.mac || nfnode?.mac || "",
         ip: "",
         serial: nfnode?.serial || "",
         ssidOpen: "",
@@ -38,9 +35,9 @@ export async function getHotspotDetail(name: string): Promise<HotspotDetail> {
         ssidPrivatePassword: "",
       },
       ownership: {
-        nftID: "",
-        ownerAddress: "",
-        macAddress: "",
+        nftID: nfnode?.solana_asset_id || "",
+        ownerAddress: nfnode?.wallet || "",
+        macAddress: device?.mac || nfnode?.mac || "",
       },
     },
     networks: {
