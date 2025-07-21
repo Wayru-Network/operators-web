@@ -25,6 +25,7 @@ const valid_emails = [
   "wayru.deployer.ecuador@gmail.com",
   "charvel.chedraui@gmail.com",
   "paula@wayru.org",
+  "alejandrocamacaro91@gmail.com",
 ];
 
 export async function GET(req: Request) {
