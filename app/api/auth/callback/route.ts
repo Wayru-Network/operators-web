@@ -88,9 +88,7 @@ export async function GET(req: Request) {
 
   const { walletAddress } = (await data.json()) as AddressResponse;
   if (!walletAddress) {
-    //@todo redirect to wallet creation/connection page
     console.error("No wallet address found for user:", email);
-    return NextResponse.redirect(fallbackUrl);
   }
 
   await updateSession({
@@ -102,10 +100,13 @@ export async function GET(req: Request) {
     wallet: walletAddress || "",
   });
 
-  console.log("User logged in:", email, walletAddress);
+  console.log("User logged in:", email, "wallet: ", walletAddress);
 
   cookieStore.delete("pkce_state");
   cookieStore.delete("pkce_verifier");
 
+  if (!walletAddress) {
+    return NextResponse.redirect(new URL("/create-wallet", env.APP_URL));
+  }
   return NextResponse.redirect(env.APP_URL + "/dashboard");
 }

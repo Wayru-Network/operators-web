@@ -2,6 +2,7 @@
 import { Prisma } from "@/lib/infra/prisma";
 import { getSession } from "@/lib/session/session";
 import { env } from "@/lib/infra/env";
+import { redirect } from "next/navigation";
 
 export interface Hotspot {
   id: number;
@@ -21,7 +22,10 @@ export interface MinersByAddressResponse {
 
 export async function getHotspots(page = 1, limit = 10): Promise<Hotspot[]> {
   const { wallet } = await getSession();
-
+  if (!wallet) {
+    console.error("No wallet found in session");
+    redirect("/create-wallet");
+  }
   const hotspotsData = await fetch(
     `${env.BACKEND_URL}/api/nfnode/miners-by-address/${wallet}?page=${page}&limit=${limit}`,
     {
