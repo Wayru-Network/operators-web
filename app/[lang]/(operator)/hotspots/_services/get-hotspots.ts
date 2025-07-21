@@ -18,16 +18,27 @@ export interface Hotspot {
 }
 export interface MinersByAddressResponse {
   data: Hotspot[];
+  meta: {
+    total: number;
+    pages: number;
+    page: number;
+    size: number;
+  };
 }
 
-export async function getHotspots(page = 1, limit = 10): Promise<Hotspot[]> {
+export async function getHotspots(
+  page: number,
+  limit: number
+): Promise<MinersByAddressResponse> {
   const { wallet } = await getSession();
   if (!wallet) {
     console.error("No wallet found in session");
     redirect("/create-wallet");
   }
   const hotspotsData = await fetch(
-    `${env.BACKEND_URL}/api/nfnode/miners-by-address/${wallet}?page=${page}&limit=${limit}`,
+    `${
+      env.BACKEND_URL
+    }/api/nfnode/miners-by-address/${wallet}?page=${page}&size=${limit}&limit=${6}`,
     {
       headers: {
         "Content-Type": "application/json",
@@ -38,7 +49,15 @@ export async function getHotspots(page = 1, limit = 10): Promise<Hotspot[]> {
 
   const hotspots = (await hotspotsData.json()) as MinersByAddressResponse;
   if (!hotspots || hotspots.data.length === 0) {
-    return [] as Hotspot[];
+    return {
+      data: [],
+      meta: {
+        total: 0,
+        pages: 0,
+        page: 0,
+        size: 0,
+      },
+    };
   }
 
   const wayruDeviceIds = hotspots.data.map(
@@ -70,7 +89,7 @@ export async function getHotspots(page = 1, limit = 10): Promise<Hotspot[]> {
     hotspot.assigned_portal = portalMap.get(hotspot.wayru_device_id) || "None";
   });
 
-  return hotspots.data;
+  return hotspots;
 }
 
 export async function getHotspotsMock(page = 1, limit = 6): Promise<Hotspot[]> {

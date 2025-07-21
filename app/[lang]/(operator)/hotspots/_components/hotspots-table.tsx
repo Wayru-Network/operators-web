@@ -14,11 +14,20 @@ import {
 import { Input } from "@heroui/input";
 import { Pagination } from "@heroui/pagination";
 import StatusPill from "@/app/[lang]/(operator)/hotspots/_components/status-pill";
-import { Hotspot } from "@/app/[lang]/(operator)/hotspots/_services/get-hotspots";
+import {
+  Hotspot,
+  MinersByAddressResponse,
+} from "@/app/[lang]/(operator)/hotspots/_services/get-hotspots";
 import { Settings, Search } from "lucide-react";
 import { redirect } from "next/navigation";
 
-export default function HotspotsTable({ rows }: { rows: Hotspot[] }) {
+export default function HotspotsTable({
+  rows,
+  meta,
+}: {
+  rows: Hotspot[];
+  meta: MinersByAddressResponse["meta"];
+}) {
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState<SortDescriptor>({
     column: "name",
@@ -71,7 +80,7 @@ export default function HotspotsTable({ rows }: { rows: Hotspot[] }) {
   const goto = useCallback(
     (page: number) => {
       setPage(page + 1);
-      redirect(`/admin/devices?page=${page}`);
+      redirect(`/hotspots?page=${page}`);
     },
     [setPage]
   );
@@ -166,8 +175,8 @@ export default function HotspotsTable({ rows }: { rows: Hotspot[] }) {
           </TableBody>
         </Table>
         <Pagination
-          total={pageCount}
-          page={page}
+          total={meta.pages}
+          page={meta.page}
           onChange={goto}
           showControls
           className="flex justify-center pt-5"
