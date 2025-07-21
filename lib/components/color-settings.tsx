@@ -1,7 +1,7 @@
 "use client";
 import { ChangeEvent } from "react";
 
-type Field = "background" | "button" | "text";
+type Field = "background" | "button" | "text" | "buttonText";
 type Values = Record<Field, string>;
 
 interface ColorSettingsProps {
@@ -16,18 +16,22 @@ export default function ColorSettings({ value, onChange }: ColorSettingsProps) {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between gap-6">
+      <div className="flex flex-col sm:flex-row sm:flex-wrap justify-between gap-6">
         {[
           { label: "Background Color", key: "background" as Field },
           { label: "Button Color", key: "button" as Field },
           { label: "Text Color", key: "text" as Field },
+          { label: "Button Text Color", key: "buttonText" as Field },
         ].map(({ label, key }) => (
-          <div key={key} className="flex flex-col space-y-3">
+          <div
+            key={key}
+            className="flex flex-col items-center justify-center space-y-3"
+          >
             <label htmlFor={key} className="font-medium">
               {label}
             </label>
 
-            <div className="flex items-center gap-1 rounded-[10px] bg-[#F8FAFA] px-2 py-2">
+            <div className="flex items-center gap-1 rounded-[10px] bg-[#F8FAFA] p-2">
               <input
                 id={key}
                 type="color"

@@ -39,7 +39,7 @@ export default function Preview({ config }: { config: NewPortalConfig }) {
                 className="flex w-full text-white dark:text-black rounded-full transition-none"
                 style={{
                   backgroundColor: colors.button,
-                  color: colors.text,
+                  color: colors.buttonText,
                 }}
               >
                 <Megaphone className="mr-1" />
@@ -51,7 +51,7 @@ export default function Preview({ config }: { config: NewPortalConfig }) {
                 className="w-full text-white dark:text-black rounded-full transition-none"
                 style={{
                   backgroundColor: colors.button,
-                  color: colors.text,
+                  color: colors.buttonText,
                 }}
               >
                 <Ticket className="mr-1" />
@@ -63,7 +63,7 @@ export default function Preview({ config }: { config: NewPortalConfig }) {
                 className="w-full text-white dark:text-black rounded-full transition-none"
                 style={{
                   backgroundColor: colors.button,
-                  color: colors.text,
+                  color: colors.buttonText,
                 }}
               >
                 <SquarePen className="mr-1" />

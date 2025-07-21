@@ -23,6 +23,7 @@ export interface PortalConfig {
     background: string;
     button: string;
     text: string;
+    buttonText: string;
   };
   logo: {
     url: string | null;
@@ -37,7 +38,6 @@ export interface PortalConfig {
   voucher: boolean;
   userInfo: boolean;
   welcomeMessage: string;
-  successMessage: string;
   adFormat: string;
   adAsset?: {
     url: string | null;
@@ -71,9 +71,6 @@ export default function CustomizeCaptivePortal({
   const [userInfo, setUserInfo] = useState(config.userInfo || false);
   const [welcomeMessage, setWelcomeMessage] = useState(
     config.welcomeMessage || ""
-  );
-  const [successMessage, setSuccessMessage] = useState(
-    config.successMessage || ""
   );
 
   // Step 3 - Create an Ad states
@@ -125,7 +122,6 @@ export default function CustomizeCaptivePortal({
     voucher,
     userInfo,
     welcomeMessage,
-    successMessage,
     adFormat,
     adAsset: {
       url: adUrl,
@@ -165,7 +161,6 @@ export default function CustomizeCaptivePortal({
                 userInfoHandler={setUserInfo}
                 selectedHandler={setSelected}
                 welcomeMessageHandler={setWelcomeMessage}
-                successMessageHandler={setSuccessMessage}
               />
             </Tab>
             <Tab key="step3" title="Create an Ad">

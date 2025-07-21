@@ -13,8 +13,9 @@ import { Hotspot } from "@/app/[lang]/(operator)/hotspots/_services/get-hotspots
 
 const initial = {
   background: "#ffffff",
-  button: "#0070f3",
   text: "#000000",
+  button: "#0070f3",
+  buttonText: "#ffffff",
 };
 
 export interface NewPortalConfig {
@@ -31,7 +32,6 @@ export interface NewPortalConfig {
   voucher: boolean;
   userInfo: boolean;
   welcomeMessage: string;
-  successMessage: string;
   adFormat: string;
   adAsset?: {
     url: string | null;
@@ -61,8 +61,9 @@ export default function CreateCaptivePortal({
   const [ad, setAd] = useState(true);
   const [voucher, setVoucher] = useState(true);
   const [userInfo, setUserInfo] = useState(true);
-  const [welcomeMessage, setWelcomeMessage] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
+  const [welcomeMessage, setWelcomeMessage] = useState(
+    "Welcome to our portal!"
+  );
 
   // Step 3 - Create an Ad states
   const [adFormat, setAdFormat] = useState("video");
@@ -109,7 +110,6 @@ export default function CreateCaptivePortal({
     voucher,
     userInfo,
     welcomeMessage,
-    successMessage,
     adFormat,
     adAsset: {
       url: adUrl,
@@ -153,7 +153,6 @@ export default function CreateCaptivePortal({
                 userInfoHandler={setUserInfo}
                 selectedHandler={setSelected}
                 welcomeMessageHandler={setWelcomeMessage}
-                successMessageHandler={setSuccessMessage}
               />
             </Tab>
             <Tab key="step3" title="Create an Ad">

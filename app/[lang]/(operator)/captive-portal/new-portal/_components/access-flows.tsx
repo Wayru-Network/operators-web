@@ -11,7 +11,6 @@ interface AccessFlowsProps {
   userInfoHandler: (value: boolean) => void;
   selectedHandler: (value: string) => void;
   welcomeMessageHandler: (value: string) => void;
-  successMessageHandler: (value: string) => void;
 }
 
 export default function AccessFlows({
@@ -21,7 +20,6 @@ export default function AccessFlows({
   userInfoHandler,
   selectedHandler,
   welcomeMessageHandler,
-  successMessageHandler,
 }: AccessFlowsProps) {
   return (
     <div className="h-full flex flex-col justify-start bg-[#ffffff] dark:bg-[#191c1d] rounded-[30px] p-8 space-y-4">
@@ -73,12 +71,6 @@ export default function AccessFlows({
           helper="Max 50 characters"
           onChange={(e) => welcomeMessageHandler(e.target.value)}
           value={newConfig.welcomeMessage}
-        />
-        <CustomInput
-          label="Success Message"
-          placeholder="Message shown after successful connection"
-          onChange={(e) => successMessageHandler(e.target.value)}
-          value={newConfig.successMessage}
         />
       </div>
       <div className="flex gap-2 mt-auto">

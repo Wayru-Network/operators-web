@@ -94,7 +94,6 @@ export default async function uploadConfig(portalConfig: NewPortalConfig) {
         background_color: portalConfig.colors.background,
         text_color: portalConfig.colors.text,
         button_color: portalConfig.colors.button,
-        success_message: portalConfig.successMessage,
         ad_access: portalConfig.ad,
         voucher_access: portalConfig.voucher,
         form_access: portalConfig.userInfo,
@@ -193,7 +192,7 @@ export default async function uploadConfig(portalConfig: NewPortalConfig) {
               },
             },
           });
-        }),
+        })
       );
     } catch (error) {
       return {
