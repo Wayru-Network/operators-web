@@ -68,9 +68,9 @@ export async function getHotspots(
     };
   }
 
-  const wayruDeviceIds = hotspots.data.map(
-    (hotspot) => hotspot.wayru_device_id
-  );
+  const wayruDeviceIds = hotspots.data
+    .filter((hotspot) => hotspot.wayru_device_id !== null)
+    .map((hotspot) => hotspot.wayru_device_id);
 
   const portals = await Prisma.hotspot.findMany({
     where: {
