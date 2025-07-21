@@ -9,6 +9,19 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
+  if (pathname === "/api/portal") {
+    const authHeader = request.headers.get("authorization");
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const token = authHeader.slice(7).trim();
+    if (!token) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    console.log("Token received:", token);
+    return NextResponse.next();
+  }
+
   // Check if there is any supported locale in the pathname
   const pathnameHasLocale = SupportedLanguages.some(
     (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`
