@@ -5,7 +5,7 @@ import {
   DropdownItem,
 } from "@heroui/dropdown";
 import { Button } from "@heroui/button";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { ChevronDown } from "lucide-react";
 
 interface InteractionTimeProps {
@@ -13,20 +13,28 @@ interface InteractionTimeProps {
   setSelected: (value: string) => void;
 }
 
+const valueLabelMap: Record<string, string> = {
+  "15": "15 Seconds",
+  "30": "30 Seconds",
+  "60": "1 Minute",
+};
+
 export default function InteractionTime({
   selected,
   setSelected,
 }: InteractionTimeProps) {
-  const [selectedKeys, setSelectedKeys] = React.useState(new Set([selected]));
+  const [selectedKeys, setSelectedKeys] = useState<Set<string>>(
+    new Set([selected])
+  );
 
-  React.useEffect(() => {
+  useEffect(() => {
     setSelectedKeys(new Set([selected]));
   }, [selected]);
 
-  const selectedValue = React.useMemo(
-    () => Array.from(selectedKeys).join(", ").replace(/_/g, ""),
-    [selectedKeys]
-  );
+  const selectedValue = React.useMemo(() => {
+    const key = Array.from(selectedKeys)[0];
+    return valueLabelMap[key] || "Select Time";
+  }, [selectedKeys]);
 
   return (
     <Dropdown placement="bottom-start">
@@ -49,9 +57,9 @@ export default function InteractionTime({
           setSelected(key as string);
         }}
       >
-        <DropdownItem key="15 seconds">15 Seconds</DropdownItem>
-        <DropdownItem key="30 seconds">30 Seconds</DropdownItem>
-        <DropdownItem key="1 minute">1 Minute</DropdownItem>
+        <DropdownItem key="15">15 Seconds</DropdownItem>
+        <DropdownItem key="30">30 Seconds</DropdownItem>
+        <DropdownItem key="60">1 Minute</DropdownItem>
       </DropdownMenu>
     </Dropdown>
   );

@@ -69,7 +69,7 @@ export default function CreateCaptivePortal({
   const [adFormat, setAdFormat] = useState("video");
   const [adUrl, setAdUrl] = useState<string | null>(null);
   const [adFile, setAdFile] = useState<File | null>(null);
-  const [interactionTime, setInteractionTime] = useState("15 Seconds");
+  const [interactionTime, setInteractionTime] = useState("15");
   const [redirectUrl, setRedirectUrl] = useState("");
 
   // Step 4 - Publish states
