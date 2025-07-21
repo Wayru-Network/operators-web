@@ -14,7 +14,6 @@ export interface rowCaptivePortal {
 
 export default async function getCaptivePortals(): Promise<rowCaptivePortal[]> {
   const session = await getSession();
-  console.log("Session:", session.userId);
   const rows = await Prisma.portal_config.findMany({
     orderBy: {
       portal_name: "asc",

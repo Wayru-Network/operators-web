@@ -11,16 +11,22 @@ export default async function userLogout() {
   };
   const session = await getSession();
   try {
-    fetch(`${kc.base}/realms/${kc.realm}/protocol/openid-connect/logout`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-        client_id: kc.clientId || "",
-        refresh_token: session.refreshToken || "",
-      },
-    });
+    await fetch(
+      `${kc.base}/realms/${kc.realm}/protocol/openid-connect/logout`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: new URLSearchParams({
+          client_id: kc.clientId || "",
+          refresh_token: session.refreshToken || "",
+        }),
+      }
+    );
   } catch (error) {
     console.error("Logout failed:", error);
+    return;
   }
   // Delete the session cookie
   await deleteSession();

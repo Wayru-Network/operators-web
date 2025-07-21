@@ -34,7 +34,7 @@ export async function socialLogin(provider: Provider) {
   console.log("app URL", env.APP_URL);
 
   const authUrl = new URL(
-    `${kc.base}/realms/${kc.realm}/protocol/openid-connect/auth`,
+    `${kc.base}/realms/${kc.realm}/protocol/openid-connect/auth`
   );
   authUrl.search = new URLSearchParams({
     client_id: kc.clientId ?? "",
@@ -45,7 +45,6 @@ export async function socialLogin(provider: Provider) {
     code_challenge_method: "S256",
     state,
     kc_idp_hint: provider,
-    prompt: "login",
   }).toString();
 
   const cookieStore = await cookies();
