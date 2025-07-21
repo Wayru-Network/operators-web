@@ -18,10 +18,14 @@ const TOKEN_ENDPOINT = `${KC_BASE}/realms/${KC_REALM}/protocol/openid-connect/to
 
 const valid_emails = [
   "daniel.velasquez@wayru.org",
-  "diego@wayru.org",
-  "charvel@wayru.org",
-  "paula@wayru.org",
   "velasmo3@gmail.com",
+  "diego@wayru.org",
+  "diegoserranor@gmail.com",
+  "charvel@wayru.org",
+  "wayru.deployer.ecuador@gmail.com",
+  "charvel.chedraui@gmail.com",
+  "paula@wayru.org",
+  "alejandrocamacaro91@gmail.com",
 ];
 
 export async function GET(req: Request) {
@@ -31,7 +35,12 @@ export async function GET(req: Request) {
   const state = searchParams.get("state");
   const err = searchParams.get("error");
 
+  console.log("code:", code);
+  console.log("state:", state);
+  console.log("err:", err);
+
   if (err) {
+    console.log("AUTH FAILURE: Error parameter present:", err);
     return NextResponse.redirect(fallbackUrl);
   }
 
@@ -40,12 +49,22 @@ export async function GET(req: Request) {
   const codeVerifier = cookieStore.get("pkce_verifier")?.value;
 
   if (!code || !state || state !== savedState || !codeVerifier) {
+    console.log("auth failure: PKCE validation failed");
+    console.log("- code present:", !!code);
+    console.log("- state present:", !!state);
+    console.log("- savedState present:", !!savedState);
+    console.log("- state matches savedState:", state === savedState);
+    console.log("- codeVerifier present:", !!codeVerifier);
     return NextResponse.redirect(fallbackUrl);
   }
 
   if (!CLIENT_ID) {
     throw new Error("KEYCLOAK_CLIENT_ID is not defined");
   }
+
+  console.log("CLIENT_ID:", CLIENT_ID);
+  console.log("REDIRECT:", REDIRECT);
+
   const body = new URLSearchParams({
     grant_type: "authorization_code",
     client_id: CLIENT_ID,
@@ -61,6 +80,11 @@ export async function GET(req: Request) {
   });
 
   if (!tokenRes.ok) {
+    console.log("auth failure: Token exchange failed");
+    console.log("- Status:", tokenRes.status);
+    console.log("- Status text:", tokenRes.statusText);
+    const errorText = await tokenRes.text();
+    console.log("- Error response:", errorText);
     return NextResponse.redirect(fallbackUrl);
   }
 
@@ -71,24 +95,42 @@ export async function GET(req: Request) {
   const sub = tokenData.sub || "";
 
   if (!valid_emails.includes(email || "")) {
+    console.log("auth failure: Email not in valid list");
+    console.log("- Email:", email);
+    console.log("- Valid emails:", valid_emails);
     return NextResponse.redirect(fallbackUrl);
   }
 
   if (email === "velasmo3@gmail.com") email = "danvelc6@gmail.com";
 
-  const data = await fetch(
-    `${env.BACKEND_URL}/api/wallet/main/by-email/${email}`,
-    {
-      headers: {
-        "Content-Type": "application/json",
-        "X-API-KEY": env.BACKEND_KEY,
-      },
-    }
-  );
+  let walletAddress = "";
 
-  const { walletAddress } = (await data.json()) as AddressResponse;
-  if (!walletAddress) {
-    console.error("No wallet address found for user:", email);
+  try {
+    const data = await fetch(
+      `${env.BACKEND_URL}/api/wallet/main/by-email/${email}`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "X-API-KEY": env.BACKEND_KEY,
+        },
+      }
+    );
+
+    if (data.ok) {
+      const response = (await data.json()) as AddressResponse;
+      walletAddress = response.walletAddress || "";
+    } else {
+      console.log(
+        "Warning: Wallet API request failed, proceeding without wallet"
+      );
+      console.log("- Status:", data.status);
+      console.log("- Status text:", data.statusText);
+    }
+  } catch (error) {
+    console.log(
+      "Warning: Wallet API request error, proceeding without wallet:",
+      error
+    );
   }
 
   await updateSession({

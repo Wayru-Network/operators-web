@@ -22,6 +22,7 @@ azureStorageAccountName: "wayruosimages"
 azureStorageContainerName: "dynamic-portal-assets"
 
 backendUrl: "https://prod.api.az.wayru.tech"
+wifiApiUrl: "https://wifi.api.wayru.tech"
 
 azureCsiClientID: "a75a5340-f123-4f52-a0ec-b2c10bdaeeca"
 azureKeyvaultTenantID: "9a2e7e82-78c3-4edd-932c-90f97a3da477"

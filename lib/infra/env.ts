@@ -24,6 +24,10 @@ export interface Environment {
   // Backend API
   BACKEND_URL: string;
   BACKEND_KEY: string;
+
+  // WiFi API
+  WIFI_API_URL: string;
+  WIFI_API_KEY: string;
 }
 
 /**
@@ -43,6 +47,8 @@ export function loadEnvironment(): Environment {
     "AZURE_CONTAINER_NAME",
     "BACKEND_URL",
     "BACKEND_KEY",
+    "WIFI_API_URL",
+    "WIFI_API_KEY",
   ];
 
   const missingVars: string[] = [];
@@ -61,7 +67,7 @@ export function loadEnvironment(): Environment {
 
   // Log warnings for missing variables
   if (missingVars.length > 0) {
-    console.warn("⚠️ Missing environment variables:");
+    console.warn("Missing environment variables:");
     missingVars.forEach((varName) => {
       console.warn(`   - ${varName}`);
     });

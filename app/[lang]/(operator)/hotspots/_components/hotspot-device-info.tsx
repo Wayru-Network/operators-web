@@ -1,4 +1,7 @@
+import CustomSnippet from "@/lib/components/custom-snippet";
 import { Button } from "@heroui/button";
+import { Snippet } from "@heroui/snippet";
+import { Spacer } from "@heroui/spacer";
 
 export interface DeviceInfoProps {
   basic: {
@@ -17,7 +20,7 @@ export interface DeviceInfoProps {
     serial: string;
     ssidOpen: string;
     ssidPrivate: string;
-    passwordPrivate: string;
+    ssidPrivatePassword: string;
   };
   ownership: {
     nftID: string;
@@ -28,25 +31,68 @@ export interface DeviceInfoProps {
 
 export default function HotspotDeviceInfo({
   basic,
-  // network,
-  // ownership,
+  network,
+  ownership,
 }: DeviceInfoProps) {
+  const basicInfoText = `Hotspot name: ${basic.name}
+Location name: ${basic.locationName}
+Model: ${basic.model}
+Brand: ${basic.brand}
+OS name: ${basic.osName}
+OS version: ${basic.osVersion}
+OS services version: ${basic.osServicesVersion}
+Public IP: ${basic.publicIP}`;
+
   return (
     <div>
-      <p className="text-lg font-semibold">Device Information</p>
+      <p className="text-lg font-semibold">Basic information</p>
       <div className="mt-4">
         {/* Top */}
         <div className="w-full flex flex-row justify-between space-x-24">
           {/* Basic info */}
-          <div>
-            <p>Hotspot Name: {basic.name}</p>
-            <p>Location Name: {basic.locationName}</p>
-            <p>Model: {basic.model}</p>
-            <p>Brand: {basic.brand}</p>
-            <p>OS Name: {basic.osName}</p>
-            <p>OS Version: {basic.osVersion}</p>
-            <p>OS Services Version: {basic.osServicesVersion}</p>
-            <p>Public IP: {basic.publicIP}</p>
+          <div className="bg-[#F8FAFA] py-[21px] px-[19px] rounded-[10px] relative flex flex-row justify-between">
+            <div className="min-w-md">
+              <div className="flex flex-row items-center space-x-2">
+                <p className="text-sm font-bold">Hotspot name:</p>
+                <p>{basic.name}</p>
+              </div>
+              <div className="flex flex-row items-center space-x-2">
+                <p className="text-sm font-bold">Location name:</p>
+                <p>{basic.locationName}</p>
+              </div>
+              <div className="flex flex-row items-center space-x-2">
+                <p className="text-sm font-bold">Model:</p>
+                <p>{basic.model}</p>
+              </div>
+              <div className="flex flex-row items-center space-x-2">
+                <p className="text-sm font-bold">Brand:</p>
+                <p>{basic.brand}</p>
+              </div>
+              <div className="flex flex-row items-center space-x-2">
+                <p className="text-sm font-bold">OS name:</p>
+                <p>{basic.osName}</p>
+              </div>
+              <div className="flex flex-row items-center space-x-2">
+                <p className="text-sm font-bold">OS version:</p>
+                <p>{basic.osVersion}</p>
+              </div>
+              <div className="flex flex-row items-center space-x-2">
+                <p className="text-sm font-bold">OS services version:</p>
+                <p>{basic.osServicesVersion}</p>
+              </div>
+              <div className="flex flex-row items-center space-x-2">
+                <p className="text-sm font-bold">Public IP:</p>
+                <p>{basic.publicIP}</p>
+              </div>
+            </div>
+            <div className="flex flex-row items-end">
+              <Snippet
+                variant="bordered"
+                codeString={basicInfoText}
+                hideSymbol={true}
+                content=""
+              />
+            </div>
           </div>
           {/* Quick actions */}
           <div>
@@ -58,17 +104,73 @@ export default function HotspotDeviceInfo({
             </Button>
           </div>
         </div>
+        <Spacer y={8} />
         {/* Network details */}
-        <div></div>
+        <div>
+          <p className="text-lg font-semibold">Network details</p>
+          <Spacer y={8} />
+          <div className="flex flex-row space-x-8">
+            <CustomSnippet label="MAC address" wrapperClass="max-w-[260px]">
+              {network.mac}
+            </CustomSnippet>
+            <CustomSnippet label="IP address" wrapperClass="max-w-[260px]">
+              192.168.45.1
+            </CustomSnippet>
+            <CustomSnippet label="Serial number" wrapperClass="max-w-[260px]">
+              {network.serial || "N/A"}
+            </CustomSnippet>
+          </div>
+          <Spacer y={8} />
+          <div className="flex flex-row space-x-8">
+            <CustomSnippet
+              label="SSID open network"
+              wrapperClass="max-w-[260px]"
+            >
+              N/A
+            </CustomSnippet>
+            <CustomSnippet
+              label="SSID private network"
+              wrapperClass="max-w-[260px]"
+            >
+              N/A
+            </CustomSnippet>
+            <CustomSnippet
+              label="Current password"
+              wrapperClass="max-w-[260px]"
+            >
+              N/A
+            </CustomSnippet>
+          </div>
+        </div>
+        <Spacer y={8} />
         {/* Ownership */}
-        <div></div>
+        <div>
+          <p className="text-lg font-semibold">Ownership</p>
+          <Spacer y={8} />
+          <div className="flex flex-row space-x-8">
+            <CustomSnippet
+              label="NFT ID"
+              wrapperClass="max-w-[260px]"
+              snippetClass="overflow-hidden whitespace-nowrap overflow-ellipsis"
+            >
+              {ownership.nftID}
+            </CustomSnippet>
+            <CustomSnippet
+              label="Owner address"
+              wrapperClass="max-w-[260px]"
+              snippetClass="overflow-hidden whitespace-nowrap overflow-ellipsis"
+            >
+              {ownership.ownerAddress}
+            </CustomSnippet>
+            <CustomSnippet label="MAC address" wrapperClass="max-w-[260px]">
+              {ownership.macAddress}
+            </CustomSnippet>
+          </div>
+        </div>
         {/* Hotspot groups */}
         <div></div>
         {/* Save changes */}
         <div></div>
-        <p>MAC Address: 00:1A:2B:3C:4D:5E</p>
-        <p>Status: Online</p>
-        <p>Assigned Portal: Main Portal</p>
       </div>
     </div>
   );
