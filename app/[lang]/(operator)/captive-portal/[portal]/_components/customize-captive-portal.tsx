@@ -190,14 +190,14 @@ export default function CustomizeCaptivePortal({
           <CustomizePortalSettings config={Config} />
         )}
       </div>
-      <div className="mt-6 p-4 border rounded">
+      {/* <div className="mt-6 p-4 border rounded">
         <h2 className="text-lg font-semibold mb-2">
           Current Portal Configuration
         </h2>
         <pre className="text-xs overflow-x-auto whitespace-pre-wrap">
           {JSON.stringify(Config, null, 2)}
         </pre>
-      </div>
+      </div> */}
     </div>
   );
 }
