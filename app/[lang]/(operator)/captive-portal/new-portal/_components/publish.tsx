@@ -2,10 +2,11 @@ import { Button } from "@heroui/button";
 import { NewPortalConfig } from "./create-captive-portal";
 import { CustomInput } from "@/lib/components/custom-input";
 import AssignHotspot from "./assign-hotspot-dropdown";
-import uploadConfig from "../_services/upload_config";
+import uploadConfig from "../_services/upload-config";
 import { addToast } from "@heroui/toast";
 import { Hotspot } from "../../../hotspots/_services/get-hotspots";
 import { redirect } from "next/navigation";
+import { useState } from "react";
 
 interface PublishProps {
   selectedHandler: (step: string) => void;
@@ -22,7 +23,11 @@ export default function Publish({
   assignedHotspotHandler,
   hotspots,
 }: PublishProps) {
+  const [isPublishing, setIsPublishing] = useState(false);
   const handlePublish = async () => {
+    if (isPublishing) return;
+    setIsPublishing(true);
+
     const result = await uploadConfig(portalConfig);
     if (!result.success) {
       addToast({
@@ -30,6 +35,7 @@ export default function Publish({
         description: result.error || "Failed to upload portal configuration",
         color: "danger",
       });
+      setIsPublishing(false);
       return;
     }
     addToast({
@@ -68,6 +74,7 @@ export default function Publish({
         <Button
           className="w-full text-white bg-black rounded-[10px]"
           onPress={handlePublish}
+          isLoading={isPublishing}
         >
           {portalConfig.assignedHotspot.length > 0
             ? `Save and publish to ${portalConfig.assignedHotspot.length} assigned hotspot(s)`
