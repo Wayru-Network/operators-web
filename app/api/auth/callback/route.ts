@@ -26,7 +26,7 @@ const valid_emails = [
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
-  const fallbackUrl = new URL("/login", req.url);
+  const fallbackUrl = new URL("/login", env.APP_URL);
   const code = searchParams.get("code");
   const state = searchParams.get("state");
   const err = searchParams.get("error");
@@ -83,11 +83,13 @@ export async function GET(req: Request) {
         "Content-Type": "application/json",
         "X-API-KEY": env.BACKEND_KEY,
       },
-    },
+    }
   );
 
   const { walletAddress } = (await data.json()) as AddressResponse;
   if (!walletAddress) {
+    //@todo redirect to wallet creation/connection page
+    console.error("No wallet address found for user:", email);
     return NextResponse.redirect(fallbackUrl);
   }
 
