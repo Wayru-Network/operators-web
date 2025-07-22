@@ -28,6 +28,10 @@ export interface Environment {
   // WiFi API
   WIFI_API_URL: string;
   WIFI_API_KEY: string;
+
+  // Devices API
+  DEVICES_API_URL: string;
+  DEVICES_API_KEY: string;
 }
 
 /**
