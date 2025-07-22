@@ -2,6 +2,7 @@
 import { Prisma } from "@/lib/infra/prisma";
 import { getSession } from "@/lib/session/session";
 import { env } from "@/lib/infra/env";
+import ensureHotspots from "./ensure-hotspots";
 
 export interface Hotspot {
   id: number;
@@ -27,7 +28,7 @@ export interface MinersByAddressResponse {
 
 export async function getHotspots(
   page: number,
-  limit: number
+  limit: number,
 ): Promise<MinersByAddressResponse> {
   const { wallet } = await getSession();
 
@@ -50,7 +51,7 @@ export async function getHotspots(
         "Content-Type": "application/json",
         "X-API-KEY": env.BACKEND_KEY,
       },
-    }
+    },
   );
 
   let hotspots: MinersByAddressResponse;
@@ -80,6 +81,9 @@ export async function getHotspots(
     };
   }
 
+  // Ensure all valid hotspots are recorded in the database
+  await ensureHotspots(hotspots.data);
+
   const wayruDeviceIds = hotspots.data
     .filter((hotspot) => hotspot.wayru_device_id !== null)
     .map((hotspot) => hotspot.wayru_device_id);
@@ -100,7 +104,7 @@ export async function getHotspots(
     if (hotspot.portal_configs && hotspot.portal_configs.length > 0) {
       portalMap.set(
         hotspot.wayru_device_id,
-        hotspot.portal_configs[0].portal_name
+        hotspot.portal_configs[0].portal_name,
       );
     }
   });
