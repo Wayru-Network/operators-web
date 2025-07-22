@@ -30,9 +30,13 @@ export async function getHotspotDetail(name: string): Promise<HotspotDetail> {
         mac: device?.mac || nfnode?.mac || "",
         ip: "",
         serial: nfnode?.serial || "",
-        ssidOpen: "",
-        ssidPrivate: "",
-        ssidPrivatePassword: "",
+        openNetwork: {
+          SSID: "",
+        },
+        privateNetwork: {
+          SSID: "",
+          password: "",
+        },
       },
       ownership: {
         nftID: nfnode?.solana_asset_id || "",
@@ -42,9 +46,13 @@ export async function getHotspotDetail(name: string): Promise<HotspotDetail> {
     },
     networks: {
       locationName: "",
-      ssidOpen: "",
-      ssidPrivate: "",
-      ssidPrivatePassword: "",
+      openNetwork: {
+        SSID: "",
+      },
+      privateNetwork: {
+        SSID: "",
+        password: "",
+      },
     },
   };
 
@@ -67,9 +75,13 @@ export interface HotspotDetail {
       mac: string;
       ip: string;
       serial: string;
-      ssidOpen: string;
-      ssidPrivate: string;
-      ssidPrivatePassword: string;
+      openNetwork?: {
+        SSID: string;
+      };
+      privateNetwork?: {
+        SSID: string;
+        password: string;
+      };
     };
     ownership: {
       nftID: string;
@@ -79,8 +91,12 @@ export interface HotspotDetail {
   };
   networks: {
     locationName: string;
-    ssidOpen: string;
-    ssidPrivate: string;
-    ssidPrivatePassword: string;
+    openNetwork?: {
+      SSID: string;
+    };
+    privateNetwork?: {
+      SSID: string;
+      password: string;
+    };
   };
 }

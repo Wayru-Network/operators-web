@@ -42,11 +42,12 @@ model portal_config {
 }
 
 model network_config {
-  id               Int      @id @default(autoincrement())
-  device_config_id String   @db.Uuid
+  id               Int               @id @default(autoincrement())
+  device_config_id String            @db.Uuid
   device_config    Json
-  hotspot          hotspot? @relation(fields: [hotspot_id], references: [id])
+  hotspot          hotspot?          @relation(fields: [hotspot_id], references: [id])
   hotspot_id       Int?
+  type             networkConfigType
 }
 
 model ad {
@@ -73,4 +74,9 @@ enum adFormat {
   static
   gif
   video
+}
+
+enum networkConfigType {
+  open
+  private
 }

@@ -1,7 +1,8 @@
-import HotspotTabs from "../_components/hotspot-tabs";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { getHotspotDetail } from "./_services/get-hotspot-detail";
+import HotspotTabs from "./_components/hotspot-tabs";
+
 export default async function HotspotPage({
   params,
 }: {

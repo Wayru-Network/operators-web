@@ -18,9 +18,13 @@ export interface DeviceInfoProps {
     mac: string;
     ip: string;
     serial: string;
-    ssidOpen: string;
-    ssidPrivate: string;
-    ssidPrivatePassword: string;
+    openNetwork?: {
+      SSID: string;
+    };
+    privateNetwork?: {
+      SSID: string;
+      password: string;
+    };
   };
   ownership: {
     nftID: string;
@@ -126,19 +130,19 @@ Public IP: ${basic.publicIP}`;
               label="SSID open network"
               wrapperClass="max-w-[260px]"
             >
-              N/A
+              {network.openNetwork?.SSID || "N/A"}
             </CustomSnippet>
             <CustomSnippet
               label="SSID private network"
               wrapperClass="max-w-[260px]"
             >
-              N/A
+              {network.privateNetwork?.SSID || "N/A"}
             </CustomSnippet>
             <CustomSnippet
               label="Current password"
               wrapperClass="max-w-[260px]"
             >
-              N/A
+              {network.privateNetwork?.password || "N/A"}
             </CustomSnippet>
           </div>
         </div>
