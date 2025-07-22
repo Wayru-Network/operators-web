@@ -11,6 +11,7 @@ datasource db {
 model hotspot {
   id              Int              @id @default(autoincrement())
   wayru_device_id String           @unique @db.Uuid
+  name            String?          @unique
   network_configs network_config[]
   portal_configs  portal_config[]  @relation("portal_hotspots")
 }
