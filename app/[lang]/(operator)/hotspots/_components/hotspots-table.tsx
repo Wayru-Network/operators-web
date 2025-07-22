@@ -142,7 +142,7 @@ export default function HotspotsTable({
                 key={item.name}
                 className="hover:bg-gray-100 dark:hover:bg-gray-500"
               >
-                {(columnKey: string) => (
+                {(columnKey) => (
                   <TableCell>
                     {columnKey === "status" ? (
                       <StatusPill

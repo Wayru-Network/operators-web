@@ -24,14 +24,14 @@ interface PortalsColumns {
 }
 
 interface PortalsRows {
-  id: string;
+  id: number | string;
   portal_name: string;
   flow_type: string;
   _count: {
     hotspots: number;
   };
-  conversion_rate: string;
   last_edit: string;
+  conversion_rate?: string; // Optional, as it may not be present in all rows
 }
 
 export default function PortalsTable({ rows }: { rows: rowCaptivePortal[] }) {
@@ -153,7 +153,7 @@ export default function PortalsTable({ rows }: { rows: rowCaptivePortal[] }) {
                 key={item.id}
                 className="hover:bg-gray-100 dark:hover:bg-gray-500"
               >
-                {(columnKey: string) => (
+                {(columnKey) => (
                   <TableCell className="text-center">
                     {columnKey === "actions" ? (
                       <a

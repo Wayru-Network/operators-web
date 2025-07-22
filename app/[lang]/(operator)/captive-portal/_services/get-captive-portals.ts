@@ -3,13 +3,14 @@ import { getSession } from "@/lib/session/session";
 import { Prisma } from "@/lib/infra/prisma";
 
 export interface rowCaptivePortal {
-  id: number;
+  id: number | string;
   portal_name: string;
   flow_type: string;
   _count: {
     hotspots: number;
   };
   last_edit: string;
+  conversion_rate?: string; // Optional, as it may not be present in all rows
 }
 
 export default async function getCaptivePortals(): Promise<rowCaptivePortal[]> {
