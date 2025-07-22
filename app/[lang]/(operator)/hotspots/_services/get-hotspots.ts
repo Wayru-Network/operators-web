@@ -44,7 +44,7 @@ export async function getHotspots(
   }
 
   const hotspotsData = await fetch(
-    `${env.BACKEND_URL}/api/nfnode/miners-by-address/G6KbU6fpUQX7ukNsVpnscfkmpyoLwNrVBBojPVxiY8Xd?page=${page}&limit=${limit}`,
+    `${env.BACKEND_URL}/api/nfnode/miners-by-address/${wallet}?page=${page}&limit=${limit}`,
     {
       headers: {
         "Content-Type": "application/json",
