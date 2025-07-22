@@ -1,8 +1,10 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Upload, X } from "lucide-react";
 import Image from "next/image";
+import { useFileHandler } from "@/lib/services/useFileHandler";
+import { addToast } from "@heroui/react";
 
 type AssetType = "logo" | "banner" | "ad";
 type Props = {
@@ -11,91 +13,68 @@ type Props = {
   existingUrl?: string;
 };
 
-const ACCEPTED_TYPES: Record<AssetType, string[]> = {
-  logo: ["image/jpeg", "image/png"],
-  banner: ["image/jpeg", "image/png"],
-  ad: ["image/jpeg", "image/png", "image/gif", "video/mp4", "video/webm"],
-};
-
-const MAX_FILE_SIZE_MB = 40;
-
 export default function FileInput({ onSelect, label, existingUrl }: Props) {
   const [isOver, setIsOver] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(
     existingUrl ?? null
   );
   const [fileData, setFileData] = useState<File | null>(null);
-
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const validateFile = useCallback(
-    (file: File) => {
-      const isValidType = ACCEPTED_TYPES[label].includes(file.type);
-      const isValidSize =
-        label === "ad" ? file.size <= MAX_FILE_SIZE_MB * 1024 * 1024 : true;
+  const { error, videoDuration, processFile, reset } = useFileHandler(label);
 
-      if (!isValidType) {
-        return `Invalid file type. Allowed: ${ACCEPTED_TYPES[label]
-          .map((t) => t.split("/")[1].toUpperCase())
-          .join(", ")}`;
+  const handleProcess = useCallback(
+    async (file: File) => {
+      const err = await processFile(file, (processed, url) => {
+        setPreviewUrl(url);
+        setFileData(processed);
+        onSelect(processed, url);
+      });
+
+      if (!err) {
+        inputRef.current!.value = "";
       }
-
-      if (!isValidSize) {
-        return `File too large. Max size is ${MAX_FILE_SIZE_MB}MB.`;
-      }
-
-      return null;
     },
-    [label]
-  );
-
-  const processFile = useCallback(
-    (file: File) => {
-      const validationError = validateFile(file);
-      if (validationError) {
-        setError(validationError);
-        return;
-      }
-      setError(null);
-      const blobUrl = URL.createObjectURL(file);
-      setPreviewUrl(blobUrl);
-      setFileData(file);
-      onSelect(file, blobUrl);
-    },
-    [onSelect, validateFile]
+    [processFile, onSelect]
   );
 
   const handleFileChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
       if (!file) return;
-      setFileData(file);
-      const newUrl = URL.createObjectURL(file);
-      setPreviewUrl(newUrl);
-      onSelect(file, newUrl);
+      handleProcess(file);
+      inputRef.current!.value = "";
     },
-    [onSelect]
+    [handleProcess]
   );
 
   const handleReset = useCallback(() => {
     setPreviewUrl(null);
-    onSelect(new File([], ""), "");
     setFileData(null);
-    setError(null);
+    onSelect(new File([], ""), "");
+    reset();
     setIsOver(false);
-  }, [onSelect]);
+  }, [onSelect, reset]);
 
-  const getHelperText = () => {
-    if (label === "logo" || label === "banner") {
-      return "Use JPG or PNG (transparent background preferred)";
+  useEffect(() => {
+    if (error) {
+      addToast({
+        title: "File Error",
+        description: error,
+        color: "danger",
+      });
     }
-    return "Use JPG, PNG, GIF, MP4 or WEBM — up to 40MB";
-  };
+    if (videoDuration !== null) {
+      console.log("Duración del video subido:", videoDuration);
+    }
+  }, [error, videoDuration]);
+  const getHelperText = () =>
+    label === "logo" || label === "banner"
+      ? "Use JPG or PNG (transparent background preferred)"
+      : "Use JPG, PNG, GIF, MP4 or WEBM — up to 40MB";
 
-  const getDisplayLabel = () => {
-    return `Drag and drop your ${label} here or browse files`;
-  };
+  const getDisplayLabel = () =>
+    `Drag and drop your ${label} here or browse files`;
 
   return (
     <div className="flex flex-col items-center justify-center w-full">
@@ -117,11 +96,11 @@ export default function FileInput({ onSelect, label, existingUrl }: Props) {
               for (const item of Array.from(items)) {
                 if (item.kind === "file") {
                   const file = item.getAsFile();
-                  if (file) processFile(file);
+                  if (file) handleProcess(file);
                 }
               }
             } else if (e.dataTransfer.files.length) {
-              processFile(e.dataTransfer.files[0]);
+              handleProcess(e.dataTransfer.files[0]);
             }
           }}
         >
@@ -141,20 +120,20 @@ export default function FileInput({ onSelect, label, existingUrl }: Props) {
         </div>
       ) : (
         <div className="w-full max-w-sm flex flex-col items-center gap-4">
-          {fileData?.type?.startsWith("video") ||
-          previewUrl.endsWith(".mp4") ||
-          previewUrl.endsWith(".webm") ? (
-            <video
-              src={previewUrl}
-              controls
-              className={`rounded-md object-contain ${
-                label === "logo"
-                  ? "w-32 h-32"
-                  : label === "banner"
-                  ? "w-full h-32"
-                  : "w-full h-48"
-              }`}
-            />
+          {fileData?.type?.startsWith("video") ? (
+            <>
+              <video
+                src={previewUrl}
+                controls
+                className={`rounded-md object-contain ${
+                  label === "logo"
+                    ? "w-32 h-32"
+                    : label === "banner"
+                    ? "w-full h-32"
+                    : "w-full h-48"
+                }`}
+              />
+            </>
           ) : (
             <Image
               src={previewUrl}
