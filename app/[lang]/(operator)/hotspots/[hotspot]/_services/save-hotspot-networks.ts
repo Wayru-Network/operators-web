@@ -1,6 +1,5 @@
 "use server";
 
-import { PrismaClient } from "@/lib/generated/prisma";
 import { randomUUID } from "crypto";
 import {
   HotspotNetworksFormData,
@@ -14,6 +13,8 @@ async function createNetworkConfigOnDevice(config: {
   type: "open" | "private";
   password?: string;
 }): Promise<string> {
+  console.log(config);
+
   // Simulate network call delay
   await new Promise((resolve) => setTimeout(resolve, 100));
 
