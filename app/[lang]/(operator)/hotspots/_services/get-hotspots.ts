@@ -28,7 +28,7 @@ export interface MinersByAddressResponse {
 
 export async function getHotspots(
   page: number,
-  limit: number,
+  limit: number
 ): Promise<MinersByAddressResponse> {
   const { wallet } = await getSession();
 
@@ -51,7 +51,7 @@ export async function getHotspots(
         "Content-Type": "application/json",
         "X-API-KEY": env.BACKEND_KEY,
       },
-    },
+    }
   );
 
   let hotspots: MinersByAddressResponse;
@@ -95,17 +95,14 @@ export async function getHotspots(
       },
     },
     include: {
-      portal_configs: true,
+      portal_config: true,
     },
   });
 
   const portalMap = new Map();
   portals.forEach((hotspot) => {
-    if (hotspot.portal_configs && hotspot.portal_configs.length > 0) {
-      portalMap.set(
-        hotspot.wayru_device_id,
-        hotspot.portal_configs[0].portal_name,
-      );
+    if (hotspot.portal_config_id && hotspot.portal_config) {
+      portalMap.set(hotspot.wayru_device_id, hotspot.portal_config.portal_name);
     }
   });
 

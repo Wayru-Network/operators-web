@@ -10,11 +10,11 @@ export async function assignHotspots(
         Prisma.hotspot.upsert({
           where: { wayru_device_id: deviceId },
           update: {
-            portal_configs: { connect: { id: portalConfigId } },
+            portal_config: { connect: { id: portalConfigId } },
           },
           create: {
             wayru_device_id: deviceId,
-            portal_configs: { connect: { id: portalConfigId } },
+            portal_config: { connect: { id: portalConfigId } },
           },
         })
       )

@@ -9,7 +9,7 @@ export default async function ensureHotspots(hotspots: Hotspot[]) {
   // Filter out hotspots without wayru_device_id
   const validHotspots = hotspots.filter(
     (hotspot) =>
-      hotspot.wayru_device_id && hotspot.wayru_device_id.trim() !== "",
+      hotspot.wayru_device_id && hotspot.wayru_device_id.trim() !== ""
   );
 
   if (validHotspots.length === 0) {
