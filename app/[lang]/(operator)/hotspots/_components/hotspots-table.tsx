@@ -21,6 +21,12 @@ import {
 import { Settings, Search } from "lucide-react";
 import { redirect } from "next/navigation";
 
+interface HotspotColumns {
+  key: string;
+  label: string;
+  allowsSorting?: boolean;
+}
+
 export default function HotspotsTable({
   rows,
   meta,
@@ -68,7 +74,7 @@ export default function HotspotsTable({
     return filtered.slice(start, start + PAGE_SIZE);
   }, [filtered, page]);
 
-  const columns = [
+  const columns: HotspotColumns[] = [
     { key: "name", label: "Hotspot Name", allowsSorting: true },
     { key: "mac", label: "MAC" },
     { key: "status", label: "Status" },
@@ -82,7 +88,7 @@ export default function HotspotsTable({
       setPage(page + 1);
       redirect(`/hotspots?page=${page}`);
     },
-    [setPage],
+    [setPage]
   );
 
   return (
@@ -119,7 +125,7 @@ export default function HotspotsTable({
           }}
         >
           <TableHeader columns={columns}>
-            {(col) => (
+            {(col: HotspotColumns) => (
               <TableColumn
                 key={col.key}
                 allowsSorting={col.allowsSorting}
@@ -131,12 +137,12 @@ export default function HotspotsTable({
           </TableHeader>
 
           <TableBody items={paged} emptyContent="No hotspots found">
-            {(item) => (
+            {(item: Hotspot) => (
               <TableRow
                 key={item.name}
                 className="hover:bg-gray-100 dark:hover:bg-gray-500"
               >
-                {(columnKey) => (
+                {(columnKey: string) => (
                   <TableCell>
                     {columnKey === "status" ? (
                       <StatusPill
@@ -178,9 +184,9 @@ export default function HotspotsTable({
           showControls
           className="flex justify-center pt-5"
           classNames={{
-            item: "dark:text-white",
-            prev: "dark:text-white",
-            next: "dark:text-white",
+            item: "dark:text-white text-black",
+            prev: "dark:text-white text-black",
+            next: "dark:text-white text-black",
           }}
         />
       </div>

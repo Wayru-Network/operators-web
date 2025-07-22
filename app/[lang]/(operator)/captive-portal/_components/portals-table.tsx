@@ -17,6 +17,23 @@ import NewPortal from "./new-portal";
 import { Search, Settings } from "lucide-react";
 import { rowCaptivePortal } from "../_services/get-captive-portals";
 
+interface PortalsColumns {
+  key: string;
+  label: string;
+  allowsSorting?: boolean;
+}
+
+interface PortalsRows {
+  id: string;
+  portal_name: string;
+  flow_type: string;
+  _count: {
+    hotspots: number;
+  };
+  conversion_rate: string;
+  last_edit: string;
+}
+
 export default function PortalsTable({ rows }: { rows: rowCaptivePortal[] }) {
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState<SortDescriptor>({
@@ -119,7 +136,7 @@ export default function PortalsTable({ rows }: { rows: rowCaptivePortal[] }) {
           }}
         >
           <TableHeader columns={columns}>
-            {(col) => (
+            {(col: PortalsColumns) => (
               <TableColumn
                 key={col.key}
                 allowsSorting={col.allowsSorting}
@@ -131,12 +148,12 @@ export default function PortalsTable({ rows }: { rows: rowCaptivePortal[] }) {
           </TableHeader>
 
           <TableBody items={paged} emptyContent="No portals found">
-            {(item) => (
+            {(item: PortalsRows) => (
               <TableRow
                 key={item.id}
                 className="hover:bg-gray-100 dark:hover:bg-gray-500"
               >
-                {(columnKey) => (
+                {(columnKey: string) => (
                   <TableCell className="text-center">
                     {columnKey === "actions" ? (
                       <a
@@ -173,9 +190,9 @@ export default function PortalsTable({ rows }: { rows: rowCaptivePortal[] }) {
           showControls
           className="flex justify-center pt-5"
           classNames={{
-            item: "dark:text-white",
-            prev: "dark:text-white",
-            next: "dark:text-white",
+            item: "dark:text-white text-black",
+            prev: "dark:text-white text-black",
+            next: "dark:text-white text-black",
           }}
         />
       </div>
