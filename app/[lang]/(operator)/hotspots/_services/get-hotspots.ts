@@ -44,9 +44,7 @@ export async function getHotspots(
   }
 
   const hotspotsData = await fetch(
-    `${
-      env.BACKEND_URL
-    }/api/nfnode/miners-by-address/${wallet}?page=${page}&size=${limit}&limit=${6}`,
+    `${env.BACKEND_URL}/api/nfnode/miners-by-address/G6KbU6fpUQX7ukNsVpnscfkmpyoLwNrVBBojPVxiY8Xd?page=${page}&limit=${limit}`,
     {
       headers: {
         "Content-Type": "application/json",
@@ -55,8 +53,22 @@ export async function getHotspots(
     }
   );
 
-  const hotspots = (await hotspotsData.json()) as MinersByAddressResponse;
-  if (!hotspots || hotspots.data.length === 0) {
+  let hotspots: MinersByAddressResponse;
+  try {
+    hotspots = (await hotspotsData.json()) as MinersByAddressResponse;
+    if (!hotspots || hotspots.data.length === 0) {
+      return {
+        data: [],
+        meta: {
+          total: 0,
+          pages: 0,
+          page: 0,
+          size: 0,
+        },
+      };
+    }
+  } catch (error) {
+    console.error("Error fetching hotspots:", error);
     return {
       data: [],
       meta: {
