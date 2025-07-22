@@ -14,11 +14,26 @@ import {
 import { Input } from "@heroui/input";
 import { Pagination } from "@heroui/pagination";
 import StatusPill from "@/app/[lang]/(operator)/hotspots/_components/status-pill";
-import { Hotspot } from "@/app/[lang]/(operator)/hotspots/_services/get-hotspots";
+import {
+  Hotspot,
+  MinersByAddressResponse,
+} from "@/app/[lang]/(operator)/hotspots/_services/get-hotspots";
 import { Settings, Search } from "lucide-react";
 import { redirect } from "next/navigation";
 
-export default function HotspotsTable({ rows }: { rows: Hotspot[] }) {
+interface HotspotColumns {
+  key: string;
+  label: string;
+  allowsSorting?: boolean;
+}
+
+export default function HotspotsTable({
+  rows,
+  meta,
+}: {
+  rows: Hotspot[];
+  meta: MinersByAddressResponse["meta"];
+}) {
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState<SortDescriptor>({
     column: "name",
@@ -59,7 +74,7 @@ export default function HotspotsTable({ rows }: { rows: Hotspot[] }) {
     return filtered.slice(start, start + PAGE_SIZE);
   }, [filtered, page]);
 
-  const columns = [
+  const columns: HotspotColumns[] = [
     { key: "name", label: "Hotspot Name", allowsSorting: true },
     { key: "mac", label: "MAC" },
     { key: "status", label: "Status" },
@@ -71,9 +86,9 @@ export default function HotspotsTable({ rows }: { rows: Hotspot[] }) {
   const goto = useCallback(
     (page: number) => {
       setPage(page + 1);
-      redirect(`/admin/devices?page=${page}`);
+      redirect(`/hotspots?page=${page}`);
     },
-    [setPage],
+    [setPage]
   );
 
   return (
@@ -110,7 +125,7 @@ export default function HotspotsTable({ rows }: { rows: Hotspot[] }) {
           }}
         >
           <TableHeader columns={columns}>
-            {(col) => (
+            {(col: HotspotColumns) => (
               <TableColumn
                 key={col.key}
                 allowsSorting={col.allowsSorting}
@@ -122,7 +137,7 @@ export default function HotspotsTable({ rows }: { rows: Hotspot[] }) {
           </TableHeader>
 
           <TableBody items={paged} emptyContent="No hotspots found">
-            {(item) => (
+            {(item: Hotspot) => (
               <TableRow
                 key={item.name}
                 className="hover:bg-gray-100 dark:hover:bg-gray-500"
@@ -163,15 +178,15 @@ export default function HotspotsTable({ rows }: { rows: Hotspot[] }) {
           </TableBody>
         </Table>
         <Pagination
-          total={pageCount}
-          page={page}
+          total={meta.pages}
+          page={meta.page}
           onChange={goto}
           showControls
           className="flex justify-center pt-5"
           classNames={{
-            item: "dark:text-white",
-            prev: "dark:text-white",
-            next: "dark:text-white",
+            item: "dark:text-white text-black",
+            prev: "dark:text-white text-black",
+            next: "dark:text-white text-black",
           }}
         />
       </div>

@@ -5,6 +5,7 @@ import { SignJWT, jwtVerify } from "jose";
 import type { SessionPayload } from "./session-interface";
 import { defaultSession } from "./session-interface";
 import { env } from "@/lib/infra/env";
+import { verifyToken } from "@/app/api/auth/callback/_services/token-service";
 
 const secretKey = env.SESSION_KEY;
 const encodedKey = new TextEncoder().encode(secretKey);
@@ -63,7 +64,7 @@ export async function getSession(): Promise<SessionPayload> {
 }
 
 export async function updateSession(
-  updates: Partial<SessionPayload>,
+  updates: Partial<SessionPayload>
 ): Promise<void> {
   const cookieStore = await cookies();
 
@@ -86,4 +87,18 @@ export async function updateSession(
     expires: expiresAt,
     path: "/",
   });
+}
+
+export async function checkSession(): Promise<boolean> {
+  const session = await getSession();
+  if (!session || !session.accessToken) {
+    console.error("No session or access token found");
+    return false;
+  }
+  const accessToken = await verifyToken(session.accessToken);
+  if (!accessToken) {
+    console.error("Invalid access token");
+    return false;
+  }
+  return true;
 }

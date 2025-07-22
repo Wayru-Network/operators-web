@@ -30,7 +30,7 @@ const valid_emails = [
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
-  const fallbackUrl = new URL("/login", req.url);
+  const fallbackUrl = new URL("/login", env.APP_URL);
   const code = searchParams.get("code");
   const state = searchParams.get("state");
   const err = searchParams.get("error");
@@ -113,7 +113,7 @@ export async function GET(req: Request) {
           "Content-Type": "application/json",
           "X-API-KEY": env.BACKEND_KEY,
         },
-      },
+      }
     );
 
     if (data.ok) {
@@ -121,7 +121,7 @@ export async function GET(req: Request) {
       walletAddress = response.walletAddress || "";
     } else {
       console.log(
-        "Warning: Wallet API request failed, proceeding without wallet",
+        "Warning: Wallet API request failed, proceeding without wallet"
       );
       console.log("- Status:", data.status);
       console.log("- Status text:", data.statusText);
@@ -129,7 +129,7 @@ export async function GET(req: Request) {
   } catch (error) {
     console.log(
       "Warning: Wallet API request error, proceeding without wallet:",
-      error,
+      error
     );
   }
 
@@ -142,10 +142,13 @@ export async function GET(req: Request) {
     wallet: walletAddress || "",
   });
 
-  console.log("User logged in:", email, walletAddress);
+  console.log("User logged in:", email, "wallet: ", walletAddress);
 
   cookieStore.delete("pkce_state");
   cookieStore.delete("pkce_verifier");
 
+  if (!walletAddress) {
+    return NextResponse.redirect(new URL("/create-wallet", env.APP_URL));
+  }
   return NextResponse.redirect(env.APP_URL + "/dashboard");
 }

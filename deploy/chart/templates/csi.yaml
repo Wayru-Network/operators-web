@@ -38,6 +38,10 @@ spec:
           objectName: wifi-api-key
           objectType: secret
           objectVersion: ""
+        - |
+          objectName: devices-api-key
+          objectType: secret
+          objectVersion: ""
   secretObjects:
     - secretName: {{ .Values.name }}
       type: Opaque
@@ -52,3 +56,5 @@ spec:
           key: BACKEND_KEY
         - objectName: wifi-api-key
           key: WIFI_API_KEY
+        - objectName: devices-api-key
+          key: DEVICES_API_KEY

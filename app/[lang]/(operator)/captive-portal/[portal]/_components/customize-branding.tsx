@@ -11,6 +11,7 @@ interface BrandingProps {
     background: string;
     button: string;
     text: string;
+    buttonText: string;
   }) => void;
 }
 

@@ -10,28 +10,29 @@ datasource db {
 
 model hotspot {
   id              Int              @id @default(autoincrement())
-  wayru_device_id String           @db.Uuid
+  wayru_device_id String           @unique @db.Uuid
+  name            String?          @unique
   network_configs network_config[]
   portal_configs  portal_config[]  @relation("portal_hotspots")
 }
 
 model portal_config {
-  id               Int      @id @default(autoincrement())
-  user_id          String
-  portal_name      String
-  welcome_message  String?
-  success_message  String?
-  background_color String?
-  text_color       String?
-  button_color     String?
-  logo_asset_id    Int
-  banner_asset_id  Int
-  ad_access        Boolean
-  voucher_access   Boolean
-  form_access      Boolean
-  redirect_url     String
-  created_at       DateTime @default(now())
-  updated_at       DateTime @updatedAt
+  id                Int      @id @default(autoincrement())
+  user_id           String
+  portal_name       String
+  welcome_message   String?
+  background_color  String?
+  text_color        String?
+  button_color      String?
+  button_text_color String?
+  logo_asset_id     Int
+  banner_asset_id   Int
+  ad_access         Boolean
+  voucher_access    Boolean
+  form_access       Boolean
+  redirect_url      String
+  created_at        DateTime @default(now())
+  updated_at        DateTime @updatedAt
 
   logo     asset     @relation("logo_asset", fields: [logo_asset_id], references: [id])
   banner   asset     @relation("banner_asset", fields: [banner_asset_id], references: [id])

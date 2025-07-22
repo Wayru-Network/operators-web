@@ -37,6 +37,7 @@ export default async function getPortal(portalId: number) {
       background: portal?.background_color || "#ffffff",
       button: portal?.button_color || "#0070f3",
       text: portal?.text_color || "#000000",
+      buttonText: portal?.button_text_color || "#ffffff",
     },
     logo: {
       url: blobLogo.url || null,
@@ -50,7 +51,6 @@ export default async function getPortal(portalId: number) {
     voucher: portal?.voucher_access || false,
     userInfo: portal?.form_access || false,
     welcomeMessage: portal?.welcome_message || "",
-    successMessage: portal?.success_message || "",
     ads: portal?.ads || [],
     redirectUrl: portal?.redirect_url || undefined,
     portalName: portal?.portal_name || "",
