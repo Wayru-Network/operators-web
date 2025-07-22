@@ -64,9 +64,6 @@ export default function FileInput({ onSelect, label, existingUrl }: Props) {
         color: "danger",
       });
     }
-    if (videoDuration !== null) {
-      console.log("Duración del video subido:", videoDuration);
-    }
   }, [error, videoDuration]);
   const getHelperText = () =>
     label === "logo" || label === "banner"
