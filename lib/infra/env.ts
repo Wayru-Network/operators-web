@@ -56,6 +56,8 @@ export function loadEnvironment(): Environment {
     "BACKEND_KEY",
     "WIFI_API_URL",
     "WIFI_API_KEY",
+    "DEVICES_API_URL",
+    "DEVICES_API_KEY",
   ];
 
   const missingVars: string[] = [];
