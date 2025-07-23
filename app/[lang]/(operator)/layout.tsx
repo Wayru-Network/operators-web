@@ -48,7 +48,7 @@ export default async function OperatorLayout({ children }: LayoutProps) {
           <NavMenu />
         </div>
         <div className="w-full p-11">
-          <div className="flex flex-row gap-x-4 justify-end mb-10">
+          <div className="flex flex-row gap-x-4 justify-end mb-3">
             <WalletStatus />
             <LangSwitch />
             <ThemeSwitcher />
