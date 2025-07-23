@@ -2,6 +2,10 @@ import CustomSnippet from "@/lib/components/custom-snippet";
 import { Button } from "@heroui/button";
 import { Snippet } from "@heroui/snippet";
 import { Spacer } from "@heroui/spacer";
+import {
+  HotspotOpenNetwork,
+  HotspotPrivateNetwork,
+} from "../_services/parse-hotspot-config";
 
 export interface DeviceInfoProps {
   basic: {
@@ -18,13 +22,8 @@ export interface DeviceInfoProps {
     mac: string;
     ip: string;
     serial: string;
-    openNetwork?: {
-      SSID: string;
-    };
-    privateNetwork?: {
-      SSID: string;
-      password: string;
-    };
+    openNetwork: HotspotOpenNetwork;
+    privateNetwork: HotspotPrivateNetwork;
   };
   ownership: {
     nftID: string;
@@ -130,19 +129,19 @@ Public IP: ${basic.publicIP}`;
               label="SSID open network"
               wrapperClass="max-w-[260px]"
             >
-              {network.openNetwork?.SSID || "N/A"}
+              {network.openNetwork.ssid || "N/A"}
             </CustomSnippet>
             <CustomSnippet
               label="SSID private network"
               wrapperClass="max-w-[260px]"
             >
-              {network.privateNetwork?.SSID || "N/A"}
+              {network.privateNetwork.ssid || "N/A"}
             </CustomSnippet>
             <CustomSnippet
               label="Current password"
               wrapperClass="max-w-[260px]"
             >
-              {network.privateNetwork?.password || "N/A"}
+              {network.privateNetwork.password || "N/A"}
             </CustomSnippet>
           </div>
         </div>

@@ -2,11 +2,37 @@
 
 import getDeviceBrief from "@/lib/device/get-device-brief";
 import getNFNodeByName from "@/lib/nfnode/get-nfnode-by-name";
-
-// import { hotspot } from "@/lib/generated/prisma";
-// import { Prisma } from "@/lib/prisma-client/prisma";
+import { Prisma } from "@/lib/infra/prisma";
+import parseHotspotConfig, {
+  HotspotOpenNetwork,
+  HotspotPrivateNetwork,
+} from "./parse-hotspot-config";
 
 export async function getHotspotDetail(name: string): Promise<HotspotDetail> {
+  const hotspot = await Prisma.hotspot.findUnique({
+    where: { name },
+    include: {
+      network_configs: true,
+    },
+  });
+
+  if (!hotspot) {
+    throw new Error(`Hotspot ${name} not found`);
+  }
+
+  let openNetwork: HotspotOpenNetwork = {
+    ssid: "",
+  };
+  let privateNetwork: HotspotPrivateNetwork = {
+    ssid: "",
+    password: "",
+  };
+  if (hotspot.network_configs) {
+    const hotspotConfig = parseHotspotConfig(hotspot.network_configs);
+    openNetwork = hotspotConfig.openNetwork;
+    privateNetwork = hotspotConfig.privateNetwork;
+  }
+
   const nfnode = await getNFNodeByName(name);
   let device = null;
 
@@ -30,13 +56,8 @@ export async function getHotspotDetail(name: string): Promise<HotspotDetail> {
         mac: device?.mac || nfnode?.mac || "",
         ip: "",
         serial: nfnode?.serial || "",
-        openNetwork: {
-          SSID: "",
-        },
-        privateNetwork: {
-          SSID: "",
-          password: "",
-        },
+        openNetwork: openNetwork,
+        privateNetwork: privateNetwork,
       },
       ownership: {
         nftID: nfnode?.solana_asset_id || "",
@@ -46,13 +67,8 @@ export async function getHotspotDetail(name: string): Promise<HotspotDetail> {
     },
     networks: {
       locationName: "",
-      openNetwork: {
-        SSID: "",
-      },
-      privateNetwork: {
-        SSID: "",
-        password: "",
-      },
+      openNetwork: openNetwork,
+      privateNetwork: privateNetwork,
     },
   };
 
@@ -75,13 +91,8 @@ export interface HotspotDetail {
       mac: string;
       ip: string;
       serial: string;
-      openNetwork?: {
-        SSID: string;
-      };
-      privateNetwork?: {
-        SSID: string;
-        password: string;
-      };
+      openNetwork: HotspotOpenNetwork;
+      privateNetwork: HotspotPrivateNetwork;
     };
     ownership: {
       nftID: string;
@@ -91,12 +102,7 @@ export interface HotspotDetail {
   };
   networks: {
     locationName: string;
-    openNetwork?: {
-      SSID: string;
-    };
-    privateNetwork?: {
-      SSID: string;
-      password: string;
-    };
+    openNetwork: HotspotOpenNetwork;
+    privateNetwork: HotspotPrivateNetwork;
   };
 }

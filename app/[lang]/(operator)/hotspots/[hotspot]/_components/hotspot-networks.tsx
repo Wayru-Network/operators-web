@@ -8,16 +8,15 @@ import { useCallback, useState } from "react";
 import saveHotspotNetworks from "../_services/save-hotspot-networks";
 import { HotspotNetworksFormData } from "../_types/hotspot-networks";
 import { useParams } from "next/navigation";
+import {
+  HotspotOpenNetwork,
+  HotspotPrivateNetwork,
+} from "../_services/parse-hotspot-config";
 
 export interface HotspotNetworksProps {
   locationName?: string;
-  openNetwork?: {
-    SSID: string;
-  };
-  privateNetwork?: {
-    SSID: string;
-    password: string;
-  };
+  openNetwork: HotspotOpenNetwork;
+  privateNetwork: HotspotPrivateNetwork;
 }
 
 export default function HotspotNetworks({
@@ -26,11 +25,9 @@ export default function HotspotNetworks({
   privateNetwork,
 }: HotspotNetworksProps) {
   const [locName, setLocName] = useState(locationName || "");
-  const [openSSID, setOpenSSID] = useState(openNetwork?.SSID || "");
-  const [privateSSID, setPrivateSSID] = useState(privateNetwork?.SSID || "");
-  const [newPassword, setNewPassword] = useState(
-    privateNetwork?.password || "",
-  );
+  const [openSSID, setOpenSSID] = useState(openNetwork.ssid || "");
+  const [privateSSID, setPrivateSSID] = useState(privateNetwork.ssid || "");
+  const [newPassword, setNewPassword] = useState(privateNetwork.password || "");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isSaving, setIsSaving] = useState(false);
 
