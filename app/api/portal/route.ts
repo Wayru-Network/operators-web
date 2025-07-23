@@ -43,7 +43,7 @@ export async function GET(request: Request) {
     },
   });
 
-  if (!portalConfig) {
+  if (!portalConfig?.portal_name) {
     return new Response("Portal not found", { status: 404 });
   }
 
