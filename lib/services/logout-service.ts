@@ -32,3 +32,30 @@ export default async function userLogout() {
   await deleteSession();
   redirect("/login");
 }
+
+export async function logout(refresh_token: string) {
+  const kc = {
+    base: env.KEYCLOAK_BASE,
+    realm: env.KEYCLOAK_REALM,
+    clientId: env.KEYCLOAK_CLIENT_ID,
+  };
+  try {
+    await fetch(
+      `${kc.base}/realms/${kc.realm}/protocol/openid-connect/logout`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: new URLSearchParams({
+          client_id: kc.clientId || "",
+          refresh_token: refresh_token,
+        }),
+      }
+    );
+  } catch (error) {
+    console.error("Logout failed:", error);
+    return;
+  }
+  redirect("/login");
+}

@@ -4,6 +4,7 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { getUserInfo } from "./_services/token-service";
 import { env } from "@/lib/infra/env";
+import userLogout, { logout } from "@/lib/services/logout-service";
 
 interface AddressResponse {
   walletAddress: string;
@@ -98,6 +99,7 @@ export async function GET(req: Request) {
     console.log("auth failure: Email not in valid list");
     console.log("- Email:", email);
     console.log("- Valid emails:", valid_emails);
+    logout(tokens.refresh_token);
     return NextResponse.redirect(fallbackUrl);
   }
 
@@ -114,7 +116,7 @@ export async function GET(req: Request) {
           "Content-Type": "application/json",
           "X-API-KEY": env.BACKEND_KEY,
         },
-      },
+      }
     );
 
     if (data.ok) {
@@ -122,7 +124,7 @@ export async function GET(req: Request) {
       walletAddress = response.walletAddress || "";
     } else {
       console.log(
-        "Warning: Wallet API request failed, proceeding without wallet",
+        "Warning: Wallet API request failed, proceeding without wallet"
       );
       console.log("- Status:", data.status);
       console.log("- Status text:", data.statusText);
@@ -130,7 +132,7 @@ export async function GET(req: Request) {
   } catch (error) {
     console.log(
       "Warning: Wallet API request error, proceeding without wallet:",
-      error,
+      error
     );
   }
 
