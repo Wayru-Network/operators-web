@@ -10,6 +10,7 @@ export interface MetaKeys {
   meta_config: string;
   meta_type: string;
   meta_section: string;
+  [key: string]: string;
 }
 
 // Config Fragment DTOs matching the Go backend

@@ -19,7 +19,7 @@ export default async function createDeviceConfig(
   },
   enabled: boolean = true,
   priority: number = 0,
-): Promise<boolean> {
+): Promise<string | null> {
   const dto: CreateConfigFragmentDto = {
     type,
     name,
@@ -53,15 +53,15 @@ export default async function createDeviceConfig(
       console.error(
         `Failed to create device config: ${response.status} - ${errorText}`,
       );
-      return false;
+      return null;
     }
 
     const result: ConfigFragmentResponse = await response.json();
 
-    // Return the fragment as DeviceConfig format
-    return true;
+    // Return the fragment ID
+    return result.id.toString();
   } catch (error) {
     console.error("Error creating device config:", error);
-    return false;
+    return null;
   }
 }

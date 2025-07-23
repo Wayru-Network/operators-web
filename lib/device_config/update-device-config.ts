@@ -17,7 +17,7 @@ export default async function updateDeviceConfig(
   },
   enabled: boolean = true,
   priority: number = 0,
-): Promise<boolean> {
+): Promise<string | null> {
   const dto: UpdateConfigFragmentDto = {
     name,
     fragment,
@@ -43,15 +43,15 @@ export default async function updateDeviceConfig(
       console.error(
         `Failed to update device config: ${response.status} - ${errorText}`,
       );
-      return false;
+      return null;
     }
 
     const result: ConfigFragmentResponse = await response.json();
 
-    // Return the fragment as DeviceConfig format
-    return true;
+    // Return the fragment ID
+    return result.id.toString();
   } catch (error) {
     console.error("Error updating device config:", error);
-    return false;
+    return null;
   }
 }
