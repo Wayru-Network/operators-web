@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { getUserInfo } from "./_services/token-service";
 import { env } from "@/lib/infra/env";
-import userLogout, { logout } from "@/lib/services/logout-service";
+import { logout } from "@/lib/services/logout-service";
 
 interface AddressResponse {
   walletAddress: string;
