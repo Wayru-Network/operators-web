@@ -67,6 +67,7 @@ export async function getHotspotDetail(name: string): Promise<HotspotDetail> {
     },
     networks: {
       locationName: "",
+      osServicesVersion: device?.os_services_version || "",
       openNetwork: openNetwork,
       privateNetwork: privateNetwork,
     },
@@ -102,6 +103,7 @@ export interface HotspotDetail {
   };
   networks: {
     locationName: string;
+    osServicesVersion: string;
     openNetwork: HotspotOpenNetwork;
     privateNetwork: HotspotPrivateNetwork;
   };
