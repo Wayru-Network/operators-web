@@ -3,6 +3,7 @@
 import { CustomInput } from "@/lib/components/custom-input";
 import { Button } from "@heroui/button";
 import { Spacer } from "@heroui/spacer";
+import { addToast } from "@heroui/toast";
 import { useCallback, useState } from "react";
 import saveHotspotNetworks from "../_services/save-hotspot-networks";
 import { HotspotNetworksFormData } from "../_types/hotspot-networks";
@@ -35,10 +36,54 @@ export default function HotspotNetworks({
 
   const helperText = `Name your hotspot to identify its location. (e.g., \"Living Room Hotspot\" or \"Office Branch 1\"). This won't change its unique ID or MAC address.`;
 
-  const { name } = useParams<{ name: string }>();
-  console.log("name", name);
+  const { hotspot } = useParams<{ hotspot: string }>();
 
   const handleSave = useCallback(async () => {
+    // Form validation
+    if (privateSSID && newPassword !== confirmPassword) {
+      addToast({
+        title: "Error",
+        description: "Password confirmation does not match",
+        color: "danger",
+      });
+      return;
+    }
+
+    if (privateSSID && newPassword.length < 8) {
+      addToast({
+        title: "Error",
+        description: "Password must be at least 8 characters long",
+        color: "danger",
+      });
+      return;
+    }
+
+    if (openSSID.length > 34) {
+      addToast({
+        title: "Error",
+        description: "Open network SSID must be 34 characters or less",
+        color: "danger",
+      });
+      return;
+    }
+
+    if (privateSSID.length > 34) {
+      addToast({
+        title: "Error",
+        description: "Private network SSID must be 34 characters or less",
+        color: "danger",
+      });
+      return;
+    }
+
+    if (!openSSID.trim() && !privateSSID.trim()) {
+      addToast({
+        title: "Error",
+        description: "At least one network must be configured",
+        color: "danger",
+      });
+      return;
+    }
     setIsSaving(true);
     try {
       const formData: HotspotNetworksFormData = {
@@ -50,22 +95,36 @@ export default function HotspotNetworks({
           ssid: privateSSID,
           password: newPassword,
         },
-        name,
+        name: hotspot,
       };
 
       const result = await saveHotspotNetworks(formData);
 
       if (result.success) {
-        console.log("Networks saved successfully");
+        addToast({
+          title: "Success",
+          description: "Networks saved successfully",
+          color: "success",
+        });
+        setConfirmPassword(""); // Clear confirm password on success
       } else {
-        console.error("Failed to save networks:", result.error);
+        addToast({
+          title: "Error",
+          description: result.error || "Failed to save networks",
+          color: "danger",
+        });
       }
     } catch (error) {
+      addToast({
+        title: "Error",
+        description: "An unexpected error occurred while saving networks",
+        color: "danger",
+      });
       console.error("Error saving networks:", error);
     } finally {
       setIsSaving(false);
     }
-  }, [locName, openSSID, privateSSID, newPassword, name]);
+  }, [locName, openSSID, privateSSID, newPassword, confirmPassword, hotspot]);
 
   return (
     <div>
@@ -120,8 +179,10 @@ export default function HotspotNetworks({
           wrapperClass="max-w-[210px]"
         />
       </div>
+      <Spacer y={8} />
+
       <Button
-        className="w-full text-white bg-black rounded-[10px]"
+        className="text-white bg-black rounded-[10px] w-[309px]"
         onPress={handleSave}
         isLoading={isSaving}
       >
