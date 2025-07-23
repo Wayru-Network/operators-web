@@ -90,6 +90,11 @@ spec:
                 secretKeyRef:
                   name: {{ .Values.name }}
                   key: DEVICES_API_KEY
+            - name: OPERATORS_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.name }}
+                  key: OPERATORS_API_KEY
           volumeMounts:
             - name: {{ .Values.name }}-csi-volume
               mountPath: /mnt/secrets

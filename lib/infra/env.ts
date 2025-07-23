@@ -32,6 +32,9 @@ export interface Environment {
   // Devices API
   DEVICES_API_URL: string;
   DEVICES_API_KEY: string;
+
+  // OPERATORS API KEY
+  OPERATORS_API_KEY: string;
 }
 
 /**
@@ -76,7 +79,7 @@ export function loadEnvironment(): Environment {
       console.warn(`   - ${varName}`);
     });
     console.warn(
-      "   These variables have been set to empty strings to prevent build failures.",
+      "   These variables have been set to empty strings to prevent build failures."
     );
   }
 
