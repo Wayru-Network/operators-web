@@ -42,7 +42,7 @@ spec:
           objectName: devices-api-key
           objectType: secret
           objectVersion: ""
-    - |
+        - |
           objectName: operators-api-key
           objectType: secret
           objectVersion: ""
