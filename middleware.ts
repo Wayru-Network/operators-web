@@ -18,7 +18,11 @@ export function middleware(request: NextRequest) {
     if (!token) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    console.log("Token received:", token);
+    // Check if the token matches the OPERATORS_API_KEY
+    if (token !== process.env.OPERATORS_API_KEY) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+    // If the token is valid, proceed with the request
     return NextResponse.next();
   }
 
