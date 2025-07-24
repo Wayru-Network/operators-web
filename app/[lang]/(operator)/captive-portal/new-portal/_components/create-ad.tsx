@@ -4,9 +4,10 @@ import InteractionTime from "@/lib/components/interaction-dropdown";
 import AdFormat from "@/lib/components/adformat-dropdown";
 import { CustomInput } from "@/lib/components/custom-input";
 import { Button } from "@heroui/button";
+import { PortalConfig } from "../../[portal]/_components/customize-captive-portal";
 
 interface CreateAdProps {
-  newConfig: NewPortalConfig;
+  newConfig: NewPortalConfig | PortalConfig;
   adFormatHandler: (value: string) => void;
   fileHandler: (
     file: File,

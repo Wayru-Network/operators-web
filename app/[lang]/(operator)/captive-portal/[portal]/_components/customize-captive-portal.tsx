@@ -9,16 +9,21 @@ import CustomizePreview from "./customize-preview";
 import CustomizePortalSettings from "./customize-portal-settings";
 import UpdatePortal from "./update-portal";
 import { adFormat } from "@/lib/generated/prisma";
+import { addToast } from "@heroui/react";
+import { redirect } from "next/navigation";
 
 interface Ad {
   id: number;
   format: adFormat;
-  portal_config_id: number | null;
-  ad_asset_id: number | null;
+  asset: {
+    asset_url: string;
+  } | null;
   interaction_time: number;
 }
 
 export interface PortalConfig {
+  id: number;
+  userId: string;
   colors: {
     background: string;
     button: string;
@@ -28,10 +33,12 @@ export interface PortalConfig {
   logo: {
     url: string | null;
     file: File | null;
+    name: string | null;
   };
   banner: {
     url: string | null;
     file: File | null;
+    name: string | null;
   };
   ad: boolean;
   ads: Ad[];
@@ -42,11 +49,12 @@ export interface PortalConfig {
   adAsset?: {
     url: string | null;
     file: File | null;
+    name: string | null;
   };
   interactionTime: string;
   redirectUrl?: string;
   portalName: string;
-  assignedHotspot: string[];
+  assignedHotspot: Hotspot[];
 }
 
 export default function CustomizeCaptivePortal({
@@ -57,6 +65,19 @@ export default function CustomizeCaptivePortal({
   config: PortalConfig;
 }) {
   const [selected, setSelected] = useState("step1");
+
+  if (!config) {
+    addToast({
+      title: "Error",
+      description: "No portal configuration found.",
+      color: "danger",
+    });
+    redirect("/captive-portal");
+  }
+
+  const [originalConfig] = useState<PortalConfig>({
+    ...config,
+  });
 
   // Step 1 - Branding states
   const [colors, setColors] = useState({ ...config.colors });
@@ -76,15 +97,19 @@ export default function CustomizeCaptivePortal({
   // Step 3 - Create an Ad states
   const [adFormat, setAdFormat] = useState(config.adFormat || "video");
   const [ads] = useState(config.ads || []);
-  const [adUrl, setAdUrl] = useState<string | null>(null);
+  const [adUrl, setAdUrl] = useState<string | null>(
+    config.adAsset?.url || null
+  );
   const [adFile, setAdFile] = useState<File | null>(null);
-  const [interactionTime, setInteractionTime] = useState("15 Seconds");
+  const [interactionTime, setInteractionTime] = useState(
+    config.ads[0]?.interaction_time.toString() || "15"
+  );
   const [redirectUrl, setRedirectUrl] = useState(config.redirectUrl);
 
   // Step 4 - Publish states
   const [portalName, setPortalName] = useState(config.portalName || "");
   const [assignedHotspot, setAssignedHotspot] = useState(
-    config.assignedHotspot || ["none"]
+    config.assignedHotspot
   );
 
   const handleSelect = (
@@ -108,14 +133,18 @@ export default function CustomizeCaptivePortal({
   };
 
   const Config: PortalConfig = {
+    id: config.id,
+    userId: config.userId,
     colors,
     logo: {
       url: logoUrl,
       file: logoFile,
+      name: logoFile ? logoFile.name : null,
     },
     banner: {
       url: bannerUrl,
       file: bannerFile,
+      name: bannerFile ? bannerFile.name : null,
     },
     ad: ad,
     ads: ads,
@@ -126,6 +155,7 @@ export default function CustomizeCaptivePortal({
     adAsset: {
       url: adUrl,
       file: adFile,
+      name: config.adAsset?.name || null,
     },
     interactionTime,
     redirectUrl: redirectUrl || undefined,
@@ -180,6 +210,7 @@ export default function CustomizeCaptivePortal({
                 nameHandler={setPortalName}
                 assignedHotspotHandler={setAssignedHotspot}
                 hotspots={hotspots}
+                originalConfig={originalConfig}
               />
             </Tab>
           </Tabs>

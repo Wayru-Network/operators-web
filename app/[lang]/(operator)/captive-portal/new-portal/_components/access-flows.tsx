@@ -3,9 +3,10 @@ import { Switch } from "@heroui/switch";
 import { Star } from "lucide-react";
 import { CustomInput } from "@/lib/components/custom-input";
 import { Button } from "@heroui/button";
+import { PortalConfig } from "../../[portal]/_components/customize-captive-portal";
 
 interface AccessFlowsProps {
-  newConfig: NewPortalConfig;
+  newConfig: NewPortalConfig | PortalConfig;
   adHandler: (value: boolean) => void;
   voucherHandler: (value: boolean) => void;
   userInfoHandler: (value: boolean) => void;
