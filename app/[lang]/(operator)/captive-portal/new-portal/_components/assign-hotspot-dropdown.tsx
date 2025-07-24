@@ -78,6 +78,7 @@ export default function AssignHotspot({
         selectedKeys={selectedKeys}
         onSelectionChange={setSelectedKeys}
         variant="flat"
+        className="max-h-[300px] overflow-y-auto"
       >
         {hotspots.map((hotspot) => (
           <DropdownItem

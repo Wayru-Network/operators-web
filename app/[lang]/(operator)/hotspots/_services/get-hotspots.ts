@@ -114,6 +114,6 @@ export async function getHotspots(
 }
 
 export async function getHotspotsToAssign(): Promise<Hotspot[]> {
-  const hotspots = await getHotspots(1, 5); // Get all hotspots
+  const hotspots = await getHotspots(1, 50); // Get all hotspots
   return hotspots.data;
 }
