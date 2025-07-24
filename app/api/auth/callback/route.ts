@@ -28,6 +28,7 @@ const valid_emails = [
   "paula@wayru.org",
   "alejandrocamacaro91@gmail.com",
   "carlosfelixmarin@gmail.com",
+  "testlaura@gmail.com",
 ];
 
 export async function GET(req: Request) {
@@ -117,7 +118,7 @@ export async function GET(req: Request) {
           "Content-Type": "application/json",
           "X-API-KEY": env.BACKEND_KEY,
         },
-      }
+      },
     );
 
     if (data.ok) {
@@ -125,7 +126,7 @@ export async function GET(req: Request) {
       walletAddress = response.walletAddress || "";
     } else {
       console.log(
-        "Warning: Wallet API request failed, proceeding without wallet"
+        "Warning: Wallet API request failed, proceeding without wallet",
       );
       console.log("- Status:", data.status);
       console.log("- Status text:", data.statusText);
@@ -133,7 +134,7 @@ export async function GET(req: Request) {
   } catch (error) {
     console.log(
       "Warning: Wallet API request error, proceeding without wallet:",
-      error
+      error,
     );
   }
 
