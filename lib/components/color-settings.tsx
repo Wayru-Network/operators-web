@@ -31,7 +31,7 @@ export default function ColorSettings({ value, onChange }: ColorSettingsProps) {
               {label}
             </label>
 
-            <div className="flex items-center gap-1 rounded-[10px] bg-[#F8FAFA] p-2">
+            <div className="flex items-center gap-1 rounded-[10px] bg-[#F8FAFA] dark:bg-[#222222] p-2">
               <input
                 id={key}
                 type="color"
@@ -43,7 +43,7 @@ export default function ColorSettings({ value, onChange }: ColorSettingsProps) {
                 type="text"
                 value={value[key]}
                 onChange={handleChange(key)}
-                className="w-20 bg-transparent text-black text-sm outline-none"
+                className="w-20 bg-transparent text-black dark:text-white text-sm outline-none"
                 maxLength={7}
                 pattern="^#([A-Fa-f0-9]{6})$"
               />

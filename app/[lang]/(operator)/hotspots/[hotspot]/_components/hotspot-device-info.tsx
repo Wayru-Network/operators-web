@@ -53,7 +53,7 @@ Public IP: ${basic.publicIP}`;
         {/* Top */}
         <div className="w-full flex flex-row justify-between space-x-24">
           {/* Basic info */}
-          <div className="bg-[#F8FAFA] py-[21px] px-[19px] rounded-[10px] relative flex flex-row justify-between">
+          <div className="bg-[#F8FAFA] dark:bg-[#222222] py-[21px] px-[19px] rounded-[10px] relative flex flex-row justify-between">
             <div className="min-w-md">
               <div className="flex flex-row items-center space-x-2">
                 <p className="text-sm font-bold">Hotspot name:</p>

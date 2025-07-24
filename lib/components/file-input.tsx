@@ -16,7 +16,7 @@ type Props = {
 export default function FileInput({ onSelect, label, existingUrl }: Props) {
   const [isOver, setIsOver] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(
-    existingUrl ?? null
+    existingUrl ?? null,
   );
   const [fileData, setFileData] = useState<File | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -35,7 +35,7 @@ export default function FileInput({ onSelect, label, existingUrl }: Props) {
         inputRef.current!.value = "";
       }
     },
-    [processFile, onSelect]
+    [processFile, onSelect],
   );
 
   const handleFileChange = useCallback(
@@ -45,7 +45,7 @@ export default function FileInput({ onSelect, label, existingUrl }: Props) {
       handleProcess(file);
       inputRef.current!.value = "";
     },
-    [handleProcess]
+    [handleProcess],
   );
 
   const handleReset = useCallback(() => {
@@ -77,7 +77,7 @@ export default function FileInput({ onSelect, label, existingUrl }: Props) {
     <div className="flex flex-col items-center justify-center w-full">
       {!previewUrl ? (
         <div
-          className={`flex flex-col items-center justify-center w-full h-48 rounded-[10px] bg-white ${
+          className={`flex flex-col items-center justify-center w-full h-48 rounded-[10px] bg-white dark:bg-[#222222] ${
             isOver ? "ring-2 ring-blue-500" : ""
           }`}
           onDragOver={(e) => {
@@ -103,9 +103,9 @@ export default function FileInput({ onSelect, label, existingUrl }: Props) {
         >
           <label
             htmlFor={`file-${label}`}
-            className="h-full w-full flex flex-col justify-center items-center bg-[#F8FAFA] dark:bg-[#858585] text-black dark:text-white rounded-[10px] cursor-pointer"
+            className="h-full w-full flex flex-col justify-center items-center bg-[#F8FAFA] dark:bg-[#222222] text-black dark:text-white rounded-[10px] cursor-pointer"
           >
-            <Upload className="text-black" />
+            <Upload className="text-black dark:text-white" />
             <p className="pt-4">{getDisplayLabel()}</p>
             <p className="text-xs">{getHelperText()}</p>
             {error && (
@@ -128,8 +128,8 @@ export default function FileInput({ onSelect, label, existingUrl }: Props) {
                   label === "logo"
                     ? "w-32 h-32"
                     : label === "banner"
-                    ? "w-full h-32"
-                    : "w-full h-48"
+                      ? "w-full h-32"
+                      : "w-full h-48"
                 }`}
               />
             </>
@@ -141,8 +141,8 @@ export default function FileInput({ onSelect, label, existingUrl }: Props) {
                 label === "logo"
                   ? "w-32 h-32"
                   : label === "banner"
-                  ? "w-full h-32"
-                  : "w-full h-48"
+                    ? "w-full h-32"
+                    : "w-full h-48"
               }`}
               width={label === "logo" ? 128 : 640}
               height={label === "logo" ? 128 : 320}
