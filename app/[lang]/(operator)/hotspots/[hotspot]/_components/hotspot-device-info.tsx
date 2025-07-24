@@ -1,5 +1,5 @@
 import CustomSnippet from "@/lib/components/custom-snippet";
-import { Button } from "@heroui/button";
+// import { Button } from "@heroui/button";
 import { Snippet } from "@heroui/snippet";
 import { Spacer } from "@heroui/spacer";
 import {
@@ -98,14 +98,14 @@ Public IP: ${basic.publicIP}`;
             </div>
           </div>
           {/* Quick actions */}
-          <div>
+          {/* <div>
             <Button
               fullWidth
               // className={`rounded-lg justify-between ${isActive ? "bg-default text-white dark:text-black" : "bg-transparent text-[#2E3132] dark:text-white hover:bg-[#F2F4F4] dark:hover:bg-[#2E3132]"}`}
             >
               Update firmware
             </Button>
-          </div>
+          </div> */}
         </div>
         <Spacer y={8} />
         {/* Network details */}
