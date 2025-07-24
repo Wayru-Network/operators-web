@@ -11,14 +11,14 @@ import {
   getKeyValue,
   type SortDescriptor,
 } from "@heroui/table";
-import { Input } from "@heroui/input";
+//import { Input } from "@heroui/input";
 import { Pagination } from "@heroui/pagination";
 import StatusPill from "@/app/[lang]/(operator)/hotspots/_components/status-pill";
 import {
   Hotspot,
   MinersByAddressResponse,
 } from "@/app/[lang]/(operator)/hotspots/_services/get-hotspots";
-import { Settings, Search } from "lucide-react";
+import { Settings } from "lucide-react";
 import { redirect } from "next/navigation";
 
 interface HotspotColumns {
@@ -34,7 +34,7 @@ export default function HotspotsTable({
   rows: Hotspot[];
   meta: MinersByAddressResponse["meta"];
 }) {
-  const [search, setSearch] = useState("");
+  const [search] = useState("");
   const [sort, setSort] = useState<SortDescriptor>({
     column: "name",
     direction: "ascending",
@@ -93,7 +93,7 @@ export default function HotspotsTable({
 
   return (
     <div className="flex flex-col space-y-4">
-      <Input
+      {/* <Input
         disabled
         placeholder="Type to search..."
         value={search}
@@ -107,7 +107,7 @@ export default function HotspotsTable({
         startContent={
           <Search className="pl-2 text-gray-400 dark:text-gray-600" />
         }
-      />
+      /> */}
 
       <div className="bg-[#ffffff] dark:bg-[#191c1d] rounded-[30px] pb-8">
         <Table
@@ -182,7 +182,7 @@ export default function HotspotsTable({
           page={meta.page}
           onChange={goto}
           showControls
-          className="flex justify-center pt-5"
+          className="flex justify-center"
           classNames={{
             item: "dark:text-white text-black",
             prev: "dark:text-white text-black",

@@ -1,18 +1,20 @@
 import { Button } from "@heroui/button";
 import { PortalConfig } from "./customize-captive-portal";
 import { CustomInput } from "@/lib/components/custom-input";
-import AssignHotspot from "@/app/[lang]/(operator)/captive-portal/new-portal/_components/assign-hotspot-dropdown";
-// import uploadConfig from "../_services/upload_config";
 import { addToast } from "@heroui/toast";
-import { Hotspot } from "../../../hotspots/_services/get-hotspots";
+import { Hotspot } from "@/app/[lang]/(operator)/hotspots/_services/get-hotspots";
+import UpdateAssignedHotspot from "./customize-hotspot-dropdown";
+import updatePortal from "../_services/update-portal-service";
 import { redirect } from "next/navigation";
+import { useState } from "react";
 
 interface PublishProps {
   selectedHandler: (step: string) => void;
   portalConfig: PortalConfig;
   nameHandler: (name: string) => void;
-  assignedHotspotHandler: (hotspot: string[]) => void;
+  assignedHotspotHandler: (hotspot: Hotspot[]) => void;
   hotspots: Hotspot[];
+  originalConfig: PortalConfig;
 }
 
 export default function UpdatePortal({
@@ -21,39 +23,45 @@ export default function UpdatePortal({
   nameHandler,
   assignedHotspotHandler,
   hotspots,
+  originalConfig,
 }: PublishProps) {
-  // const handlePublish = async () => {
-  //   const result = await uploadConfig(portalConfig);
-  //   if (!result.success) {
-  //     addToast({
-  //       title: "Error",
-  //       description: result.error || "Failed to upload portal configuration",
-  //       color: "danger",
-  //     });
-  //     return;
-  //   }
-  //   addToast({
-  //     title: "Success",
-  //     description: "Portal configuration uploaded successfully",
-  //     color: "success",
-  //   });
-  // };
-  const handlePublish = () => {
+  const [isUpdating, setIsUpdating] = useState(false);
+  const handlePublish = async () => {
+    setIsUpdating(true);
+    const result = await updatePortal(portalConfig, originalConfig);
+    if (!result.success) {
+      addToast({
+        title: "Error",
+        description: result.error || "Failed to upload portal configuration",
+        color: "danger",
+      });
+      setIsUpdating(false);
+      return;
+    }
+    if (!result.success && result.error === "No changes detected") {
+      addToast({
+        title: "No changes detected",
+        description: "No changes were made to the portal configuration.",
+        color: "warning",
+      });
+      setIsUpdating(false);
+      return;
+    }
     addToast({
-      title: "Success - Demo",
+      title: "Success",
       description: "Portal configuration updated successfully",
       color: "success",
     });
     redirect("/captive-portal");
   };
 
-  const handleTest = () => {
-    addToast({
-      title: "Test Mode",
-      description: "This feature is not yet implemented.",
-      color: "danger",
-    });
-  };
+  // const handleTest = () => {
+  //   addToast({
+  //     title: "Test Mode",
+  //     description: "This feature is not yet implemented.",
+  //     color: "danger",
+  //   });
+  // };
 
   return (
     <div className="flex flex-col justify-start bg-[#ffffff] dark:bg-[#191c1d] rounded-[30px] p-8 space-y-4">
@@ -66,7 +74,7 @@ export default function UpdatePortal({
         onChange={(e) => nameHandler(e.target.value)}
       />
       <p className="font-semibold text-lg">Assign a Hotspot</p>
-      <AssignHotspot
+      <UpdateAssignedHotspot
         selected={portalConfig.assignedHotspot}
         setSelected={assignedHotspotHandler}
         hotspots={hotspots}
@@ -75,9 +83,10 @@ export default function UpdatePortal({
         <Button
           className="w-full text-white bg-black rounded-[10px]"
           onPress={handlePublish}
+          isLoading={isUpdating}
         >
           {portalConfig.assignedHotspot.length > 0
-            ? `Save and publish to ${portalConfig.assignedHotspot.length} assigned hotspot(s)`
+            ? `Update and publish to ${portalConfig.assignedHotspot.length} assigned hotspot(s)`
             : "Update portal without assigning hotspots"}
         </Button>
         <div className="flex flex-row gap-2">
@@ -87,12 +96,12 @@ export default function UpdatePortal({
           >
             Go back
           </Button>
-          <Button
+          {/* <Button
             className="w-full text-white dark:text-black rounded-[10px]"
             onPress={handleTest}
           >
             Save for later
-          </Button>
+          </Button> */}
         </div>
       </div>
     </div>

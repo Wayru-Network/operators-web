@@ -46,13 +46,13 @@ export default function Publish({
     redirect("/captive-portal");
   };
 
-  const handleTest = () => {
-    addToast({
-      title: "Test Mode",
-      description: "This feature is not yet implemented.",
-      color: "danger",
-    });
-  };
+  // const handleTest = () => {
+  //   addToast({
+  //     title: "Test Mode",
+  //     description: "This feature is not yet implemented.",
+  //     color: "danger",
+  //   });
+  // };
 
   return (
     <div className="flex flex-col justify-start bg-[#ffffff] dark:bg-[#191c1d] rounded-[30px] p-8 space-y-4">
@@ -87,12 +87,12 @@ export default function Publish({
           >
             Go back
           </Button>
-          <Button
+          {/* <Button
             className="w-full text-white dark:text-black rounded-[10px]"
             onPress={handleTest}
           >
             Save for later
-          </Button>
+          </Button> */}
         </div>
       </div>
     </div>

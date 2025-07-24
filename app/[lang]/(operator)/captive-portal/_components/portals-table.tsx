@@ -11,10 +11,10 @@ import {
   getKeyValue,
   type SortDescriptor,
 } from "@heroui/table";
-import { Input } from "@heroui/input";
+//import { Input } from "@heroui/input";
 import { Pagination } from "@heroui/pagination";
 import NewPortal from "./new-portal";
-import { Search, Settings } from "lucide-react";
+import { Settings } from "lucide-react";
 import { rowCaptivePortal } from "../_services/get-captive-portals";
 
 interface PortalsColumns {
@@ -35,7 +35,7 @@ interface PortalsRows {
 }
 
 export default function PortalsTable({ rows }: { rows: rowCaptivePortal[] }) {
-  const [search, setSearch] = useState("");
+  const [search] = useState("");
   const [sort, setSort] = useState<SortDescriptor>({
     column: "name",
     direction: "ascending",
@@ -104,7 +104,7 @@ export default function PortalsTable({ rows }: { rows: rowCaptivePortal[] }) {
   return (
     <div className="flex flex-col space-y-4">
       <div className="flex items-center justify-between mb-4">
-        <Input
+        {/* <Input
           disabled
           placeholder="Type to search..."
           value={search}
@@ -116,7 +116,7 @@ export default function PortalsTable({ rows }: { rows: rowCaptivePortal[] }) {
             inputWrapper: "p-0",
           }}
           startContent={<Search className="pl-2 text-gray-600" />}
-        />
+        /> */}
         <NewPortal />
       </div>
 
@@ -140,7 +140,7 @@ export default function PortalsTable({ rows }: { rows: rowCaptivePortal[] }) {
               <TableColumn
                 key={col.key}
                 allowsSorting={col.allowsSorting}
-                className="font-semibold"
+                className="font-semibold text-[14px]"
               >
                 {col.label}
               </TableColumn>
@@ -188,7 +188,7 @@ export default function PortalsTable({ rows }: { rows: rowCaptivePortal[] }) {
           page={page}
           onChange={setPage}
           showControls
-          className="flex justify-center pt-5"
+          className="flex justify-center"
           classNames={{
             item: "dark:text-white text-black",
             prev: "dark:text-white text-black",

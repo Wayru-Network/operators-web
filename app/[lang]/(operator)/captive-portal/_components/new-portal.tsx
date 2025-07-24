@@ -11,7 +11,7 @@ export default function NewPortal() {
   }, []);
 
   return (
-    <Button onPress={handleClick}>
+    <Button onPress={handleClick} className="ml-auto">
       <Plus />
       Create new portal
     </Button>
