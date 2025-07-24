@@ -26,6 +26,7 @@ export async function getHotspotsAnalytics(
   nasIds: string[],
   period: "last" | "3d" | "7d"
 ): Promise<HotspotsAnalyticsResponse> {
+
   const hotspotsData = await fetch(
     `${env.NAS_API_URL}/miner-dashboard?period=${period}`,
     {

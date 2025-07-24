@@ -1,16 +1,19 @@
 "use client";
 import React from "react";
 import { Period } from "@/app/[lang]/(operator)/dashboard/_services/get-hotspots-analytics";
+import { redirect } from "next/navigation";
 
 interface PeriodPickerProps {
-  label?: string;
-  selectedPeriod: Period;
-  onPeriodChange: (period: Period) => void;
+  currentPeriod: Period;
 }
 
-export default function PeriodPicker({ selectedPeriod, onPeriodChange, label }: PeriodPickerProps) {
+export default function PeriodPicker({ currentPeriod }: PeriodPickerProps) {
   const Period = ({ period, label }: { period: Period, label?: string }) => {
-    const isSelected = period === selectedPeriod;
+    const isSelected = period === currentPeriod;
+    
+  const goto = (period: Period) => {
+    redirect(`?period=${period}`);
+  }
     
     return (
       <div 
@@ -21,7 +24,7 @@ export default function PeriodPicker({ selectedPeriod, onPeriodChange, label }: 
             : 'text-gray-600 hover:bg-gray-200 dark:hover:bg-[#191c1d]'
           }
         `}
-        onClick={() => onPeriodChange(period)}
+        onClick={() => goto(period)}
       >
         <p className={`text-xs ${isSelected ? 'font-medium dark:text-white' : 'font-normal dark:text-white'}`}>
           {label || period}
@@ -29,6 +32,7 @@ export default function PeriodPicker({ selectedPeriod, onPeriodChange, label }: 
       </div>
     )
   }
+
 
   return (
     <div className="flex items-center justify-between gap-2 max-w-[280px]">
