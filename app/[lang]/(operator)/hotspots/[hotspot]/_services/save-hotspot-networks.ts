@@ -60,11 +60,11 @@ export default async function saveHotspotNetworks(
         return { success: false, error: "Invalid open network configuration" };
       }
 
-      let deviceConfigId: string | null = null;
+      let deviceConfigId: number | null = null;
 
       if (existingOpenConfig) {
         // Update existing config
-        const fragmentId = parseInt(existingOpenConfig.device_config_id);
+        const fragmentId = existingOpenConfig.device_config_id;
         deviceConfigId = await updateDeviceConfig(
           fragmentId,
           "open-network-config",
@@ -142,11 +142,11 @@ export default async function saveHotspotNetworks(
         };
       }
 
-      let deviceConfigId: string | null = null;
+      let deviceConfigId: number | null = null;
 
       if (existingPrivateConfig) {
         // Update existing config
-        const fragmentId = parseInt(existingPrivateConfig.device_config_id);
+        const fragmentId = existingPrivateConfig.device_config_id;
         deviceConfigId = await updateDeviceConfig(
           fragmentId,
           "private-network-config",
