@@ -117,7 +117,9 @@ export default function FileInput({ onSelect, label, existingUrl }: Props) {
         </div>
       ) : (
         <div className="w-full max-w-sm flex flex-col items-center gap-4">
-          {fileData?.type?.startsWith("video") ? (
+          {fileData?.type?.startsWith("video") ||
+          previewUrl.includes(".mp4") ||
+          previewUrl.includes(".webm") ? (
             <>
               <video
                 src={previewUrl}
