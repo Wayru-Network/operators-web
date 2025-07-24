@@ -8,16 +8,17 @@ import { Prisma } from "@/lib/infra/prisma";
 import { DeviceConfig } from "@/lib/device_config/types";
 import createDeviceConfig from "@/lib/device_config/create-device-config";
 import updateDeviceConfig from "@/lib/device_config/update-device-config";
+import { validateDeviceConfig } from "@/lib/device_config/validate-device-config";
 
 export default async function saveHotspotNetworks(
-  data: HotspotNetworksFormData,
+  newData: HotspotNetworksFormData,
 ): Promise<SaveHotspotNetworksResponse> {
   try {
-    console.log("Location name:", data.locationName);
+    console.log("Location name:", newData.locationName);
 
     // Check if hotspot exists
     const hotspot = await Prisma.hotspot.findUnique({
-      where: { name: data.name },
+      where: { name: newData.name },
       include: { network_configs: true },
     });
 
@@ -34,7 +35,7 @@ export default async function saveHotspotNetworks(
     );
 
     // Handle open network configuration
-    if (data.openNetwork.ssid.trim()) {
+    if (newData.openNetwork.ssid.trim()) {
       const openConfig: DeviceConfig = {
         device_config: {
           wireless: [
@@ -42,17 +43,22 @@ export default async function saveHotspotNetworks(
               meta_config: "wireless",
               meta_type: "wifi-iface",
               meta_section: "captive_wifi_2ghz",
-              ssid: data.openNetwork.ssid,
+              ssid: newData.openNetwork.ssid,
             },
             {
               meta_config: "wireless",
               meta_type: "wifi-iface",
               meta_section: "captive_wifi_5ghz",
-              ssid: data.openNetwork.ssid,
+              ssid: newData.openNetwork.ssid,
             },
           ],
         },
       };
+
+      // Validate the device config before proceeding
+      if (!validateDeviceConfig(openConfig)) {
+        return { success: false, error: "Invalid open network configuration" };
+      }
 
       let deviceConfigId: string | null = null;
 
@@ -72,10 +78,7 @@ export default async function saveHotspotNetworks(
             where: { id: existingOpenConfig.id },
             data: {
               device_config_id: deviceConfigId,
-              device_config: {
-                ssid: data.openNetwork.ssid,
-                type: "open",
-              },
+              device_config: JSON.parse(JSON.stringify(openConfig)),
             },
           });
         }
@@ -95,10 +98,7 @@ export default async function saveHotspotNetworks(
           await Prisma.network_config.create({
             data: {
               device_config_id: deviceConfigId,
-              device_config: {
-                ssid: data.openNetwork.ssid,
-                type: "open",
-              },
+              device_config: JSON.parse(JSON.stringify(openConfig)),
               hotspot_id: hotspot.id,
               type: "open",
             },
@@ -112,7 +112,7 @@ export default async function saveHotspotNetworks(
     }
 
     // Handle private network configuration
-    if (data.privateNetwork.ssid.trim()) {
+    if (newData.privateNetwork.ssid.trim()) {
       const privateConfig: DeviceConfig = {
         device_config: {
           wireless: [
@@ -120,17 +120,27 @@ export default async function saveHotspotNetworks(
               meta_config: "wireless",
               meta_type: "wifi-iface",
               meta_section: "default_wifi_interface_0",
-              ssid: data.privateNetwork.ssid,
+              ssid: newData.privateNetwork.ssid,
+              key: newData.privateNetwork.password,
             },
             {
               meta_config: "wireless",
               meta_type: "wifi-iface",
               meta_section: "default_wifi_interface_1",
-              ssid: data.privateNetwork.ssid,
+              ssid: newData.privateNetwork.ssid,
+              key: newData.privateNetwork.password,
             },
           ],
         },
       };
+
+      // Validate the device config before proceeding
+      if (!validateDeviceConfig(privateConfig)) {
+        return {
+          success: false,
+          error: "Invalid private network configuration",
+        };
+      }
 
       let deviceConfigId: string | null = null;
 
@@ -150,11 +160,7 @@ export default async function saveHotspotNetworks(
             where: { id: existingPrivateConfig.id },
             data: {
               device_config_id: deviceConfigId,
-              device_config: {
-                ssid: data.privateNetwork.ssid,
-                password: data.privateNetwork.password,
-                type: "private",
-              },
+              device_config: JSON.parse(JSON.stringify(privateConfig)),
             },
           });
         }
@@ -174,11 +180,7 @@ export default async function saveHotspotNetworks(
           await Prisma.network_config.create({
             data: {
               device_config_id: deviceConfigId,
-              device_config: {
-                ssid: data.privateNetwork.ssid,
-                password: data.privateNetwork.password,
-                type: "private",
-              },
+              device_config: JSON.parse(JSON.stringify(privateConfig)),
               hotspot_id: hotspot.id,
               type: "private",
             },
