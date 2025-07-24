@@ -29,6 +29,7 @@ const valid_emails = [
   "alejandrocamacaro91@gmail.com",
   "carlosfelixmarin@gmail.com",
   "testlaura@gmail.com",
+  "laura1.vizcaino@gmail.com",
 ];
 
 export async function GET(req: Request) {
