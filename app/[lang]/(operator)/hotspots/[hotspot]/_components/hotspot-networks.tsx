@@ -179,7 +179,7 @@ export default function HotspotNetworks({
       <Spacer y={8} />
 
       <Button
-        className="text-white bg-black rounded-[10px] w-[309px]"
+        className="rounded-[10px] w-[309px]"
         onPress={handleSave}
         isLoading={isSaving}
       >
