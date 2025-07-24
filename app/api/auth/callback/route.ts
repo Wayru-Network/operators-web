@@ -107,6 +107,7 @@ export async function GET(req: Request) {
 
   if (email === "velasmo3@gmail.com") email = "danvelc6@gmail.com";
   if (email === "diego@wayru.org") email = "diegoserranor@gmail.com";
+  if (email === "testlaura@gmail.com") email = "laura1.vizcaino@gmail.com";
 
   let walletAddress = "";
 
