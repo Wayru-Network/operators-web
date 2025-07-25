@@ -1,7 +1,7 @@
 "use client";
 import { Tab, Tabs } from "@heroui/tabs";
 import Account from "./account";
-import Billing from "./billing";
+import Billing from "./Billing/billing";
 
 export default function SettingsTabs() {
   return (
@@ -9,8 +9,10 @@ export default function SettingsTabs() {
       <Tabs
         fullWidth
         classNames={{
-          tabList: "border-b-2 p-0 border-gray-200 dark:border-gray-700 sticky top-0 bg-white dark:bg-[#191c1d] z-10",
-          panel: "bg-[#ffffff] dark:bg-[#191c1d] rounded-[30px] my-2 p-10 min-h-[500px]",
+          tabList:
+            "border-b-2 p-0 border-gray-200 dark:border-gray-700 sticky top-0 bg-white  z-10",
+          panel:
+            "bg-[#ffffff] dark:bg-[#191c1d] rounded-[30px] my-2 p-10 min-h-[500px]",
           tab: "pb-4",
           cursor: "w-full",
           tabContent: "text-lg text-gray-900 dark:text-white",
