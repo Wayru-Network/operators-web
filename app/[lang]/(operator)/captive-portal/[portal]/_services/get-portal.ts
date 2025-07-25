@@ -89,7 +89,7 @@ export default async function getPortal(portalId: number) {
       longitude: "",
       solana_asset_id: "",
       nfnode_type: "",
-      status: "",
+      status: "unknown",
     })),
     adFormat: portal.ads[0].format || "video",
     adAsset: {

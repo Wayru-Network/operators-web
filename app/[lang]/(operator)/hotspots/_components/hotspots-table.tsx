@@ -88,7 +88,7 @@ export default function HotspotsTable({
       setPage(page + 1);
       redirect(`/hotspots?page=${page}`);
     },
-    [setPage]
+    [setPage],
   );
 
   return (
@@ -147,7 +147,10 @@ export default function HotspotsTable({
                     {columnKey === "status" ? (
                       <StatusPill
                         status={
-                          getKeyValue(item, columnKey) as "active" | "inactive"
+                          getKeyValue(item, columnKey) as
+                            | "online"
+                            | "offline"
+                            | "unknown"
                         }
                       />
                     ) : columnKey === "actions" ? (
