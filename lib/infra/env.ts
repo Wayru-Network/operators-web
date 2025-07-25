@@ -35,6 +35,10 @@ export interface Environment {
 
   // OPERATORS API KEY
   OPERATORS_API_KEY: string;
+
+  // NAS API
+  NAS_API_URL: string;
+  NAS_API_KEY: string;
 }
 
 /**
@@ -58,6 +62,8 @@ export function loadEnvironment(): Environment {
     "WIFI_API_KEY",
     "DEVICES_API_URL",
     "DEVICES_API_KEY",
+    "NAS_API_URL",
+    "NAS_API_KEY",
   ];
 
   const missingVars: string[] = [];

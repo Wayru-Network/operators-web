@@ -28,6 +28,8 @@ const valid_emails = [
   "paula@wayru.org",
   "alejandrocamacaro91@gmail.com",
   "carlosfelixmarin@gmail.com",
+  "david@wayru.org",
+  "jironulload@gmail.com",
   "testlaura@gmail.com",
   "laura1.vizcaino@gmail.com",
 ];
