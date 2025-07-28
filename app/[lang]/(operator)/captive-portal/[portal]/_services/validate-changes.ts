@@ -1,4 +1,3 @@
-import { pre } from "framer-motion/client";
 import { PortalConfig } from "../_components/customize-captive-portal";
 
 export interface validateChangesResult {
