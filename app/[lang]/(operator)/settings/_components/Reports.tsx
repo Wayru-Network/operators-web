@@ -95,7 +95,7 @@ const Reports = () => {
                 <TableCell className="text-sm">
                   {columnKey === "actions" ? (
                     <button
-                      className="p-2 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-full transition-colors"
+                      className="p-2 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-full transition-colors cursor-pointer"
                       title="Download Report"
                     >
                       <Download size={16} />
