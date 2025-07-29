@@ -2,6 +2,7 @@
 import { Tab, Tabs } from "@heroui/tabs";
 import Account from "./account";
 import Billing from "./Billing/billing";
+import Reports from "./Reports";
 
 export default function SettingsTabs() {
   return (
@@ -27,12 +28,7 @@ export default function SettingsTabs() {
           <Billing />
         </Tab>
         <Tab key="Reports" title="Reports">
-          <p className="text-lg font-semibold">Reports</p>
-          <div className="mt-4">
-            <p>Usage Statistics: 100GB</p>
-            <p>Connected Clients: 50</p>
-            <p>Last Report Generated: 12/01/2023</p>
-          </div>
+          <Reports />
         </Tab>
       </Tabs>
     </div>
