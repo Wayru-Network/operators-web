@@ -5,8 +5,13 @@ import { useState } from "react";
 import Account from "./account";
 import Billing from "./Billing/billing";
 import Reports from "./Reports";
+import { AccountInfo } from "../_services/account-info";
 
-export default function SettingsTabs() {
+export default function SettingsTabs({
+  accountInfo,
+}: {
+  accountInfo: AccountInfo;
+}) {
   const [selectedTab, setSelectedTab] = useState("Account");
 
   const handleSelectionChange = (key: React.Key) => {
@@ -52,7 +57,7 @@ export default function SettingsTabs() {
           <AnimatePresence mode="wait">
             {selectedTab === "Account" && (
               <AnimatedContent key="account">
-                <Account />
+                <Account accountInfo={accountInfo} />
               </AnimatedContent>
             )}
           </AnimatePresence>
