@@ -11,12 +11,18 @@ type Props = {
   onSelect: (file: File, url: string) => void;
   label: AssetType;
   existingUrl?: string;
+  adType?: string;
 };
 
-export default function FileInput({ onSelect, label, existingUrl }: Props) {
+export default function FileInput({
+  onSelect,
+  label,
+  existingUrl,
+  adType,
+}: Props) {
   const [isOver, setIsOver] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(
-    existingUrl ?? null,
+    existingUrl ?? null
   );
   const [fileData, setFileData] = useState<File | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -35,7 +41,7 @@ export default function FileInput({ onSelect, label, existingUrl }: Props) {
         inputRef.current!.value = "";
       }
     },
-    [processFile, onSelect],
+    [processFile, onSelect]
   );
 
   const handleFileChange = useCallback(
@@ -45,7 +51,7 @@ export default function FileInput({ onSelect, label, existingUrl }: Props) {
       handleProcess(file);
       inputRef.current!.value = "";
     },
-    [handleProcess],
+    [handleProcess]
   );
 
   const handleReset = useCallback(() => {
@@ -65,10 +71,23 @@ export default function FileInput({ onSelect, label, existingUrl }: Props) {
       });
     }
   }, [error, videoDuration]);
-  const getHelperText = () =>
-    label === "logo" || label === "banner"
+  const getHelperText = () => {
+    if (adType === "video") {
+      return "MP4 or WEBM — up to 40MB";
+    }
+
+    if (adType === "static") {
+      return "JPG or PNG — up to 10MB";
+    }
+
+    if (adType === "gif") {
+      return "GIF — up to 10MB";
+    }
+
+    return label === "logo" || label === "banner"
       ? "Use JPG or PNG (transparent background preferred)"
       : "Use JPG, PNG, GIF, MP4 or WEBM — up to 40MB";
+  };
 
   const getDisplayLabel = () =>
     `Drag and drop your ${label} here or browse files`;
@@ -128,8 +147,8 @@ export default function FileInput({ onSelect, label, existingUrl }: Props) {
                   label === "logo"
                     ? "w-32 h-32"
                     : label === "banner"
-                      ? "w-full h-32"
-                      : "w-full h-48"
+                    ? "w-full h-32"
+                    : "w-full h-48"
                 }`}
               />
             </>
@@ -141,8 +160,8 @@ export default function FileInput({ onSelect, label, existingUrl }: Props) {
                 label === "logo"
                   ? "w-32 h-32"
                   : label === "banner"
-                    ? "w-full h-32"
-                    : "w-full h-48"
+                  ? "w-full h-32"
+                  : "w-full h-48"
               }`}
               width={label === "logo" ? 128 : 640}
               height={label === "logo" ? 128 : 320}
