@@ -10,7 +10,7 @@ type BillingStatus =
   | "plan-selected-with-data"
   | "plan-not-selected";
 
-const billing = () => {
+const Billing = () => {
   // change state to see the different states
   const [billingStatus] = useState<BillingStatus>("plan-selected-with-data");
 
@@ -28,4 +28,4 @@ const billing = () => {
   return <div className="w-full">{renderBillingStatus()}</div>;
 };
 
-export default billing;
+export default Billing;

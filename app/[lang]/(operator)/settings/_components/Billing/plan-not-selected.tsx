@@ -3,11 +3,9 @@
 import React from "react";
 import { Button } from "@heroui/react";
 
-const planNotSelected = () => {
-
+const PlanNotSelected = () => {
   return (
     <div className=" flex flex-row gap-8 w-full ">
-
       {/* Left side */}
       <div className="flex flex-col gap-3 w-1/2">
         <div className="flex flex-col items-center max-w-96">
@@ -72,11 +70,8 @@ const planNotSelected = () => {
           </div>
         </div>
       </div>
-      
     </div>
   );
 };
 
-
-
-export default planNotSelected;
+export default PlanNotSelected;

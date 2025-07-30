@@ -3,7 +3,7 @@ import { ArrowDownToLine } from "lucide-react";
 import { PaymentIcon } from "react-svg-credit-card-payment-icons";
 import PlanTable from "./plan-table";
 
-export default function PlanSelectedWithData() {
+const PlanSelectedWithData = () => {
   const plans = [
     {
       label: "Monthly",
@@ -17,7 +17,6 @@ export default function PlanSelectedWithData() {
 
   return (
     <div className=" flex flex-row gap-8 w-full ">
-
       {/* Left side */}
       <div className="flex flex-col gap-3 w-1/2">
         <div className="flex flex-col items-center max-w-96 ">
@@ -29,7 +28,9 @@ export default function PlanSelectedWithData() {
             <div className="flex flex-col w-full mt-2 ml-4 gap-1">
               <div className="flex flex-row">
                 <p className="text-xs font-semibold">Number of hotspots:</p>
-                <p className="text-xs font-medium dark:text-gray-300 text-gray-700 ml-1">10</p>
+                <p className="text-xs font-medium dark:text-gray-300 text-gray-700 ml-1">
+                  10
+                </p>
               </div>
               <div className="flex flex-row">
                 <p className="text-xs font-semibold">Billing cycle:</p>
@@ -39,7 +40,9 @@ export default function PlanSelectedWithData() {
               </div>
               <div className="flex flex-row">
                 <p className="text-xs font-semibold">Price per hotspot:</p>
-                <p className="text-xs font-medium dark:text-gray-300 text-gray-700 ml-1">$29.50</p>
+                <p className="text-xs font-medium dark:text-gray-300 text-gray-700 ml-1">
+                  $29.50
+                </p>
               </div>
               <div className="flex flex-row">
                 <p className="text-xs font-semibold">Total monthly cost:</p>
@@ -133,7 +136,8 @@ export default function PlanSelectedWithData() {
           </div>
         </div>
       </div>
-
     </div>
   );
-}
+};
+
+export default PlanSelectedWithData;

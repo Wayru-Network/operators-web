@@ -6,7 +6,7 @@ type Plan = {
   type: "hotspot" | "gateway";
 };
 
-export default function PlanTable() {
+const PlanTable = () => {
   const paged: Plan[] = [
     {
       name: "Pop bar mac 44:35:ab:e5:01",
@@ -57,4 +57,6 @@ export default function PlanTable() {
       ))}
     </div>
   );
-}
+};
+
+export default PlanTable;

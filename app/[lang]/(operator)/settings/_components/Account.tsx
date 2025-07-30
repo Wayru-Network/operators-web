@@ -6,7 +6,7 @@ import { updateAccountInfoAction } from "../_services/account-info";
 import { industry_type } from "@/lib/generated/prisma";
 import { AccountInfo, AccountInfoUpdate, FormData } from "../_services/types";
 
-const account = ({ accountInfo }: { accountInfo: AccountInfo }) => {
+const Account = ({ accountInfo }: { accountInfo: AccountInfo }) => {
   const [language, setLanguage] = useState("en");
   const [mounted, setMounted] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -391,4 +391,4 @@ const account = ({ accountInfo }: { accountInfo: AccountInfo }) => {
   );
 };
 
-export default account;
+export default Account;

@@ -1,10 +1,9 @@
 import { Button } from "@heroui/react";
 import { Minus, Plus } from "lucide-react";
 
-export default function PlanSelectedNotData() {
+const PlanSelectedNotData = () => {
   return (
     <div className=" flex flex-row gap-8 w-full ">
-
       {/* Left side */}
       <div className="flex flex-col gap-3 w-1/2">
         <div className="flex flex-col items-center max-w-96">
@@ -16,11 +15,15 @@ export default function PlanSelectedNotData() {
             <div className="flex flex-col w-full mt-2 ml-4">
               <div className="flex flex-row">
                 <p className="text-xs font-semibold">Active hotspots:</p>
-                <p className="text-xs font-medium dark:text-gray-300 text-gray-700 ml-1">0</p>
+                <p className="text-xs font-medium dark:text-gray-300 text-gray-700 ml-1">
+                  0
+                </p>
               </div>
               <div className="flex flex-row">
                 <p className="text-xs font-semibold">Monthly cost:</p>
-                <p className="text-xs font-medium dark:text-gray-300 text-gray-700 ml-1">$0</p>
+                <p className="text-xs font-medium dark:text-gray-300 text-gray-700 ml-1">
+                  $0
+                </p>
               </div>
             </div>
           </div>
@@ -47,11 +50,15 @@ export default function PlanSelectedNotData() {
               <div className="flex flex-col w-full ml-4">
                 <div className="flex flex-row">
                   <p className="text-xs  font-semibold">New monthly cost:</p>
-                  <p className="text-xs  font-medium ml-1 dark:text-gray-300 text-gray-700">$749.75</p>
+                  <p className="text-xs  font-medium ml-1 dark:text-gray-300 text-gray-700">
+                    $749.75
+                  </p>
                 </div>
                 <div className="flex flex-row">
                   <p className="text-xs  font-semibold">Change in cost:</p>
-                  <p className="text-xs  font-medium ml-1 dark:text-gray-300 text-gray-700">$749.75</p>
+                  <p className="text-xs  font-medium ml-1 dark:text-gray-300 text-gray-700">
+                    $749.75
+                  </p>
                 </div>
               </div>
             </div>
@@ -64,9 +71,9 @@ export default function PlanSelectedNotData() {
       </div>
 
       {/* Right side */}
-      <div className="flex flex-col gap-3 items-center w-1/2 justify-self-end">
-        
-      </div>
+      <div className="flex flex-col gap-3 items-center w-1/2 justify-self-end"></div>
     </div>
   );
-}
+};
+
+export default PlanSelectedNotData;

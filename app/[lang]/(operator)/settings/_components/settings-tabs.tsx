@@ -1,9 +1,9 @@
 "use client";
 import { Tab, Tabs } from "@heroui/tabs";
-import Account from "./account";
-import Billing from "./Billing/billing";
+import Account from "./Account";
+import Billing from "./Billing/Billing";
 import Reports from "./Reports";
-import { AccountInfo } from "../_services/account-info";
+import { AccountInfo } from "../_services/types";
 import EaseInOutContent from "@/lib/components/ease-in-out-content";
 
 export default function SettingsTabs({

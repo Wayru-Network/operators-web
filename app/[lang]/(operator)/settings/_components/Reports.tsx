@@ -10,15 +10,7 @@ import {
 } from "@heroui/react";
 import { Download } from "lucide-react";
 
-// Función para formatear las keys a headers legibles
-const formatHeader = (key: string): string => {
-  return key
-    .replace(/([A-Z])/g, " $1") // Agregar espacio antes de mayúsculas
-    .replace(/^./, (str) => str.toUpperCase()) // Capitalizar primera letra
-    .trim();
-};
-
-// Definir las columnas con anchos específicos
+// Data example
 const columns = [
   { key: "startDate", label: "Start Date", width: "120px" },
   { key: "endDate", label: "End Date", width: "120px" },
