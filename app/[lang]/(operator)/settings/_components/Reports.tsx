@@ -51,7 +51,18 @@ const Reports = () => {
     },
   ];
 
-  const getKeyValue = (item: any, key: string) => {
+  const getKeyValue = (
+    item: {
+      startDate: string;
+      endDate: string;
+      emailsCollected: number;
+      connections: number;
+      dataUsed: string;
+      actions: string;
+      id: number;
+    },
+    key: keyof typeof item
+  ) => {
     return item[key];
   };
 
@@ -78,7 +89,15 @@ const Reports = () => {
         </TableHeader>
 
         <TableBody items={data} emptyContent="No reports found">
-          {(item: any) => (
+          {(item: {
+            startDate: string;
+            endDate: string;
+            emailsCollected: number;
+            connections: number;
+            dataUsed: string;
+            actions: string;
+            id: number;
+          }) => (
             <TableRow
               key={`${item.startDate}-${item.endDate}`}
               className="hover:bg-gray-100 dark:hover:bg-gray-500"
@@ -93,7 +112,7 @@ const Reports = () => {
                       <Download size={16} />
                     </button>
                   ) : (
-                    getKeyValue(item, String(columnKey))
+                    getKeyValue(item, columnKey as keyof typeof item)
                   )}
                 </TableCell>
               )}

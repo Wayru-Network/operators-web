@@ -66,7 +66,10 @@ export async function updateAccountInfoAction(accountInfo: Partial<AccountInfoUp
         await Prisma.$transaction(async (tx) => {
             // Update customer if full_name is provided
             if (accountInfo.full_name !== undefined) {
-                const customerData: any = {};
+                const customerData: {
+                    full_name?: string;
+                    email?: string;
+                } = {};
                 if (accountInfo.full_name !== undefined) customerData.full_name = accountInfo.full_name;
                 if (accountInfo.email !== undefined) customerData.email = accountInfo.email;
 
@@ -86,7 +89,13 @@ export async function updateAccountInfoAction(accountInfo: Partial<AccountInfoUp
                 accountInfo.vat_number !== undefined ||
                 accountInfo.industry !== undefined
             )) {
-                const companyData: any = {};
+                const companyData: {
+                    name?: string;
+                    email?: string;
+                    tax_id?: string;
+                    vat_number?: string;
+                    industry?: industry_type;
+                } = {};
                 if (accountInfo.company_name !== undefined) companyData.name = accountInfo.company_name;
                 if (accountInfo.company_email !== undefined) companyData.email = accountInfo.company_email;
                 if (accountInfo.company_tax_id !== undefined) companyData.tax_id = accountInfo.company_tax_id;

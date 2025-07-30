@@ -26,11 +26,6 @@ const PlanTable = () => {
     },
   ];
 
-  const columns = [
-    { key: "name", label: "Name" },
-    { key: "type", label: "Type" },
-  ];
-
   return (
     <div className="flex flex-col w-full mt-2 ml-4 gap-1">
       {paged.map((item, index) => (
