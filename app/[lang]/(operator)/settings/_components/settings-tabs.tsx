@@ -12,12 +12,6 @@ export default function SettingsTabs({
 }: {
   accountInfo: AccountInfo;
 }) {
-  const [selectedTab, setSelectedTab] = useState("Account");
-
-  const handleSelectionChange = (key: React.Key) => {
-    setSelectedTab(key as string);
-  };
-
   // Component to animate the tabs for making the transition easeInOut
   const AnimatedContent = ({ children }: { children: React.ReactNode }) => (
     <motion.div
@@ -38,8 +32,6 @@ export default function SettingsTabs({
   return (
     <div className="w-full min-h-[600px]">
       <Tabs
-        selectedKey={selectedTab}
-        onSelectionChange={handleSelectionChange}
         fullWidth
         classNames={{
           tabList:
@@ -55,29 +47,23 @@ export default function SettingsTabs({
       >
         <Tab key="Account" title="Account">
           <AnimatePresence mode="wait">
-            {selectedTab === "Account" && (
-              <AnimatedContent key="account">
-                <Account accountInfo={accountInfo} />
-              </AnimatedContent>
-            )}
+            <AnimatedContent key="account">
+              <Account accountInfo={accountInfo} />
+            </AnimatedContent>
           </AnimatePresence>
         </Tab>
         <Tab key="Billing" title="Billing">
           <AnimatePresence mode="wait">
-            {selectedTab === "Billing" && (
-              <AnimatedContent key="billing">
-                <Billing />
-              </AnimatedContent>
-            )}
+            <AnimatedContent key="billing">
+              <Billing />
+            </AnimatedContent>
           </AnimatePresence>
         </Tab>
         <Tab key="Reports" title="Reports">
           <AnimatePresence mode="wait">
-            {selectedTab === "Reports" && (
-              <AnimatedContent key="reports">
-                <Reports />
-              </AnimatedContent>
-            )}
+            <AnimatedContent key="reports">
+              <Reports />
+            </AnimatedContent>
           </AnimatePresence>
         </Tab>
       </Tabs>
