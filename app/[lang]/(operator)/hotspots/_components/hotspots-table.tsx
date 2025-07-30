@@ -11,7 +11,7 @@ import {
   getKeyValue,
   type SortDescriptor,
 } from "@heroui/table";
-//import { Input } from "@heroui/input";
+import { Input } from "@heroui/input";
 import { Pagination } from "@heroui/pagination";
 import StatusPill from "@/app/[lang]/(operator)/hotspots/_components/status-pill";
 import {
@@ -20,6 +20,9 @@ import {
 } from "@/app/[lang]/(operator)/hotspots/_services/get-hotspots";
 import { Settings } from "lucide-react";
 import { redirect } from "next/navigation";
+import { useHotspots } from "@/lib/hooks/use-hotspots";
+import { Search } from "lucide-react";
+import { useDebouncedValue } from "@/lib/hooks/use-debounced-value";
 
 interface HotspotColumns {
   key: string;
@@ -29,27 +32,34 @@ interface HotspotColumns {
 
 export default function HotspotsTable({
   rows,
-  meta,
+  initialMeta,
 }: {
   rows: Hotspot[];
-  meta: MinersByAddressResponse["meta"];
+  initialMeta: MinersByAddressResponse["meta"];
 }) {
-  const [search] = useState("");
+  const [search, setSearch] = useState("");
+  const debouncedSearch = useDebouncedValue(search, 400);
   const [sort, setSort] = useState<SortDescriptor>({
     column: "name",
     direction: "ascending",
   });
+
   const PAGE_SIZE = 6; // row limit per page
   const [page, setPage] = useState(1);
 
+  const { hotspots, meta, isLoading } = useHotspots(
+    initialMeta.page,
+    PAGE_SIZE,
+    debouncedSearch,
+    {
+      data: rows,
+      meta: initialMeta,
+    }
+  );
+
   // filter and sort logic
   const filtered = useMemo(() => {
-    const text = search.trim().toLowerCase();
-    let data = rows;
-
-    if (text) {
-      data = data.filter((r) => r.name.toLowerCase().includes(text));
-    }
+    let data = hotspots;
 
     if (sort.column) {
       data = [...data].sort((a, b) => {
@@ -60,7 +70,7 @@ export default function HotspotsTable({
       });
     }
     return data;
-  }, [rows, search, sort]);
+  }, [sort, hotspots]);
 
   // pagination logic
   const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
@@ -93,6 +103,18 @@ export default function HotspotsTable({
 
   return (
     <div className="flex flex-col space-y-4">
+      <Input
+        placeholder="Type to search..."
+        value={search}
+        onValueChange={setSearch}
+        className="max-w-xs"
+        classNames={{
+          input:
+            "bg-[#ffffff] dark:bg-[#191c1d] rounded-[28px] dark:text-white disabled:placeholder:text-gray-400 dark:disabled:placeholder:text-gray-600",
+          inputWrapper: "p-0",
+        }}
+        startContent={<Search className="pl-2" />}
+      />
       <div className="bg-[#ffffff] dark:bg-[#191c1d] rounded-[30px] pb-8">
         <Table
           aria-label="Virtualized Paginated Table"
@@ -119,7 +141,11 @@ export default function HotspotsTable({
             )}
           </TableHeader>
 
-          <TableBody items={paged} emptyContent="No hotspots found">
+          <TableBody
+            items={paged}
+            emptyContent="No hotspots found"
+            isLoading={isLoading}
+          >
             {(item: Hotspot) => (
               <TableRow
                 key={item.name}
@@ -130,7 +156,10 @@ export default function HotspotsTable({
                     {columnKey === "status" ? (
                       <StatusPill
                         status={
-                          getKeyValue(item, columnKey) as "active" | "inactive"
+                          getKeyValue(item, columnKey) as
+                            | "online"
+                            | "offline"
+                            | "unknown"
                         }
                       />
                     ) : columnKey === "actions" ? (

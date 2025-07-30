@@ -7,6 +7,7 @@ import UpdateAssignedHotspot from "./customize-hotspot-dropdown";
 import updatePortal from "../_services/update-portal-service";
 import { redirect } from "next/navigation";
 import { useState } from "react";
+import cleanPortalCache from "../_services/clean_portal_cache";
 
 interface PublishProps {
   selectedHandler: (step: string) => void;
@@ -46,6 +47,14 @@ export default function UpdatePortal({
       });
       setIsUpdating(false);
       return;
+    }
+    const cleanup = await cleanPortalCache(portalConfig.assignedHotspot);
+    if (!cleanup.success) {
+      addToast({
+        title: "Warning",
+        description: cleanup.error || "Could not clean portal cache",
+        color: "warning",
+      });
     }
     addToast({
       title: "Success",

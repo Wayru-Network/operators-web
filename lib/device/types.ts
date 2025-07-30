@@ -13,3 +13,16 @@ export interface DeviceBrief {
 }
 
 export type DeviceStatus = "ok" | "problem" | "bad" | "unknown";
+
+export interface DeviceConnectivityDto {
+  device_ids: string[];
+}
+
+export interface DeviceConnectivityStatus {
+  deviceId: string;
+  status: "online" | "offline";
+}
+
+export interface DeviceConnectivityResponse {
+  connectivityResults: DeviceConnectivityStatus[];
+}

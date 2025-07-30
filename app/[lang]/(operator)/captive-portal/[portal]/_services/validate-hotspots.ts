@@ -7,6 +7,14 @@ export default async function validateHotspots(
   success: boolean;
   error?: string;
 }> {
+  if (
+    newConfig.assignedHotspot.length === originalConfig.assignedHotspot.length
+  ) {
+    if (originalConfig.assignedHotspot.length === 0) {
+      return { success: false };
+    }
+  }
+
   const newHotspotIds = newConfig.assignedHotspot.map((h) => h.wayru_device_id);
 
   if (newHotspotIds.length === 0) {
@@ -63,6 +71,6 @@ export default async function validateHotspots(
     }
   }
   return {
-    success: true,
+    success: false,
   };
 }

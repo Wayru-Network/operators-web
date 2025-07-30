@@ -39,6 +39,10 @@ export interface Environment {
   // NAS API
   NAS_API_URL: string;
   NAS_API_KEY: string;
+
+  // FAS API
+  FAS_URL: string;
+  FAS_API_KEY: string;
 }
 
 /**
@@ -64,6 +68,8 @@ export function loadEnvironment(): Environment {
     "DEVICES_API_KEY",
     "NAS_API_URL",
     "NAS_API_KEY",
+    "FAS_URL",
+    "FAS_API_KEY",
   ];
 
   const missingVars: string[] = [];
