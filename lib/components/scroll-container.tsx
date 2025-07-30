@@ -9,7 +9,7 @@ export default function ScrollContainer({
   children: React.ReactNode;
 }) {
   return (
-    <ScrollShadow className="h-screen w-full" visibility="both">
+    <ScrollShadow className="h-screen w-full" visibility="bottom">
       <div className="p-11">{children}</div>
     </ScrollShadow>
   );

@@ -11,6 +11,7 @@ import { ToastProvider } from "@heroui/toast";
 import LogoutButton from "@/lib/components/logout";
 import ThemeSwitcher from "@/lib/components/theme-switcher";
 import ScrollContainer from "@/lib/components/scroll-container";
+import StickyHeader from "@/lib/components/sticky-header";
 
 export const metadata: Metadata = {
   title: "Operators - Wayru",
@@ -49,14 +50,16 @@ export default async function OperatorLayout({ children }: LayoutProps) {
           <Spacer y={12} />
           <NavMenu />
         </div>
-        {/* Content */}
+        {/* header and page content */}
         <ScrollContainer>
-          <div className="flex flex-row gap-x-4 justify-end mb-3">
+          {/* Header */}
+          <StickyHeader>
             <WalletStatus />
             <LangSwitch />
             <ThemeSwitcher />
             <LogoutButton />
-          </div>
+          </StickyHeader>
+          {/* Page Content */}
           {children}
         </ScrollContainer>
       </div>
