@@ -89,6 +89,9 @@ importers:
       react-dom:
         specifier: 19.1.0
         version: 19.1.0(react@19.1.0)
+      react-svg-credit-card-payment-icons:
+        specifier: ^4.0.0
+        version: 4.0.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       server-only:
         specifier: ^0.0.1
         version: 0.0.1
@@ -3443,6 +3446,12 @@ packages:
 
   react-is@16.13.1:
     resolution: {integrity: sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==}
+
+  react-svg-credit-card-payment-icons@4.0.0:
+    resolution: {integrity: sha512-pwJD/Aii+MLdH+UnTWZAJrF4NTy0mmzjyaN6QVgt+a/gJNrsG7S3YLY1lT3hpOf98OR6NuKbDdeOKrkHR3U7Mg==}
+    peerDependencies:
+      react: '>=16'
+      react-dom: '>=16'
 
   react-textarea-autosize@8.5.9:
     resolution: {integrity: sha512-U1DGlIQN5AwgjTyOEnI1oCcMuEr1pv1qOtklB2l4nyMGbHzWrI0eFsYK0zos2YWqAolJyG0IWJaqWmWj5ETh0A==}
@@ -8360,6 +8369,11 @@ snapshots:
       scheduler: 0.26.0
 
   react-is@16.13.1: {}
+
+  react-svg-credit-card-payment-icons@4.0.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0):
+    dependencies:
+      react: 19.1.0
+      react-dom: 19.1.0(react@19.1.0)
 
   react-textarea-autosize@8.5.9(@types/react@19.1.8)(react@19.1.0):
     dependencies:

@@ -4,6 +4,7 @@ import { Tab, Tabs } from "@heroui/tabs";
 import HotspotDeviceInfo, { DeviceInfoProps } from "./hotspot-device-info";
 import HotspotNetworks, { HotspotNetworksProps } from "./hotspot-networks";
 import HotspotCaptivePortal from "./hotspot-captive-portal";
+import EaseInOutContent from "@/lib/components/ease-in-out-content";
 
 export interface HotspotTabsProps {
   info: DeviceInfoProps;
@@ -25,13 +26,19 @@ export default function HotspotTabs({ info, networks }: HotspotTabsProps) {
       color="primary"
     >
       <Tab key="device-info" title="Device Information">
-        <HotspotDeviceInfo {...info} />
+        <EaseInOutContent>
+          <HotspotDeviceInfo {...info} />
+        </EaseInOutContent>
       </Tab>
       <Tab key="networks" title="Networks">
-        <HotspotNetworks {...networks} />
+        <EaseInOutContent>
+          <HotspotNetworks {...networks} />
+        </EaseInOutContent>
       </Tab>
       <Tab key="captive-portal" title="Captive Portal">
-        <HotspotCaptivePortal />
+        <EaseInOutContent>
+          <HotspotCaptivePortal />
+        </EaseInOutContent>
       </Tab>
     </Tabs>
   );

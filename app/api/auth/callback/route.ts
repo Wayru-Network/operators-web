@@ -5,6 +5,7 @@ import { NextResponse } from "next/server";
 import { getUserInfo } from "./_services/token-service";
 import { env } from "@/lib/infra/env";
 import { logout } from "@/lib/services/logout-service";
+import { getOrCreateCustomer } from "./_services/customer-service";
 
 interface AddressResponse {
   walletAddress: string;
@@ -111,6 +112,11 @@ export async function GET(req: Request) {
   if (email === "velasmo3@gmail.com") email = "danvelc6@gmail.com";
   if (email === "diego@wayru.org") email = "diegoserranor@gmail.com";
   if (email === "testlaura@gmail.com") email = "laura1.vizcaino@gmail.com";
+
+  // save customer in db
+  await getOrCreateCustomer(sub, {
+    email: email,
+  });
 
   let walletAddress = "";
 
