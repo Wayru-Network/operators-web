@@ -14,17 +14,16 @@ type PageProps = {
 };
 
 export default async function Hotspots({ searchParams }: PageProps) {
-  const params = (await searchParams) ?? {};
-  if (!params.page) params.page = "1";
-  if (!params.limit) params.limit = "6";
-  const hotspots = await getHotspots(Number(params.page), Number(params.limit));
+  const page = Number((await searchParams)?.page ?? "1");
+  const limit = Number((await searchParams)?.limit ?? "6");
+  const hotspots = await getHotspots(page, limit);
   return (
     <div>
       <h1 className="text-2xl font-normal pb-5">My Hotspots</h1>
       <HotspotsTable
         key={"hotspots-table"}
         rows={hotspots.data}
-        meta={hotspots.meta}
+        initialMeta={hotspots.meta}
       />
     </div>
   );
