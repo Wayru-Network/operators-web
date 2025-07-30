@@ -17,7 +17,7 @@ const PlanNotSelected = () => {
             <div className="flex flex-col gap-3 items-center justify-self-end">
               <div className="max-w-[300px] mt-7">
                 <p className="text-xs  font-medium">
-                  You don't have an active plan
+                  You do not have an active plan
                 </p>
                 <p className="text-xs  font-medium">
                   Select one to customize your hotspots.
