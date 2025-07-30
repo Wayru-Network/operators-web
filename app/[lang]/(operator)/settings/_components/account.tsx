@@ -1,51 +1,71 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useTransition } from "react";
 import { Input, Button, Select, SelectItem } from "@heroui/react";
-import { AccountInfo } from "../_services/account-info";
-import {
-  AccountInfoUpdate,
-  updateAccountInfo,
-} from "@/lib/services/account-info";
+import { updateAccountInfoAction } from "../_services/account-info";
 import { industry_type } from "@/lib/generated/prisma";
+import { AccountInfo, AccountInfoUpdate, FormData } from "../_services/types";
 
 const account = ({ accountInfo }: { accountInfo: AccountInfo }) => {
   const [language, setLanguage] = useState("en");
   const [mounted, setMounted] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [isPending, setIsPending] = useState(false);
+  const [isPending, startTransition] = useTransition();
 
   // Local state to handle changes
-  const [formData, setFormData] = useState({
-    full_name: accountInfo.full_name,
-    email: accountInfo.email || "",
-    company_name: accountInfo.company.company_name,
-    company_email: accountInfo.company.company_email,
-    tax_id:
-      accountInfo.company.company_tax_id ||
-      accountInfo.company.vat_number ||
-      "",
-    industry: accountInfo.company.industry || ("telecom" as industry_type),
-    company_id: accountInfo.company.company_id,
+  const [formData, setFormData] = useState<FormData>({
+    full_name: "",
+    email: "",
+    company_name: "",
+    company_email: "",
+    tax_id: "",
+    industry: "telecom" as industry_type,
+    company_id: 0,
   });
 
   // Original state to compare changes
-  const [originalData] = useState({
-    full_name: accountInfo.full_name,
-    email: accountInfo.email || "",
-    company_name: accountInfo.company.company_name,
-    company_email: accountInfo.company.company_email,
-    tax_id:
-      accountInfo.company.company_tax_id ||
-      accountInfo.company.vat_number ||
-      "",
-    industry: accountInfo.company.industry || "telecom",
-    company_id: accountInfo.company.company_id,
+  const [originalData, setOriginalData] = useState({
+    full_name: "",
+    email: "",
+    company_name: "",
+    company_email: "",
+    tax_id: "",
+    industry: "telecom",
+    company_id: 0,
   });
 
   useEffect(() => {
     setMounted(true);
-  }, []);
+
+    // Initialize form data after mount to avoid hydration mismatch
+    setFormData({
+      full_name: accountInfo.full_name,
+      email: accountInfo.email || "",
+      company_name: accountInfo.company.company_name,
+      company_email: accountInfo.company.company_email,
+      tax_id:
+        accountInfo.company.company_tax_id ||
+        accountInfo.company.vat_number ||
+        "",
+      industry: accountInfo.company.industry as industry_type,
+      company_id: accountInfo.company.company_id,
+    });
+
+    setOriginalData({
+      full_name: accountInfo.full_name,
+      email: accountInfo.email || "",
+      company_name: accountInfo.company.company_name,
+      company_email: accountInfo.company.company_email,
+      tax_id:
+        accountInfo.company.company_tax_id ||
+        accountInfo.company.vat_number ||
+        "",
+      industry: accountInfo.company.industry || "telecom",
+      company_id: accountInfo.company.company_id,
+    });
+
+    setLanguage("en");
+  }, [accountInfo]);
 
   const languages = [
     { label: "English (US)", value: "en" },
@@ -124,15 +144,13 @@ const account = ({ accountInfo }: { accountInfo: AccountInfo }) => {
   // Fc to save changes
   const handleSaveChanges = async () => {
     if (validateForm()) {
-      setIsPending(true);
-
       // Create an object with only the changed fields
       const changedData: Partial<AccountInfoUpdate> = {};
 
       // Check customer fields (full_name, email)
       if (formData.full_name !== originalData.full_name) {
         changedData.full_name = formData.full_name;
-        changedData.email = formData.email; // Always include email when updating customer
+        changedData.email = formData.email;
       }
 
       // Check company fields
@@ -168,19 +186,35 @@ const account = ({ accountInfo }: { accountInfo: AccountInfo }) => {
 
       // Only proceed if there are actual changes
       if (Object.keys(changedData).length > 0) {
-        const newAccountInfo = await updateAccountInfo(changedData);
-        setFormData({
-          full_name: newAccountInfo.full_name,
-          email: newAccountInfo.email || "",
-          company_name: newAccountInfo.company.company_name,
-          company_email: newAccountInfo.company.company_email,
-          tax_id: newAccountInfo.company.company_tax_id || "",
-          industry: newAccountInfo.company.industry || "telecom",
-          company_id: newAccountInfo.company.company_id,
+        startTransition(async () => {
+          try {
+            const newAccountInfo = await updateAccountInfoAction(changedData);
+
+            // Update local state with new data
+            setFormData({
+              full_name: newAccountInfo.full_name,
+              email: newAccountInfo.email || "",
+              company_name: newAccountInfo.company.company_name,
+              company_email: newAccountInfo.company.company_email,
+              tax_id: newAccountInfo.company.company_tax_id || "",
+              industry: newAccountInfo.company.industry as industry_type,
+              company_id: newAccountInfo.company.company_id,
+            });
+
+            setOriginalData({
+              full_name: newAccountInfo.full_name,
+              email: newAccountInfo.email || "",
+              company_name: newAccountInfo.company.company_name,
+              company_email: newAccountInfo.company.company_email,
+              tax_id: newAccountInfo.company.company_tax_id || "",
+              industry: newAccountInfo.company.industry || "telecom",
+              company_id: newAccountInfo.company.company_id,
+            });
+          } catch (error) {
+            console.error("Error updating account info:", error);
+          }
         });
       }
-
-      setIsPending(false);
     }
   };
 
