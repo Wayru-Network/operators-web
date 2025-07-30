@@ -20,37 +20,26 @@ export async function getAccountInfo(): Promise<AccountInfo> {
             where: {
                 customer_uuid: userId,
             },
+            include: {
+                companies: true,
+            },
         });
 
         if (!customer) {
             return defaultAccountInfo;
         }
 
-        // get company info
-        const company = await Prisma.companies.findFirst({
-            where: {
-                customer_id: customer.id,
-            },
-        });
-
-        if (!company) {
-            return {
-                ...customer,
-                company: {
-                    ...defaultAccountInfo.company,
-                },
-            };
-        }
+        const company = customer.companies?.length > 0 ? customer.companies[0] : null;
 
         return {
             ...customer,
             company: {
-                company_name: company.name,
-                company_email: company.email,
-                company_tax_id: company.tax_id || "",
-                vat_number: company.vat_number || "",
-                industry: company.industry,
-                company_id: company.id,
+                company_name: company?.name || "",
+                company_email: company?.email || "",
+                company_tax_id: company?.tax_id || "",
+                vat_number: company?.vat_number || "",
+                industry: company?.industry || "telecom",
+                company_id: company?.id || 0,
             },
         };
     } catch (error) {
