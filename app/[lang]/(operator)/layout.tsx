@@ -10,6 +10,7 @@ import { verifySession } from "@/lib/dal/dal";
 import { ToastProvider } from "@heroui/toast";
 import LogoutButton from "@/lib/components/logout";
 import ThemeSwitcher from "@/lib/components/theme-switcher";
+import ScrollContainer from "@/lib/components/scroll-container";
 
 export const metadata: Metadata = {
   title: "Operators - Wayru",
@@ -30,7 +31,8 @@ export default async function OperatorLayout({ children }: LayoutProps) {
           },
         }}
       />
-      <div className="min-h-screen flex flex-row bg-[#F8FAFA] dark:bg-[#101415]">
+      <div className="h-screen flex flex-row bg-[#F8FAFA] dark:bg-[#101415]">
+        {/* Sidebar */}
         <div className="w-[306px] p-7 bg-[#ffffff] dark:bg-[#191c1d]">
           <div className="flex flex-row justify-center align-end">
             <Image
@@ -47,7 +49,8 @@ export default async function OperatorLayout({ children }: LayoutProps) {
           <Spacer y={12} />
           <NavMenu />
         </div>
-        <div className="w-full p-11">
+        {/* Content */}
+        <ScrollContainer>
           <div className="flex flex-row gap-x-4 justify-end mb-3">
             <WalletStatus />
             <LangSwitch />
@@ -55,7 +58,7 @@ export default async function OperatorLayout({ children }: LayoutProps) {
             <LogoutButton />
           </div>
           {children}
-        </div>
+        </ScrollContainer>
       </div>
     </RootLayout>
   );

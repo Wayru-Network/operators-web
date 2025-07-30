@@ -93,35 +93,18 @@ export default function HotspotsTable({
 
   return (
     <div className="flex flex-col space-y-4">
-      {/* <Input
-        disabled
-        placeholder="Type to search..."
-        value={search}
-        onValueChange={setSearch}
-        className="max-w-xs"
-        classNames={{
-          input:
-            "bg-[#ffffff] dark:bg-[#191c1d] rounded-[28px] dark:text-white disabled:placeholder:text-gray-400 dark:disabled:placeholder:text-gray-600",
-          inputWrapper: "p-0",
-        }}
-        startContent={
-          <Search className="pl-2 text-gray-400 dark:text-gray-600" />
-        }
-      /> */}
-
       <div className="bg-[#ffffff] dark:bg-[#191c1d] rounded-[30px] pb-8">
         <Table
           aria-label="Virtualized Paginated Table"
           isVirtualized
           isHeaderSticky
           rowHeight={40}
-          maxTableHeight={500}
           sortDescriptor={sort}
           onSortChange={setSort}
           classNames={{
             wrapper: "bg-transparent border-none shadow-none p-0",
-            th: "bg-[#ffffff] dark:bg-[#191c1d] border-b-1 border-gray-200 dark:border-gray-700 px-10 pt-8 pb-3 text-[14px] font-semibold text-gray-900 dark:text-white",
-            td: "px-10 py-5",
+            th: "bg-[#ffffff] dark:bg-[#191c1d] border-b-1 border-gray-200 dark:border-gray-700 px-4 pt-8 pb-3 text-[14px] font-semibold text-gray-900 dark:text-white",
+            td: "px-4 py-5",
           }}
         >
           <TableHeader columns={columns}>
@@ -177,18 +160,20 @@ export default function HotspotsTable({
             )}
           </TableBody>
         </Table>
-        <Pagination
-          total={meta.pages}
-          page={meta.page}
-          onChange={goto}
-          showControls
-          className="flex justify-center"
-          classNames={{
-            item: "dark:text-white text-black",
-            prev: "dark:text-white text-black",
-            next: "dark:text-white text-black",
-          }}
-        />
+        {meta && meta.pages > 1 && (
+          <Pagination
+            total={meta.pages}
+            page={meta.page}
+            onChange={goto}
+            showControls
+            className="flex justify-center"
+            classNames={{
+              item: "dark:text-white text-black",
+              prev: "dark:text-white text-black",
+              next: "dark:text-white text-black",
+            }}
+          />
+        )}
       </div>
     </div>
   );
