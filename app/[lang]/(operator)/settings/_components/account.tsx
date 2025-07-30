@@ -40,6 +40,7 @@ const account = ({ accountInfo }: { accountInfo: AccountInfo }) => {
       accountInfo.company.vat_number ||
       "",
     industry: accountInfo.company.industry || "telecom",
+    company_id: accountInfo.company.company_id,
   });
 
   useEffect(() => {
@@ -77,7 +78,16 @@ const account = ({ accountInfo }: { accountInfo: AccountInfo }) => {
   };
 
   // Check if there are changes
-  const hasChanges = JSON.stringify(formData) !== JSON.stringify(originalData);
+  const hasChanges = () => {
+    return (
+      formData.full_name !== originalData.full_name ||
+      formData.email !== originalData.email ||
+      formData.company_name !== originalData.company_name ||
+      formData.company_email !== originalData.company_email ||
+      formData.tax_id !== originalData.tax_id ||
+      formData.industry !== originalData.industry
+    );
+  };
 
   // Validations
   const validateEmail = (email: string) => {
@@ -115,18 +125,61 @@ const account = ({ accountInfo }: { accountInfo: AccountInfo }) => {
   const handleSaveChanges = async () => {
     if (validateForm()) {
       setIsPending(true);
-      const newAccountInfo = await updateAccountInfo(
-        formData as unknown as AccountInfoUpdate
-      );
-      setFormData({
-        full_name: newAccountInfo.full_name,
-        email: newAccountInfo.email || "",
-        company_name: newAccountInfo.company.company_name,
-        company_email: newAccountInfo.company.company_email,
-        tax_id: newAccountInfo.company.company_tax_id || "",
-        industry: newAccountInfo.company.industry || "telecom",
-        company_id: newAccountInfo.company.company_id,
-      });
+
+      // Create an object with only the changed fields
+      const changedData: Partial<AccountInfoUpdate> = {};
+
+      // Check customer fields (full_name, email)
+      if (formData.full_name !== originalData.full_name) {
+        changedData.full_name = formData.full_name;
+        changedData.email = formData.email; // Always include email when updating customer
+      }
+
+      // Check company fields
+      if (formData.company_name !== originalData.company_name) {
+        changedData.company_name = formData.company_name;
+      }
+
+      if (formData.company_email !== originalData.company_email) {
+        changedData.company_email = formData.company_email;
+      }
+
+      if (formData.tax_id !== originalData.tax_id) {
+        changedData.company_tax_id = formData.tax_id;
+      }
+
+      if (formData.industry !== originalData.industry) {
+        changedData.industry = formData.industry as industry_type;
+      }
+
+      // Always include company_id if any company field has changed
+      if (
+        Object.keys(changedData).some((key) =>
+          [
+            "company_name",
+            "company_email",
+            "company_tax_id",
+            "industry",
+          ].includes(key)
+        )
+      ) {
+        changedData.company_id = formData.company_id;
+      }
+
+      // Only proceed if there are actual changes
+      if (Object.keys(changedData).length > 0) {
+        const newAccountInfo = await updateAccountInfo(changedData);
+        setFormData({
+          full_name: newAccountInfo.full_name,
+          email: newAccountInfo.email || "",
+          company_name: newAccountInfo.company.company_name,
+          company_email: newAccountInfo.company.company_email,
+          tax_id: newAccountInfo.company.company_tax_id || "",
+          industry: newAccountInfo.company.industry || "telecom",
+          company_id: newAccountInfo.company.company_id,
+        });
+      }
+
       setIsPending(false);
     }
   };
@@ -185,6 +238,12 @@ const account = ({ accountInfo }: { accountInfo: AccountInfo }) => {
                 placeholder={`English (US)`}
                 value={language}
                 onChange={(e) => setLanguage(e.target.value)}
+                classNames={{
+                  trigger:
+                    "!text-black dark:!text-white data-[has-value=true]:!text-black dark:data-[has-value=true]:!text-white",
+                  value: "!text-black dark:!text-white",
+                  listbox: "!text-black dark:!text-white",
+                }}
               >
                 {languages.map((language) => (
                   <SelectItem key={language.value}>{language.label}</SelectItem>
@@ -248,7 +307,9 @@ const account = ({ accountInfo }: { accountInfo: AccountInfo }) => {
               <Select
                 variant="bordered"
                 size="sm"
-                placeholder={`Select Industry`}
+                placeholder={
+                  formData.industry ? formData.industry : "Select Industry"
+                }
                 value={formData.industry}
                 onSelectionChange={(e) =>
                   handleInputChange("industry", e?.currentKey as string)
@@ -268,10 +329,10 @@ const account = ({ accountInfo }: { accountInfo: AccountInfo }) => {
           </div>
 
           {/* Action buttons */}
-          {hasChanges && (
+          {hasChanges() && (
             <Button
               onPress={handleSaveChanges}
-              disabled={!hasChanges}
+              isLoading={isPending}
               className="w-full mt-4 dark:bg-[#751CF6] bg-[#000] text-white"
             >
               {isPending ? "Saving..." : "Save All Changes"}

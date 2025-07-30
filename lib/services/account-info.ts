@@ -20,32 +20,40 @@ export async function updateAccountInfo(accountInfo: Partial<AccountInfoUpdate>)
         const { userId } = await getSession();
 
         await Prisma.$transaction(async (tx) => {
-            // if there is a change in the full_name, update the customer
-            if (accountInfo.full_name) {
+            // Update customer if full_name is provided
+            if (accountInfo.full_name !== undefined) {
+                const customerData: any = {};
+                if (accountInfo.full_name !== undefined) customerData.full_name = accountInfo.full_name;
+                if (accountInfo.email !== undefined) customerData.email = accountInfo.email;
+
                 await tx.customers.update({
                     where: {
                         customer_uuid: userId,
                     },
-                    data: {
-                        full_name: accountInfo.full_name,
-                        email: accountInfo.email,
-                    },
+                    data: customerData,
                 });
             }
 
-            // if there is a change in the company name, email, tax_id, vat_number, industry, update the company
-            if (accountInfo.company_id) {
+            // Update company if company_id is provided and any company field is present
+            if (accountInfo.company_id && (
+                accountInfo.company_name !== undefined ||
+                accountInfo.company_email !== undefined ||
+                accountInfo.company_tax_id !== undefined ||
+                accountInfo.vat_number !== undefined ||
+                accountInfo.industry !== undefined
+            )) {
+                const companyData: any = {};
+                if (accountInfo.company_name !== undefined) companyData.name = accountInfo.company_name;
+                if (accountInfo.company_email !== undefined) companyData.email = accountInfo.company_email;
+                if (accountInfo.company_tax_id !== undefined) companyData.tax_id = accountInfo.company_tax_id;
+                if (accountInfo.vat_number !== undefined) companyData.vat_number = accountInfo.vat_number;
+                if (accountInfo.industry !== undefined) companyData.industry = accountInfo.industry as industry_type;
+
                 await tx.companies.update({
                     where: {
                         id: accountInfo.company_id
                     },
-                    data: {
-                        name: accountInfo.company_name,
-                        email: accountInfo.company_email,
-                        tax_id: accountInfo.company_tax_id,
-                        vat_number: accountInfo.vat_number,
-                        industry: accountInfo.industry as industry_type
-                    },
+                    data: companyData,
                 });
             }
         });
