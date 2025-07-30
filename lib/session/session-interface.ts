@@ -7,6 +7,7 @@ export interface SessionPayload extends JWTPayload {
   accessToken?: string;
   refreshToken?: string;
   wallet?: string;
+  isCollapsed?: boolean;
 }
 
 export const defaultSession: SessionPayload = {
@@ -17,4 +18,5 @@ export const defaultSession: SessionPayload = {
   accessToken: "",
   refreshToken: "",
   wallet: "",
+  isCollapsed: false,
 };
