@@ -1,7 +1,6 @@
 "use client";
 import { Tab, Tabs } from "@heroui/tabs";
 import { motion, AnimatePresence } from "framer-motion";
-import { useState } from "react";
 import Account from "./account";
 import Billing from "./Billing/billing";
 import Reports from "./Reports";
