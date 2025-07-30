@@ -9,7 +9,7 @@ export default function StickyHeader({
 }) {
   return (
     <div className="sticky top-0 z-50 bg-[#F8FAFA] dark:bg-[#101415] backdrop-blur-sm bg-opacity-95 dark:bg-opacity-95">
-      <div className="flex flex-row gap-x-4 justify-end items-center px-6 py-4">
+      <div className="flex flex-row gap-x-4 justify-end items-center py-4">
         {children}
       </div>
     </div>
