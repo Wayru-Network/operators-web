@@ -6,7 +6,7 @@ import {
 } from "./types";
 
 export default async function getConnectivity(
-  wayru_device_ids: string[],
+  wayru_device_ids: string[]
 ): Promise<DeviceConnectivityStatus[] | null> {
   try {
     const body: DeviceConnectivityDto = {
@@ -23,7 +23,7 @@ export default async function getConnectivity(
           "Content-Type": "application/json",
         },
         body: JSON.stringify(body),
-      },
+      }
     );
 
     if (!device_connectivity_response.ok) {
@@ -35,7 +35,7 @@ export default async function getConnectivity(
     const response: DeviceConnectivityResponse =
       await device_connectivity_response.json();
 
-    console.log(response);
+    //console.log(response);
 
     return response.connectivityResults;
   } catch (err) {
