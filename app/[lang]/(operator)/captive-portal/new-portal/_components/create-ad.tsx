@@ -37,6 +37,7 @@ export default function CreateAd({
         onSelect={(file, url) => fileHandler(file, url, "ad")}
         label="ad"
         existingUrl={newConfig.adAsset?.url || ""}
+        adType={newConfig.adFormat}
       />
       <p className="font-semibold text-lg">Minimum interaction time</p>
       <InteractionTime

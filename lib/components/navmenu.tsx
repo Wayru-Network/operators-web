@@ -1,5 +1,5 @@
 "use client";
-import { ForwardRefExoticComponent, RefAttributes, useEffect } from "react";
+import { ForwardRefExoticComponent, RefAttributes } from "react";
 import { Button } from "@heroui/button";
 import Link from "next/link";
 import { usePathname } from "next/navigation";

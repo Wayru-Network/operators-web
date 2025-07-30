@@ -23,9 +23,9 @@ export default async function updatePortal(
   const assetsChanged = Object.keys(assetsUpdates).length > 0;
   const configChanged = Object.keys(updates).length > 0;
 
-  if (!hotspotValidation.success) {
+  if (!hotspotValidation.success && hotspotValidation.error) {
     return { success: false, error: hotspotValidation.error };
-  } else if (!assetsChanged && !configChanged) {
+  } else if (hotspotValidation.success && !assetsChanged && !configChanged) {
     return { success: true };
   }
 

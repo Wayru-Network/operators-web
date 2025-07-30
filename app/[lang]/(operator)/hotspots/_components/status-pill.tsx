@@ -3,11 +3,12 @@
 export default function statusPill({
   status,
 }: {
-  status: "active" | "inactive";
+  status: "online" | "offline" | "unknown";
 }) {
   const statusClasses = {
-    active: "bg-secondary text-black",
-    inactive: "bg-primary text-white",
+    online: "bg-secondary text-black",
+    offline: "bg-primary text-white",
+    unknown: "bg-gray-200 text-gray-700",
   };
 
   return (

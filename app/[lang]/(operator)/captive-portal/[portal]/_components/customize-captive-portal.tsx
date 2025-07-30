@@ -52,7 +52,7 @@ export interface PortalConfig {
     name: string | null;
   };
   interactionTime: string;
-  redirectUrl?: string;
+  redirectUrl: string;
   portalName: string;
   assignedHotspot: Hotspot[];
 }
@@ -158,7 +158,7 @@ export default function CustomizeCaptivePortal({
       name: config.adAsset?.name || null,
     },
     interactionTime,
-    redirectUrl: redirectUrl || undefined,
+    redirectUrl: redirectUrl || "",
     portalName: portalName,
     assignedHotspot: assignedHotspot,
   };

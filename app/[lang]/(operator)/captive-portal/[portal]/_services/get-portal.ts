@@ -78,7 +78,7 @@ export default async function getPortal(portalId: number) {
     userInfo: portal?.form_access || false,
     welcomeMessage: portal?.welcome_message || "",
     ads: portal?.ads || [],
-    redirectUrl: portal?.redirect_url || undefined,
+    redirectUrl: portal?.redirect_url || "",
     portalName: portal?.portal_name || "",
     assignedHotspot: portal.hotspots.map((h) => ({
       id: h.id,
@@ -89,7 +89,7 @@ export default async function getPortal(portalId: number) {
       longitude: "",
       solana_asset_id: "",
       nfnode_type: "",
-      status: "",
+      status: "unknown",
     })),
     adFormat: portal.ads[0].format || "video",
     adAsset: {

@@ -46,7 +46,15 @@ export default function validateChanges(
   if (newConfig.userInfo !== previousConfig.userInfo) {
     updates.form_access = newConfig.userInfo;
   }
-  if (newConfig.redirectUrl !== previousConfig.redirectUrl) {
+  if (previousConfig.redirectUrl && newConfig.redirectUrl) {
+    if (newConfig.redirectUrl !== previousConfig.redirectUrl) {
+      updates.redirect_url = newConfig.redirectUrl;
+    }
+  } else if (newConfig.redirectUrl && !previousConfig.redirectUrl) {
+    updates.redirect_url = newConfig.redirectUrl;
+  }
+
+  if (previousConfig.redirectUrl && !newConfig.redirectUrl) {
     updates.redirect_url = newConfig.redirectUrl;
   }
 
