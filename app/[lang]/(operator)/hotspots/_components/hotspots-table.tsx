@@ -19,7 +19,7 @@ import {
   MinersByAddressResponse,
 } from "@/app/[lang]/(operator)/hotspots/_services/get-hotspots";
 import { Settings } from "lucide-react";
-import { redirect } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useHotspots } from "@/lib/hooks/use-hotspots";
 import { Search } from "lucide-react";
 import { useDebouncedValue } from "@/lib/hooks/use-debounced-value";
@@ -33,11 +33,16 @@ interface HotspotColumns {
 export default function HotspotsTable({
   rows,
   initialMeta,
+  initialQuery,
 }: {
   rows: Hotspot[];
   initialMeta: MinersByAddressResponse["meta"];
+  initialQuery: string;
 }) {
-  const [search, setSearch] = useState("");
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const [search, setSearch] = useState(initialQuery || "");
   const debouncedSearch = useDebouncedValue(search, 400);
   const [sort, setSort] = useState<SortDescriptor>({
     column: "name",
@@ -45,7 +50,7 @@ export default function HotspotsTable({
   });
 
   const PAGE_SIZE = 6; // row limit per page
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(Number(searchParams.get("page") ?? "1"));
 
   const { hotspots, meta, isLoading } = useHotspots(
     initialMeta.page,
@@ -94,11 +99,18 @@ export default function HotspotsTable({
   ];
 
   const goto = useCallback(
-    (page: number) => {
-      setPage(page + 1);
-      redirect(`/hotspots?page=${page}`);
+    (nextPage: number) => {
+      const params = new URLSearchParams(searchParams);
+      params.set("page", String(nextPage));
+      if (search.trim()) {
+        params.set("q", search.trim());
+      } else {
+        params.delete("q");
+      }
+
+      router.push(`/hotspots?${params.toString()}`);
     },
-    [setPage]
+    [search, searchParams, router]
   );
 
   return (

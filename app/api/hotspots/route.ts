@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
   const query = searchParams.get("q")?.trim();
 
   if (query && query.length > 0) {
-    const data = await searchHotspots(query);
+    const data = await searchHotspots(query, page, limit);
     return Response.json(data);
   }
 
