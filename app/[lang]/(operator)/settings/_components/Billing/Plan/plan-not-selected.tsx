@@ -1,9 +1,13 @@
 "use client";
 
 import React from "react";
+import { motion } from "framer-motion";
 import { Button } from "@heroui/react";
+import { useBilling } from "../../../contexts/BillingContext";
 
 const PlanNotSelected = () => {
+  const { changeBillingStatus } = useBilling();
+
   return (
     <div className=" flex flex-row gap-8 w-full ">
       {/* Left side */}
@@ -22,9 +26,14 @@ const PlanNotSelected = () => {
                 <p className="text-xs  font-medium">
                   Select one to customize your hotspots.
                 </p>
-                <Button className="w-full bg-[#000] dark:bg-[#fff] text-white dark:text-black mt-2">
-                  Select plan
-                </Button>
+                <div>
+                  <Button
+                    className="w-full bg-[#000] dark:bg-[#fff] text-white dark:text-black mt-2"
+                    onPress={() => changeBillingStatus("select-a-plan")}
+                  >
+                    Select plan
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
@@ -57,7 +66,7 @@ const PlanNotSelected = () => {
       </div>
 
       {/* Right side */}
-      <div className="flex flex-col gap-3 items-center w-1/2 justify-self-end">
+      <div className="flex flex-col gap-3 items-center w-1/2 justify-self-start">
         {/* Assign plan to hotspots section */}
         <div className="flex flex-col w-full max-w-[200px]">
           <p className="text-base font-semibold w-full align-left">

@@ -1,14 +1,10 @@
 import { Prisma } from "@/lib/infra/prisma";
+import { Prisma as PrismaGenerated } from "@/lib/generated/prisma";
 
-interface Customer {
-    email: string;
-    name: string;
-    full_name: string;
-    phone: string;
-}
+
 export async function getOrCreateCustomer(
     uuid: string,
-    customerData: Partial<Customer>
+    customerData: Partial<PrismaGenerated.customersUncheckedCreateInput>
 ) {
     let customer = await Prisma.customers.findFirst({
         where: {

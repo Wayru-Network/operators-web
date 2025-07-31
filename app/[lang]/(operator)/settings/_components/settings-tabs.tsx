@@ -5,14 +5,11 @@ import Billing from "./Billing/Billing";
 import Reports from "./Reports";
 import { AccountInfo } from "../_services/types";
 import EaseInOutContent from "@/lib/components/ease-in-out-content";
-import { StripeSubscription } from "@/lib/interfaces/stripe";
 
 export default function SettingsTabs({
   accountInfo,
-  subscription,
 }: {
   accountInfo: AccountInfo;
-  subscription: StripeSubscription | null;
 }) {
   return (
     <div className="w-full min-h-[600px]">
@@ -37,7 +34,7 @@ export default function SettingsTabs({
         </Tab>
         <Tab key="Billing" title="Billing">
           <EaseInOutContent>
-            <Billing subscription={subscription} />
+            <Billing />
           </EaseInOutContent>
         </Tab>
         <Tab key="Reports" title="Reports">

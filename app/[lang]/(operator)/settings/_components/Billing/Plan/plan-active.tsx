@@ -3,7 +3,7 @@ import { ArrowDownToLine } from "lucide-react";
 import { PaymentIcon } from "react-svg-credit-card-payment-icons";
 import PlanTable from "./plan-table";
 
-const PlanSelectedWithData = () => {
+const PlanActive = () => {
   const plans = [
     {
       label: "Monthly",
@@ -140,4 +140,4 @@ const PlanSelectedWithData = () => {
   );
 };
 
-export default PlanSelectedWithData;
+export default PlanActive;
