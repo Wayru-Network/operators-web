@@ -43,6 +43,9 @@ export interface Environment {
   // FAS API
   FAS_URL: string;
   FAS_API_KEY: string;
+
+  // STRIPE
+  STRIPE_SECRET_KEY: string;
 }
 
 /**
@@ -70,6 +73,7 @@ export function loadEnvironment(): Environment {
     "NAS_API_KEY",
     "FAS_URL",
     "FAS_API_KEY",
+    "STRIPE_SECRET_KEY",
   ];
 
   const missingVars: string[] = [];

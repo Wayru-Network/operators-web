@@ -10,7 +10,11 @@ import { industry_type } from "@/lib/generated/prisma";
 
 export async function getAccountInfo(): Promise<AccountInfo> {
     try {
-        const { userId } = await getSession();
+        const { isLoggedIn, userId } = await getSession();
+
+        if (!isLoggedIn) {
+            return defaultAccountInfo;
+        }
 
         if (!userId) {
             return defaultAccountInfo;
@@ -50,7 +54,12 @@ export async function getAccountInfo(): Promise<AccountInfo> {
 
 export async function updateAccountInfoAction(accountInfo: Partial<AccountInfoUpdate>): Promise<AccountInfo> {
     try {
-        const { userId } = await getSession();
+        const { userId, isLoggedIn } = await getSession();
+
+        // check if the user is logged in
+        if (!userId || !isLoggedIn) {
+            return defaultAccountInfo;
+        }
 
         await Prisma.$transaction(async (tx) => {
             // Update customer if full_name is provided
