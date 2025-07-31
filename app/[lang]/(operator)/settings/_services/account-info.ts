@@ -10,7 +10,11 @@ import { industry_type } from "@/lib/generated/prisma";
 
 export async function getAccountInfo(): Promise<AccountInfo> {
     try {
-        const { userId } = await getSession();
+        const { isLoggedIn, userId } = await getSession();
+        
+        if (!isLoggedIn) {
+            return defaultAccountInfo;
+        }
 
         if (!userId) {
             return defaultAccountInfo;
