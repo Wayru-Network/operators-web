@@ -37,12 +37,11 @@ export async function getOrCreateCustomer(
         company = await Prisma.companies.create({
             data: {
                 customer_id: customer.id,
-                name: customerData.name || "",
-                email: customerData.email || "",
+                name: "",
+                email: "",
                 tax_id: "",
                 vat_number: "",
-                industry: "telecom",
-            },
+            }
         });
     }
 

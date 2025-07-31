@@ -42,7 +42,7 @@ export async function getAccountInfo(): Promise<AccountInfo> {
                 company_email: company?.email || "",
                 company_tax_id: company?.tax_id || "",
                 vat_number: company?.vat_number || "",
-                industry: company?.industry || "telecom",
+                industry: company?.industry as industry_type,
                 company_id: company?.id || 0,
             },
         };

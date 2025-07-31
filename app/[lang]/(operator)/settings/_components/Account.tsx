@@ -1,10 +1,11 @@
 "use client";
 
 import React, { useState, useEffect, useTransition } from "react";
-import { Input, Button, Select, SelectItem } from "@heroui/react";
+import { Input, Button, Select, SelectItem, Form } from "@heroui/react";
 import { updateAccountInfoAction } from "../_services/account-info";
 import { industry_type } from "@/lib/generated/prisma";
 import { AccountInfo, AccountInfoUpdate, FormData } from "../_services/types";
+import userLogout from "@/lib/services/logout-service";
 
 const Account = ({ accountInfo }: { accountInfo: AccountInfo }) => {
   const [language, setLanguage] = useState("en");
@@ -19,18 +20,18 @@ const Account = ({ accountInfo }: { accountInfo: AccountInfo }) => {
     company_name: "",
     company_email: "",
     tax_id: "",
-    industry: "telecom" as industry_type,
+    industry: null,
     company_id: 0,
   });
 
   // Original state to compare changes
-  const [originalData, setOriginalData] = useState({
+  const [originalData, setOriginalData] = useState<FormData>({
     full_name: "",
     email: "",
     company_name: "",
     company_email: "",
     tax_id: "",
-    industry: "telecom",
+    industry: null,
     company_id: 0,
   });
 
@@ -60,7 +61,7 @@ const Account = ({ accountInfo }: { accountInfo: AccountInfo }) => {
         accountInfo.company.company_tax_id ||
         accountInfo.company.vat_number ||
         "",
-      industry: accountInfo.company.industry || "telecom",
+      industry: accountInfo.company.industry as industry_type | null,
       company_id: accountInfo.company.company_id,
     });
 
@@ -207,7 +208,7 @@ const Account = ({ accountInfo }: { accountInfo: AccountInfo }) => {
               company_name: newAccountInfo.company.company_name,
               company_email: newAccountInfo.company.company_email,
               tax_id: newAccountInfo.company.company_tax_id || "",
-              industry: newAccountInfo.company.industry || "telecom",
+              industry: newAccountInfo.company.industry as industry_type,
               company_id: newAccountInfo.company.company_id,
             });
           } catch (error) {
@@ -224,7 +225,11 @@ const Account = ({ accountInfo }: { accountInfo: AccountInfo }) => {
 
   return (
     <div className="flex flex-row gap-8 w-full">
-      <div className="flex flex-col gap-3 w-1/2">
+      <Form
+        className="flex flex-col gap-3 w-1/2"
+        onSubmit={handleSaveChanges}
+        validationErrors={errors}
+      >
         <div className="flex flex-col items-center w-full">
           {/* Personal Information section */}
           <div className="flex flex-col w-full">
@@ -243,6 +248,8 @@ const Account = ({ accountInfo }: { accountInfo: AccountInfo }) => {
                   type="text"
                   variant="bordered"
                   maxLength={20}
+                  isRequired
+                  errorMessage={errors.full_name}
                 />
               </div>
               <div className="w-1/2">
@@ -254,7 +261,6 @@ const Account = ({ accountInfo }: { accountInfo: AccountInfo }) => {
                   type="email"
                   variant="bordered"
                   isRequired
-                  disabled={true}
                 />
               </div>
             </div>
@@ -344,7 +350,7 @@ const Account = ({ accountInfo }: { accountInfo: AccountInfo }) => {
                 placeholder={
                   formData.industry ? formData.industry : "Select Industry"
                 }
-                value={formData.industry}
+                value={formData.industry || ""}
                 onSelectionChange={(e) =>
                   handleInputChange("industry", e?.currentKey as string)
                 }
@@ -365,22 +371,27 @@ const Account = ({ accountInfo }: { accountInfo: AccountInfo }) => {
           {/* Action buttons */}
           {hasChanges() && (
             <Button
-              onPress={handleSaveChanges}
               isLoading={isPending}
               className="w-full mt-4 dark:bg-[#751CF6] bg-[#000] text-white"
+              type="submit"
             >
               {isPending ? "Saving..." : "Save All Changes"}
             </Button>
           )}
         </div>
-      </div>
+      </Form>
 
       <div className="flex flex-col gap-3 items-center w-1/2 justify-self-end">
         {/* Other section */}
         <div className="flex flex-col w-full max-w-[200px]">
           <p className="text-base font-semibold w-full align-left">Other</p>
           <div className="flex flex-col gap-3 mt-2 items-center w-full">
-            <Button className="w-full bg-[#751CF6] text-white">Logout</Button>
+            <Button
+              onPress={userLogout}
+              className="w-full bg-[#751CF6] text-white"
+            >
+              Logout
+            </Button>
             <Button className="w-full bg-transparent border-2 border-gray-200 dark:border-gray-700 text-color">
               Delete Account
             </Button>
