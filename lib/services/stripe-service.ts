@@ -1,12 +1,21 @@
 "use server";
 
 import { centsToDollars } from "../helpers/numbers";
-import { StripeProduct, StripeProductType, StripeSubscription, SubscriptionType } from "../interfaces/stripe";
+import { Prisma } from "../infra/prisma";
+import {
+    CreateSubscriptionInput,
+    StripeProduct,
+    StripeProductType,
+    StripeSubscription,
+    SubscriptionType,
+} from "../interfaces/stripe";
 import { getSession } from "../session/session";
 import { stripe } from "./stripe-config";
 import Stripe from "stripe";
 
-export async function getCustomerSubscriptions(): Promise<StripeSubscription[]> {
+export async function getCustomerSubscriptions(): Promise<
+    StripeSubscription[]
+> {
     try {
         const { isLoggedIn, stripeCustomerId } = await getSession();
         if (!isLoggedIn || !stripeCustomerId) {
@@ -88,16 +97,18 @@ export async function getCustomerSubscriptions(): Promise<StripeSubscription[]> 
             type: sub.type as SubscriptionType,
             name: sub.name,
             description: sub.description || undefined,
-            payment_method: sub.payment_method_details ? {
-                id: sub.payment_method_details.id,
-                type: sub.payment_method_details.type as string,
-                card: sub.payment_method_details.card,
-                billing_details: sub.payment_method_details.billing_details,
-            } : undefined,
+            payment_method: sub.payment_method_details
+                ? {
+                    id: sub.payment_method_details.id,
+                    type: sub.payment_method_details.type as string,
+                    card: sub.payment_method_details.card,
+                    billing_details: sub.payment_method_details.billing_details,
+                }
+                : undefined,
             billing_details: sub.billing_details,
         }));
     } catch (error) {
-        console.error('get subscriptions error', error);
+        console.error("get subscriptions error", error);
         return [];
     }
 }
@@ -132,7 +143,77 @@ export async function getStripeProducts(): Promise<StripeProduct[]> {
 
         return products;
     } catch (error) {
-        console.error('get products error', error);
+        console.error("get products error", error);
         return [];
     }
 }
+
+export const createStripeSubscription = async (
+    input: CreateSubscriptionInput
+) => {
+    try {
+        const { isLoggedIn, stripeCustomerId, email } = await getSession();
+        if (!isLoggedIn) {
+            return;
+        }
+
+        // find customer by email into db
+        const customer = await Prisma.customers.findFirst({
+            where: {
+                email: email ?? "",
+            },
+        });
+
+        if (!customer) {
+            return null;
+        }
+
+        // if no exist customer, create one
+        let stripeCustomer: Stripe.Customer | undefined;
+        if (!stripeCustomerId) {
+            stripeCustomer = await stripe.customers.create({
+                email: customer.email ?? "",
+                name: customer.full_name ?? "",
+                metadata: {
+                    customer_id: customer.customer_uuid,
+                },
+            });
+        } else {
+            stripeCustomer = (await stripe.customers.retrieve(stripeCustomerId, {
+                expand: ["subscriptions"],
+            })) as Stripe.Customer;
+        }
+
+        // create subscription
+        const trial_period_days = 1;
+        const subscription = await stripe.subscriptions.create({
+            customer: stripeCustomer.id,
+            items: [{ price: input.price_id }],
+            metadata: {
+                customer_id: customer.customer_uuid,
+                plan_id: input.plan_id,
+            },
+            trial_period_days: trial_period_days,
+            payment_behavior: "default_incomplete",
+            payment_settings: { save_default_payment_method: "on_subscription" },
+            expand: ["pending_setup_intent", "latest_invoice", "customer"],
+        });
+
+        const setupIntent = subscription.pending_setup_intent as Stripe.SetupIntent;
+        const latestInvoice = subscription.latest_invoice as Stripe.Invoice;
+
+        return {
+            subscription_id: subscription.id,
+            stripe_customer_id: subscription.customer as string,
+            status: subscription.status,
+            current_period_start: subscription.start_date,
+            current_period_end: latestInvoice?.lines?.data[0]?.period?.end,
+            trial_end: subscription.trial_end || undefined,
+            cancel_at_period_end: subscription.cancel_at_period_end || false,
+            payment_intent_client_secret: setupIntent?.client_secret || undefined,
+        };
+    } catch (error) {
+        console.error("create subscription error", error);
+        return null;
+    }
+};

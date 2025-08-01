@@ -8,12 +8,14 @@ import {
 import { stripe } from "@/app/[lang]/(operator)/settings/_services/stripe";
 import { useBilling } from "@/app/[lang]/(operator)/settings/contexts/BillingContext";
 import moment from "moment";
-import { PaymentIcon } from "react-svg-credit-card-payment-icons";
+import { PaymentIcon, PaymentType } from "react-svg-credit-card-payment-icons";
 import { CardBrand } from "@stripe/stripe-js";
+import { useTheme } from "next-themes";
+import { Button } from "@heroui/button";
 
 export default function PlanCheckout() {
   const { hotspotsToAdd, products } = useBilling();
-  const [cardBrand, setCardBrand] = useState<CardBrand | undefined>(undefined);
+  const [cardBrand, setCardBrand] = useState<CardBrand | undefined>("unknown");
   const product = products.find((product) => product.type === "hotspots");
   const productPriceDetails = product?.priceDetails[0];
   const productPrice = productPriceDetails?.price ?? 0;
@@ -23,6 +25,7 @@ export default function PlanCheckout() {
     .format("MMM D, YYYY");
 
   const totalPrice = hotspotsToAdd * productPrice;
+  const { theme } = useTheme();
 
   const getRecurringInterval = (interval: string) => {
     switch (interval) {
@@ -86,54 +89,74 @@ export default function PlanCheckout() {
             <div className="flex flex-col gap-4 w-full">
               {/* Card number on top */}
               <div className="flex flex-col">
-                <label className="text-sm font-medium mb-2">Card number</label>
+                <label className="text-xs font-medium mb-2">Card number</label>
                 <div className="relative">
                   <CardNumberElement
-                    className="p-3 border border-gray-300 rounded-md pl-14"
+                    className="p-3 border border-gray-300 rounded-md pl-10"
                     options={{
                       disableLink: true,
                       placeholder: "1234 1234 1234 1234",
+                      style: {
+                        base: {
+                          color: theme === "dark" ? "#ffffff" : "#000000",
+                          fontSize: "16px",
+                        },
+                      },
                     }}
                     onChange={(event) => {
                       setCardBrand(event.brand);
                     }}
                   />
-                  {cardBrand && (
-                    <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
-                      <PaymentIcon
-                        type={cardBrand}
-                        format="logo"
-                        className="mr-2"
-                      />
-                    </div>
-                  )}
+
+                  <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
+                    <PaymentIcon
+                      type={cardBrand as PaymentType}
+                      format="logo"
+                      className="mr-2"
+                      width={25}
+                      height={25}
+                    />
+                  </div>
                 </div>
               </div>
 
               {/* CVC and expiry below */}
               <div className="flex gap-4">
                 <div className="flex-1">
-                  <label className="text-sm font-medium mb-2">
+                  <label className="text-xs font-medium mb-2">
                     Expiry date
                   </label>
                   <CardExpiryElement
                     className="p-3 border border-gray-300 rounded-md"
                     options={{
                       placeholder: "MM/YY",
+                      style: {
+                        base: {
+                          color: theme === "dark" ? "#ffffff" : "#000000",
+                          fontSize: "16px",
+                        },
+                      },
                     }}
                   />
                 </div>
                 <div className="flex-1">
-                  <label className="text-sm font-medium mb-2">CVC</label>
+                  <label className="text-xs font-medium mb-2">CVC</label>
                   <CardCvcElement
                     className="p-3 border border-gray-300 rounded-md"
                     options={{
                       placeholder: "123",
+                      style: {
+                        base: {
+                          color: theme === "dark" ? "#ffffff" : "#000000",
+                          fontSize: "16px",
+                        },
+                      },
                     }}
                   />
                 </div>
               </div>
             </div>
+            <Button className="w-full mt-4">Pay $ {totalPrice}</Button>
           </Elements>
         </div>
       </div>
