@@ -1,19 +1,22 @@
 import { env } from "@/lib/infra/env";
 import { MinersByAddressResponse } from "@/app/[lang]/(operator)/hotspots/_services/get-hotspots";
 import { getSession } from "../session/session";
-import { Hotspot } from "@/app/[lang]/(operator)/hotspots/_services/get-hotspots";
 import ensureHotspots from "@/app/[lang]/(operator)/hotspots/_services/ensure-hotspots";
 import getConnectivity from "@/lib/device/get-connectivity";
 import { Prisma } from "@/lib/infra/prisma";
 
 export async function searchHotspots(
-  query: string
+  query: string,
+  page: number,
+  limit: number
 ): Promise<MinersByAddressResponse> {
   const { wallet } = await getSession();
 
   const url = `${
     env.BACKEND_URL
-  }/api/nfnode/miners-by-query/${wallet}/${encodeURIComponent(query)}`;
+  }/api/nfnode/miners-by-query/${wallet}/${encodeURIComponent(
+    query
+  )}?page=${page}&limit=${limit}`;
   const res = await fetch(url, {
     headers: {
       "Content-Type": "application/json",
@@ -34,28 +37,28 @@ export async function searchHotspots(
     };
   }
 
-  const hotspots = (await res.json()) as Hotspot[];
+  const hotspots = (await res.json()) as MinersByAddressResponse;
 
-  if (!hotspots || hotspots.length === 0) {
+  if (!hotspots || hotspots.data.length === 0) {
     return {
       data: [],
       meta: {
         total: 0,
         pages: 0,
-        page: 1,
-        size: 0,
+        page,
+        size: limit,
       },
     };
   }
 
-  const wayruDeviceIds = hotspots
+  const wayruDeviceIds = hotspots.data
     .filter((h) => h.wayru_device_id?.trim() !== "")
     .map((h) => h.wayru_device_id);
 
   const deviceConnectivity = await getConnectivity(wayruDeviceIds);
 
   if (!deviceConnectivity || deviceConnectivity.length === 0) {
-    hotspots.forEach((h) => {
+    hotspots.data.forEach((h) => {
       h.status = "unknown";
     });
   } else {
@@ -63,11 +66,11 @@ export async function searchHotspots(
       deviceConnectivity.map((status) => [status.deviceId, status.status])
     );
 
-    hotspots.forEach((h) => {
+    hotspots.data.forEach((h) => {
       h.status = deviceConnectivityMap.get(h.wayru_device_id) || "unknown";
     });
   }
-  await ensureHotspots(hotspots);
+  await ensureHotspots(hotspots.data);
 
   const portals = await Prisma.hotspot.findMany({
     where: {
@@ -85,17 +88,17 @@ export async function searchHotspots(
     }
   });
 
-  hotspots.forEach((h) => {
+  hotspots.data.forEach((h) => {
     h.assigned_portal = portalMap.get(h.wayru_device_id) || "None";
   });
 
   return {
-    data: hotspots,
+    data: hotspots.data,
     meta: {
-      total: hotspots.length,
-      pages: 1,
-      page: 1,
-      size: hotspots.length,
+      total: hotspots.data.length,
+      pages: hotspots.meta.pages,
+      page,
+      size: hotspots.data.length,
     },
   };
 }

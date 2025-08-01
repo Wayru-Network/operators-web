@@ -8,6 +8,7 @@ export interface SessionPayload extends JWTPayload {
   refreshToken?: string;
   wallet?: string;
   stripeCustomerId?: string | null;
+  isCollapsed?: boolean;
 }
 
 export const defaultSession: SessionPayload = {
@@ -18,4 +19,5 @@ export const defaultSession: SessionPayload = {
   accessToken: "",
   refreshToken: "",
   wallet: "",
+  isCollapsed: false,
 };
