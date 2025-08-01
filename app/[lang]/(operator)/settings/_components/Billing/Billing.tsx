@@ -20,7 +20,8 @@ const Billing = () => {
   // change state to see the different states
   const hotspotSubscription = subscriptions.find(
     (subscription) =>
-      subscription.type === "hotspots" && subscription.status === "active"
+      subscription.type === "hotspots" &&
+      (subscription.status === "active" || subscription.status === "trialing")
   );
 
   useEffect(() => {
@@ -44,31 +45,32 @@ const Billing = () => {
 
   return (
     <div className="w-full">
-      {billingStatusHistory?.length > 1 && (
-        <Breadcrumbs className="mb-4 mt-[-30px]">
-          {billingStatusHistory.map(({ component, status }, index) => {
-            const isPreviousStep = index === billingStatusHistory.length - 2;
-            const isCurrentComponent = component === billingStatus;
+      {billingStatusHistory?.length > 1 &&
+        billingStatus === "plan-checkout" && (
+          <Breadcrumbs className="mb-4 mt-[-30px]">
+            {billingStatusHistory.map(({ component, status }, index) => {
+              const isPreviousStep = index === billingStatusHistory.length - 2;
+              const isCurrentComponent = component === billingStatus;
 
-            return (
-              <BreadcrumbItem
-                key={component}
-                isDisabled={isCurrentComponent ? false : !isPreviousStep}
-                onPress={() => {
-                  if (isPreviousStep) {
-                    goBack();
+              return (
+                <BreadcrumbItem
+                  key={component}
+                  isDisabled={isCurrentComponent ? false : !isPreviousStep}
+                  onPress={() => {
+                    if (isPreviousStep) {
+                      goBack();
+                    }
+                  }}
+                  className={
+                    isPreviousStep ? "cursor-pointer" : "cursor-not-allowed"
                   }
-                }}
-                className={
-                  isPreviousStep ? "cursor-pointer" : "cursor-not-allowed"
-                }
-              >
-                {status}
-              </BreadcrumbItem>
-            );
-          })}
-        </Breadcrumbs>
-      )}
+                >
+                  {status}
+                </BreadcrumbItem>
+              );
+            })}
+          </Breadcrumbs>
+        )}
 
       <AnimatePresence mode="wait">
         <motion.div

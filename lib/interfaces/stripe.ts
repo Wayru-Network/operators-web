@@ -1,5 +1,4 @@
 import Stripe from "stripe";
-import { customers } from "../generated/prisma";
 
 export type SubscriptionType = 'hotspots'
 export type StripeProductType = 'hotspots' | 'vpn'
@@ -14,6 +13,7 @@ export interface StripeSubscription {
     type: SubscriptionType;
     name: string;
     description: string | undefined;
+    last_invoice: Stripe.Invoice;
     payment_method: {
         id: string;
         type: string;
@@ -39,7 +39,9 @@ export interface StripeSubscription {
         currency: string;
         trial_period_days: number;
         billing_cycle: string;
+        next_payment_attempt: string;
     } | undefined;
+    products_amount: number;
 }
 
 
@@ -60,4 +62,5 @@ export interface StripeProduct {
 export interface CreateSubscriptionInput {
     plan_id: string;
     price_id: string;
+    quantity: number;
 }

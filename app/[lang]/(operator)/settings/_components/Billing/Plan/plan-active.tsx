@@ -1,9 +1,16 @@
 import { Button, Select, SelectItem } from "@heroui/react";
 import { ArrowDownToLine } from "lucide-react";
-import { PaymentIcon } from "react-svg-credit-card-payment-icons";
+import { PaymentIcon, PaymentType } from "react-svg-credit-card-payment-icons";
 import PlanTable from "./plan-table";
+import { useBilling } from "../../../contexts/BillingContext";
+import moment from "moment";
 
 const PlanActive = () => {
+  const { subscriptions } = useBilling();
+  const hotspotSubscription = subscriptions.find(
+    (subscription) => subscription.type === "hotspots"
+  );
+
   const plans = [
     {
       label: "Monthly",
@@ -29,31 +36,56 @@ const PlanActive = () => {
               <div className="flex flex-row">
                 <p className="text-xs font-semibold">Number of hotspots:</p>
                 <p className="text-xs font-medium dark:text-gray-300 text-gray-700 ml-1">
-                  10
+                  {hotspotSubscription?.products_amount}
                 </p>
               </div>
               <div className="flex flex-row">
                 <p className="text-xs font-semibold">Billing cycle:</p>
                 <p className="text-xs font-medium dark:text-gray-300 text-gray-700 ml-1">
-                  Monthly
+                  {hotspotSubscription?.billing_details?.interval}
                 </p>
               </div>
               <div className="flex flex-row">
                 <p className="text-xs font-semibold">Price per hotspot:</p>
                 <p className="text-xs font-medium dark:text-gray-300 text-gray-700 ml-1">
-                  $29.50
+                  ${hotspotSubscription?.billing_details?.amount}
                 </p>
               </div>
               <div className="flex flex-row">
                 <p className="text-xs font-semibold">Total monthly cost:</p>
                 <p className="text-xs font-medium dark:text-gray-300 text-gray-700 ml-1">
-                  $749.75
+                  $
+                  {(hotspotSubscription?.billing_details?.amount || 0) *
+                    (hotspotSubscription?.products_amount || 0)}
                 </p>
               </div>
+              {moment().isBefore(
+                moment(
+                  (hotspotSubscription?.last_invoice?.period_end || 0) * 1000
+                ).add(1, "day")
+              ) && (
+                <div className="flex flex-row">
+                  <p className="text-xs font-semibold">Trial period:</p>
+                  <p className="text-xs font-medium dark:text-gray-300 text-gray-700 ml-1">
+                    {moment(
+                      Number(hotspotSubscription?.last_invoice?.period_start) *
+                        1000
+                    ).format("MMM DD, YYYY")}{" "}
+                    -{" "}
+                    {moment(
+                      Number(hotspotSubscription?.last_invoice?.period_end) *
+                        1000
+                    )
+                      .add(1, "day")
+                      .format("MMM DD, YYYY")}
+                  </p>
+                </div>
+              )}
               <div className="flex flex-row">
                 <p className="text-xs font-semibold">Next billing date:</p>
                 <p className="text-xs font-medium dark:text-gray-300 text-gray-700 ml-1">
-                  March 15, 2025
+                  {hotspotSubscription?.billing_details?.next_payment_attempt ||
+                    "N/A"}
                 </p>
               </div>
             </div>
@@ -74,9 +106,7 @@ const PlanActive = () => {
             </p>
             <div className="flex flex-row w-full items-center gap-4 ml-4 mt-2 justify-between">
               <div>
-                <p className="text-xs  font-small">
-                  25 hotspots - Monthly Plan
-                </p>
+                <p className="text-xs  font-small">1 hotspots - Monthly Plan</p>
                 <p className="text-lg  font-medium">February 2025</p>
               </div>
               <ArrowDownToLine size={22} className="cursor-pointer mr-4" />
@@ -91,7 +121,14 @@ const PlanActive = () => {
             <div className="flex flex-row gap-3 mt-2 items-center w-full"></div>
             <div className="flex flex-row w-full">
               <div className="flex flex-row w-full ml-4 items-center">
-                <PaymentIcon type="Mastercard" format="logo" className="mr-2" />
+                <PaymentIcon
+                  type={
+                    hotspotSubscription?.payment_method?.card
+                      ?.brand as PaymentType
+                  }
+                  format="logo"
+                  className="mr-2"
+                />
                 <div>
                   <p className="text-sm  font-medium">Mastercard **** 1234</p>
                   <p className="text-xs  font-normal">Expires October 2025</p>
@@ -113,12 +150,6 @@ const PlanActive = () => {
           <p className="text-base font-semibold w-full align-left ">
             Assign plan to hotspots
           </p>
-          <div className="flex flex-col w-full mt-2 ml-4 gap-1">
-            <div className="flex flex-row">
-              <p className="text-xs font-semibold">Number of hotspots:</p>
-              <p className="text-xs font-medium text-gray-700 ml-1">10</p>
-            </div>
-          </div>
           <div className="flex flex-row w-full justify-start mt-3">
             <Select
               variant="bordered"
