@@ -67,7 +67,7 @@ const Reports = () => {
   };
 
   return (
-    <div className="w-full overflow-hidden max-w-[900px]">
+    <div className="w-full overflow-hidden ">
       <Table
         aria-label="Reports Table"
         classNames={{

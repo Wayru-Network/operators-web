@@ -5,13 +5,15 @@ import NavMenu from "@/lib/components/navmenu";
 import { LayoutProps } from "@/lib/interfaces/page";
 import { Spacer } from "@heroui/spacer";
 import { Metadata } from "next";
-import Image from "next/image";
 import { verifySession } from "@/lib/dal/dal";
 import { ToastProvider } from "@heroui/toast";
 import LogoutButton from "@/lib/components/logout";
 import ThemeSwitcher from "@/lib/components/theme-switcher";
 import ScrollContainer from "@/lib/components/scroll-container";
 import StickyHeader from "@/lib/components/sticky-header";
+import { SidebarProvider } from "@/lib/contexts/sidebar-context";
+import SidebarLogo from "@/lib/components/sidebar-logo";
+import SidebarWrapper from "@/lib/components/sidebar-wrapper";
 
 export const metadata: Metadata = {
   title: "Operators - Wayru",
@@ -20,7 +22,8 @@ export const metadata: Metadata = {
 };
 
 export default async function OperatorLayout({ children }: LayoutProps) {
-  void (await verifySession());
+  const session = await verifySession();
+  const isCollapsed = session.isCollapsed;
 
   return (
     <RootLayout>
@@ -32,37 +35,28 @@ export default async function OperatorLayout({ children }: LayoutProps) {
           },
         }}
       />
-      <div className="h-screen flex flex-row bg-[#F8FAFA] dark:bg-[#101415]">
-        {/* Sidebar */}
-        <div className="w-[306px] p-7 bg-[#ffffff] dark:bg-[#191c1d]">
-          <div className="flex flex-row justify-center align-end">
-            <Image
-              className="dark:invert"
-              src="/assets/logo.webp"
-              alt="Wayru logo"
-              width={131}
-              height={42}
-            />
-            <p className="text-[10px] font-medium -mb-0.5 self-end ml-2 text-[#838383]">
-              v.01
-            </p>
-          </div>
-          <Spacer y={12} />
-          <NavMenu />
+      <SidebarProvider initialIsCollapsed={isCollapsed}>
+        <div className="h-screen flex flex-row bg-[#F8FAFA] dark:bg-[#101415]">
+          {/* Sidebar */}
+          <SidebarWrapper>
+            <SidebarLogo />
+            <Spacer y={12} />
+            <NavMenu />
+          </SidebarWrapper>
+          {/* header and page content */}
+          <ScrollContainer>
+            {/* Header */}
+            <StickyHeader>
+              <WalletStatus />
+              <LangSwitch />
+              <ThemeSwitcher />
+              <LogoutButton />
+            </StickyHeader>
+            {/* Page Content */}
+            {children}
+          </ScrollContainer>
         </div>
-        {/* header and page content */}
-        <ScrollContainer>
-          {/* Header */}
-          <StickyHeader>
-            <WalletStatus />
-            <LangSwitch />
-            <ThemeSwitcher />
-            <LogoutButton />
-          </StickyHeader>
-          {/* Page Content */}
-          {children}
-        </ScrollContainer>
-      </div>
+      </SidebarProvider>
     </RootLayout>
   );
 }
