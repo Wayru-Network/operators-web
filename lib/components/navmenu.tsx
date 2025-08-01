@@ -1,6 +1,7 @@
 "use client";
 import { ForwardRefExoticComponent, RefAttributes } from "react";
 import { Button } from "@heroui/button";
+import { Tooltip } from "@heroui/tooltip";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -57,27 +58,35 @@ function NavLink({
 
   return (
     <Link href={href}>
-      <Button
-        fullWidth
-        className={`rounded-lg justify-between ${
-          isActive
-            ? "bg-default text-white dark:text-black"
-            : "bg-transparent text-[#2E3132] dark:text-white hover:bg-[#F2F4F4] dark:hover:bg-[#2E3132]"
-        }`}
-      >
-        <div className="flex flex-row gap-4 items-center">
-          <Icon
-            size={14}
-            className={`${
-              isActive
-                ? "text-white dark:text-black"
-                : "text-[#000000] dark:text-[#ffffff]"
-            }`}
-          />
-          {!isCollapsed && label}
-        </div>
-        <ChevronRight size={16} strokeWidth={3} />
-      </Button>
+      <Tooltip isDisabled={!isCollapsed} content={label} placement="right">
+        <Button
+          fullWidth
+          className={`rounded-lg justify-between ${
+            isActive
+              ? "bg-default text-white dark:text-black"
+              : "bg-transparent text-[#2E3132] dark:text-white hover:bg-[#F2F4F4] dark:hover:bg-[#2E3132]"
+          }`}
+        >
+          <div
+            className={
+              !isCollapsed
+                ? "flex flex-row gap-4 items-center"
+                : "flex flex-row gap-2 items-center justify-center w-full"
+            }
+          >
+            <Icon
+              size={isCollapsed ? 18 : 14}
+              className={`${
+                isActive
+                  ? "text-white dark:text-black"
+                  : "text-[#000000] dark:text-[#ffffff]"
+              }`}
+            />
+            {!isCollapsed && label}
+          </div>
+          {!isCollapsed && <ChevronRight size={16} strokeWidth={3} />}
+        </Button>
+      </Tooltip>
     </Link>
   );
 }

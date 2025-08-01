@@ -1,37 +1,44 @@
 "use client";
 import Image from "next/image";
 import { useSidebar } from "../contexts/sidebar-context";
-import { ChevronFirst, ChevronLast } from "lucide-react";
 
 export default function SidebarLogo() {
-  const { toggleSidebar, isCollapsed } = useSidebar();
+  const { isCollapsed } = useSidebar();
 
   return (
     <div>
-      <div className="flex flex-row justify-end items-center align-end ">
+      <div
+        className={
+          isCollapsed
+            ? "flex flex-col justify-center items-center mt-5"
+            : "flex flex-row justify-center items-center"
+        }
+      >
         {isCollapsed ? (
-          <ChevronLast
-            size={20}
-            onClick={toggleSidebar}
-            className="cursor-pointer"
+          <Image
+            className="dark:invert"
+            src="/assets/logo-iso.webp"
+            alt="Wayru logo"
+            width={42}
+            height={12}
           />
         ) : (
-          <ChevronFirst
-            size={20}
-            onClick={toggleSidebar}
-            className="cursor-pointer"
+          <Image
+            className="dark:invert"
+            src="/assets/logo.webp"
+            alt="Wayru logo"
+            width={131}
+            height={42}
           />
         )}
-      </div>
-      <div className="flex flex-row justify-center align-end">
-        <Image
-          className="dark:invert"
-          src="/assets/logo.webp"
-          alt="Wayru logo"
-          width={isCollapsed ? 70 : 131}
-          height={isCollapsed ? 20 : 42}
-        />
-        <p className="text-[10px] font-medium -mb-0.5 self-end ml-2 text-[#838383]">
+
+        <p
+          className={
+            isCollapsed
+              ? "text-[10px] font-medium -mb-0.5 ml-2 text-center text-[#838383] w-full mt-1"
+              : "text-[10px] font-medium -mb-0.5 self-end ml-2 text-[#838383]"
+          }
+        >
           v.01
         </p>
       </div>

@@ -12,7 +12,7 @@ export default function SettingsTabs({
   accountInfo: AccountInfo;
 }) {
   return (
-    <div className="w-full min-h-[600px]">
+    <div className="w-full min-h-[600px] mt-5">
       <Tabs
         fullWidth
         classNames={{
