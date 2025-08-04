@@ -29,7 +29,7 @@ export interface MinersByAddressResponse {
 
 export async function getHotspots(
   page: number,
-  limit: number,
+  limit: number
 ): Promise<MinersByAddressResponse> {
   const { wallet } = await getSession();
 
@@ -52,7 +52,7 @@ export async function getHotspots(
         "Content-Type": "application/json",
         "X-API-KEY": env.BACKEND_KEY,
       },
-    },
+    }
   );
 
   let hotspots: MinersByAddressResponse;
@@ -85,7 +85,7 @@ export async function getHotspots(
   const wayruDeviceIds = hotspots.data
     .filter(
       (hotspot) =>
-        hotspot.wayru_device_id && hotspot.wayru_device_id.trim() !== "",
+        hotspot.wayru_device_id && hotspot.wayru_device_id.trim() !== ""
     )
     .map((hotspot) => hotspot.wayru_device_id);
 
@@ -99,7 +99,7 @@ export async function getHotspots(
     });
   } else {
     const deviceConnectivityMap = new Map(
-      deviceConnectivity.map((status) => [status.deviceId, status.status]),
+      deviceConnectivity.map((status) => [status.deviceId, status.status])
     );
 
     hotspots.data.forEach((hotspot) => {
@@ -138,5 +138,6 @@ export async function getHotspots(
 
 export async function getHotspotsToAssign(): Promise<Hotspot[]> {
   const hotspots = await getHotspots(1, 50); // Get all hotspots
+  console.log("Fetched hotspots:", hotspots.data.length);
   return hotspots.data;
 }

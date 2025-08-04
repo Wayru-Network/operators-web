@@ -26,7 +26,7 @@ export default async function Hotspots({ searchParams }: PageProps) {
 
   return (
     <div>
-      <h1 className="text-2xl font-normal pb-5">My Hotspots</h1>
+      <h1 className="text-2xl font-normal pb-4">My Hotspots</h1>
       <HotspotsTable
         key={"hotspots-table"}
         rows={hotspots.data}
