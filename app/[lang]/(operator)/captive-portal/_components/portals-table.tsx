@@ -11,10 +11,10 @@ import {
   getKeyValue,
   type SortDescriptor,
 } from "@heroui/table";
-//import { Input } from "@heroui/input";
+import { Input } from "@heroui/input";
 import { Pagination } from "@heroui/pagination";
 import NewPortal from "./new-portal";
-import { Settings } from "lucide-react";
+import { Settings, Search } from "lucide-react";
 import { rowCaptivePortal } from "../_services/get-captive-portals";
 
 interface PortalsColumns {
@@ -35,7 +35,7 @@ interface PortalsRows {
 }
 
 export default function PortalsTable({ rows }: { rows: rowCaptivePortal[] }) {
-  const [search] = useState("");
+  const [search, setSearch] = useState("");
   const [sort, setSort] = useState<SortDescriptor>({
     column: "name",
     direction: "ascending",
@@ -103,20 +103,20 @@ export default function PortalsTable({ rows }: { rows: rowCaptivePortal[] }) {
 
   return (
     <div className="flex flex-col space-y-4">
-      <div className="flex items-center justify-between mb-4">
-        {/* <Input
-          disabled
+      <div className="flex items-center justify-between">
+        <Input
           placeholder="Type to search..."
           value={search}
           onValueChange={setSearch}
+          radius="full"
           className="max-w-xs"
           classNames={{
-            input:
-              "bg-[#ffffff] dark:bg-[#191c1d] rounded-[28px] disabled:placeholder:text-gray-400 dark:disabled:placeholder:text-gray-600",
-            inputWrapper: "p-0",
+            input: "!text-black dark:!text-white",
+            inputWrapper: "pl-1 bg-[#E6E8E9] dark:bg-[#191c1d]",
+            mainWrapper: "rounded-[30px]",
           }}
-          startContent={<Search className="pl-2 text-gray-600" />}
-        /> */}
+          startContent={<Search className="pl-2" />}
+        />
         <NewPortal />
       </div>
 

@@ -119,11 +119,12 @@ export default function HotspotsTable({
         placeholder="Type to search..."
         value={search}
         onValueChange={setSearch}
+        radius="full"
         className="max-w-xs"
         classNames={{
-          input:
-            "bg-[#ffffff] dark:bg-[#191c1d] rounded-[28px] dark:text-white disabled:placeholder:text-gray-400 dark:disabled:placeholder:text-gray-600",
-          inputWrapper: "p-0",
+          input: "!text-black dark:!text-white",
+          inputWrapper: "pl-1 bg-[#E6E8E9] dark:bg-[#191c1d]",
+          mainWrapper: "rounded-[30px]",
         }}
         startContent={<Search className="pl-2" />}
       />
