@@ -7,8 +7,7 @@
     "build": "next build",
     "start": "next start",
     "generate": "prisma generate",
-    "lint": "next lint",
-    "prebuild": "prisma generate && next build"
+    "lint": "next lint"
   },
   "dependencies": {
     "@azure/storage-blob": "^12.27.0",
