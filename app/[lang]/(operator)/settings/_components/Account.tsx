@@ -1,11 +1,12 @@
 "use client";
 
 import React, { useState, useEffect, useTransition } from "react";
-import { Button, Select, SelectItem, Form } from "@heroui/react";
+import { Button, Select, SelectItem, Form, Spacer } from "@heroui/react";
 import { updateAccountInfoAction } from "../_services/account-info";
 import { industry_type } from "@/lib/generated/prisma";
 import { AccountInfo, AccountInfoUpdate, FormData } from "../_services/types";
 import { CustomInput } from "@/lib/components/custom-input";
+const SPACER_SECTION = 9;
 
 const Account = ({ accountInfo }: { accountInfo: AccountInfo }) => {
   const [mounted, setMounted] = useState(false);
@@ -64,12 +65,6 @@ const Account = ({ accountInfo }: { accountInfo: AccountInfo }) => {
       company_id: accountInfo.company.company_id,
     });
   }, [accountInfo]);
-
-  const languages = [
-    { label: "English (US)", value: "en" },
-    { label: "Spanish", value: "es" },
-    { label: "Portuguese (BR)", value: "pt" },
-  ];
 
   const industries = [
     { label: "Telecom", value: "telecom" },
@@ -221,108 +216,86 @@ const Account = ({ accountInfo }: { accountInfo: AccountInfo }) => {
   }
 
   return (
-    <div className="flex flex-row gap-8 w-full">
+    <div className="flex flex-row w-full">
       <Form
-        className="flex flex-col gap-3 w-1/2"
+        className="flex flex-col w-1/2"
         onSubmit={handleSaveChanges}
         validationErrors={errors}
       >
-        <div className="flex flex-col items-center w-full">
+        <div>
           {/* Personal Information section */}
-          <div className="flex flex-col w-full">
-            <p className="text-base font-semibold w-full align-left">
-              Personal Information
-            </p>
-            <div className="flex flex-row gap-3 mt-4 items-center w-full">
-              <div className="w-1/2">
-                <CustomInput
-                  value={formData.full_name}
-                  onChange={(e) =>
-                    handleInputChange("full_name", e.target.value)
-                  }
-                  label="Full Name"
-                  type="text"
-                  wrapperClass="max-w-[210px] max-h-[30px]"
-                  placeholder="John Doe"
-                  required
-                  inputClass="!text-sm"
-                  labelClass="!text-sm"
-                />
-              </div>
-              <div className="w-1/2">
-                <CustomInput
-                  className="w-full focus:outline-none focus:ring-0 focus-visible:outline-none"
-                  value={formData.email}
-                  onChange={(e) => handleInputChange("email", e.target.value)}
-                  label="Email Address"
-                  type="email"
-                  wrapperClass="max-w-[210px] max-h-[30px]"
-                  required
-                  inputClass="!text-sm"
-                  labelClass="!text-sm"
-                />
-              </div>
-            </div>
-          </div>
+          <RenderSection
+            title="Personal Information"
+            Input1={
+              <CustomInput
+                value={formData.full_name}
+                onChange={(e) => handleInputChange("full_name", e.target.value)}
+                label="Full Name"
+                type="text"
+                wrapperClass="max-w-[210px] max-h-[30px]"
+                placeholder="John Doe"
+                required
+                inputClass="!text-sm"
+                labelClass="!text-sm"
+              />
+            }
+            Input2={
+              <CustomInput
+                className="w-full focus:outline-none focus:ring-0 focus-visible:outline-none"
+                value={formData.email}
+                onChange={(e) => handleInputChange("email", e.target.value)}
+                label="Email Address"
+                type="email"
+                wrapperClass="max-w-[210px] max-h-[30px]"
+                required
+                inputClass="!text-sm"
+                labelClass="!text-sm"
+              />
+            }
+          />
+          <Spacer y={SPACER_SECTION} />
 
           {/* Company Information section */}
-          <div className="flex flex-col w-full mt-10">
-            <p className="text-base font-semibold w-full align-left mt-6">
-              Company Information (Optional)
-            </p>
-            <div className="flex flex-row gap-3 items-center w-full h-[75px]">
-              <div className="w-1/2">
-                <CustomInput
-                  value={formData.company_name}
-                  onChange={(e) =>
-                    handleInputChange("company_name", e.target.value)
-                  }
-                  label="Company Name"
-                  placeholder="Pop Bar"
-                  type="text"
-                  wrapperClass="max-w-[210px] max-h-[30px]"
-                  inputClass="!text-sm"
-                  labelClass="!text-sm"
-                />
-              </div>
-              <div className="w-1/2">
-                <CustomInput
-                  value={formData.company_email}
-                  onChange={(e) =>
-                    handleInputChange("company_email", e.target.value)
-                  }
-                  label="Business Email"
-                  placeholder="business@email.com"
-                  type="email"
-                  wrapperClass="max-w-[210px] max-h-[30px]"
-                  inputClass="!text-sm"
-                  labelClass="!text-sm"
-                />
-              </div>
-            </div>
-            <div className="flex flex-row w-full mt-9 h-[80px]">
-              <div className="w-1/2">
-                <CustomInput
-                  value={formData.tax_id ?? "Tax ID/VAT number"}
-                  onChange={(e) => handleInputChange("tax_id", e.target.value)}
-                  label="Tax ID/VAT number"
-                  wrapperClass="max-w-[210px] max-h-[30px]"
-                  placeholder="543121234"
-                  inputClass="!text-sm"
-                  labelClass="!text-sm"
-                />
-              </div>
-            </div>
-          </div>
+          <RenderSection
+            title="Company Information (Optional)"
+            Input1={
+              <CustomInput
+                value={formData.company_name}
+                onChange={(e) =>
+                  handleInputChange("company_name", e.target.value)
+                }
+                label="Company Name"
+                placeholder="Pop Bar"
+                type="text"
+                wrapperClass="max-w-[210px] max-h-[30px]"
+                inputClass="!text-sm"
+                labelClass="!text-sm"
+              />
+            }
+            Input2={
+              <CustomInput
+                value={formData.company_email}
+                onChange={(e) =>
+                  handleInputChange("company_email", e.target.value)
+                }
+                label="Business Email"
+                placeholder="business@email.com"
+                type="email"
+                wrapperClass="max-w-[210px] max-h-[30px]"
+                inputClass="!text-sm"
+                labelClass="!text-sm"
+              />
+            }
+          />
+          <Spacer y={SPACER_SECTION} />
 
           {/* Industry section */}
-          <div className="flex flex-col w-full mt-0">
-            <p className="text-base font-semibold w-full align-left mt-2">
-              Industry
-            </p>
-            <div className="flex flex-row w-1/2 mt-2">
+          <RenderSection
+            title="Industry"
+            Input1={
               <Select
                 variant="bordered"
+                className="mt-[-10px]"
                 size="sm"
                 placeholder={
                   formData.industry ? formData.industry : "Select Industry"
@@ -333,7 +306,7 @@ const Account = ({ accountInfo }: { accountInfo: AccountInfo }) => {
                 }
                 classNames={{
                   trigger:
-                    "!text-black dark:!text-white data-[has-value=true]:!text-black dark:data-[has-value=true]:!text-white",
+                    "!text-black dark:!text-white data-[has-value=true]:!text-black dark:data-[has-value=true]:!text-white !border-neutral-300 !h-[42px]",
                   value: "!text-black dark:!text-white",
                   listbox: "!text-black dark:!text-white",
                 }}
@@ -342,8 +315,8 @@ const Account = ({ accountInfo }: { accountInfo: AccountInfo }) => {
                   <SelectItem key={industry.value}>{industry.label}</SelectItem>
                 ))}
               </Select>
-            </div>
-          </div>
+            }
+          />
 
           {/* Action buttons */}
           {hasChanges() && (
@@ -367,6 +340,28 @@ const Account = ({ accountInfo }: { accountInfo: AccountInfo }) => {
               Delete Account
             </Button>
           </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+interface RenderSectionProps {
+  title: string;
+  Input1: React.ReactNode;
+  Input2?: React.ReactNode;
+}
+
+const RenderSection = ({ title, Input1, Input2 }: RenderSectionProps) => {
+  return (
+    <div>
+      <p className="text-lg font-semibold w-full align-left">{title}</p>
+      {/* Personal Information container */}
+      <div className="mt-8">
+        {/* Personal Information content */}
+        <div className="flex flex-row gap-1.5 rounded-[10px] relative h-[80px]">
+          <div className="w-1/2 relative">{Input1}</div>
+          <div className="w-1/2">{Input2}</div>
         </div>
       </div>
     </div>

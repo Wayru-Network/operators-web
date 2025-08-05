@@ -17,8 +17,8 @@ export default async function Settings() {
   const products = await getStripeProducts();
 
   return (
-    <div>
-      <h1 className="text-2xl font-normal">Settings</h1>
+    <div className="flex flex-col space-y-4">
+      <p className="text-2xl pb-4">Settings</p>
       <BillingProvider subscriptions={subscriptions} products={products}>
         <SettingsTabs accountInfo={accountInfo} />
       </BillingProvider>

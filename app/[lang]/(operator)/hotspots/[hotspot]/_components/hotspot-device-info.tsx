@@ -1,5 +1,3 @@
-import CustomSnippet from "@/lib/components/custom-snippet";
-// import { Button } from "@heroui/button";
 import { Snippet } from "@heroui/snippet";
 import { Spacer } from "@heroui/spacer";
 import {
@@ -38,13 +36,73 @@ export default function HotspotDeviceInfo({
   ownership,
 }: DeviceInfoProps) {
   const basicInfoText = `Hotspot name: ${basic.name}
-Location name: ${basic.locationName}
-Model: ${basic.model}
-Brand: ${basic.brand}
-OS name: ${basic.osName}
-OS version: ${basic.osVersion}
-OS services version: ${basic.osServicesVersion}
-Public IP: ${basic.publicIP}`;
+    Location name: ${basic.locationName}
+    Model: ${basic.model}
+    Brand: ${basic.brand}
+    OS name: ${basic.osName}
+    OS version: ${basic.osVersion}
+    OS services version: ${basic.osServicesVersion}
+    Public IP: ${basic.publicIP}`;
+
+  const networkInfoText = `Mac address: ${network.mac}
+    IP address: ${network.ip ? network.ip : "192.168.45.1"}
+    Serial number: ${network.serial || "N/A"}
+    SSID open network: ${network.openNetwork.ssid || "N/A"}
+    SSID private network: ${network.privateNetwork.ssid || "N/A"}
+    Current password: ${network.privateNetwork.password || "N/A"}`;
+
+  const ownershipInfoText = `NFT ID: ${ownership.nftID}
+    Owner address: ${ownership.ownerAddress}
+    MAC address: ${ownership.macAddress}`;
+
+  const networkDetails = [
+    {
+      label: "Mac address",
+      value: network.mac,
+    },
+    {
+      label: "IP address",
+      value: network.ip ? network.ip : "192.168.45.1",
+    },
+    {
+      label: "Serial number",
+      value: network.serial || "N/A",
+    },
+    {
+      label: "SSID open network",
+      value: network.openNetwork.ssid || "N/A",
+    },
+    {
+      label: "SSID private network",
+      value: network.privateNetwork.ssid || "N/A",
+    },
+    {
+      label: "Current password",
+      value: network.privateNetwork.password || "N/A",
+    },
+  ];
+
+  const ownershipDetails = [
+    {
+      label: "NFT ID",
+      value: ownership.nftID,
+    },
+    {
+      label: "Owner address",
+      value: ownership.ownerAddress,
+    },
+    {
+      label: "MAC address",
+      value: ownership.macAddress,
+    },
+  ];
+
+  const formatValue = (value: string) => {
+    if (value.length > 15) {
+      return value.slice(0, 5) + "..." + value.slice(-5);
+    }
+    return value;
+  };
 
   return (
     <div>
@@ -91,6 +149,7 @@ Public IP: ${basic.publicIP}`;
             <div className="flex flex-row items-end">
               <Snippet
                 variant="bordered"
+                className="rounded-[50px] px-1 py-1 flex flex-row items-center justify-center"
                 codeString={basicInfoText}
                 hideSymbol={true}
                 content=""
@@ -111,63 +170,61 @@ Public IP: ${basic.publicIP}`;
         {/* Network details */}
         <div>
           <p className="text-lg font-semibold">Network details</p>
-          <Spacer y={8} />
-          <div className="flex flex-row space-x-8">
-            <CustomSnippet label="MAC address" wrapperClass="max-w-[260px]">
-              {network.mac}
-            </CustomSnippet>
-            <CustomSnippet label="IP address" wrapperClass="max-w-[260px]">
-              192.168.45.1
-            </CustomSnippet>
-            <CustomSnippet label="Serial number" wrapperClass="max-w-[260px]">
-              {network.serial || "N/A"}
-            </CustomSnippet>
-          </div>
-          <Spacer y={8} />
-          <div className="flex flex-row space-x-8">
-            <CustomSnippet
-              label="SSID open network"
-              wrapperClass="max-w-[260px]"
-            >
-              {network.openNetwork.ssid || "N/A"}
-            </CustomSnippet>
-            <CustomSnippet
-              label="SSID private network"
-              wrapperClass="max-w-[260px]"
-            >
-              {network.privateNetwork.ssid || "N/A"}
-            </CustomSnippet>
-            <CustomSnippet
-              label="Current password"
-              wrapperClass="max-w-[260px]"
-            >
-              {network.privateNetwork.password || "N/A"}
-            </CustomSnippet>
+          <div className="mt-4">
+            <div className="w-full flex flex-row justify-between space-x-24">
+              <div className="bg-[#F8FAFA] dark:bg-[#222222] py-[21px] px-[19px] rounded-[10px] relative flex flex-row justify-between">
+                <div className="min-w-md">
+                  {networkDetails.map((detail) => (
+                    <div
+                      key={detail.label}
+                      className="flex flex-row items-center space-x-2"
+                    >
+                      <p className="text-sm font-bold">{detail.label}:</p>
+                      <p>{detail.value || "N/A"}</p>
+                    </div>
+                  ))}
+                </div>
+                <div className="flex flex-row items-end">
+                  <Snippet
+                    variant="bordered"
+                    codeString={networkInfoText}
+                    hideSymbol={true}
+                    content=""
+                  />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
         <Spacer y={8} />
+
         {/* Ownership */}
         <div>
           <p className="text-lg font-semibold">Ownership</p>
-          <Spacer y={8} />
-          <div className="flex flex-row space-x-8">
-            <CustomSnippet
-              label="NFT ID"
-              wrapperClass="max-w-[260px]"
-              snippetClass="overflow-hidden whitespace-nowrap overflow-ellipsis"
-            >
-              {ownership.nftID}
-            </CustomSnippet>
-            <CustomSnippet
-              label="Owner address"
-              wrapperClass="max-w-[260px]"
-              snippetClass="overflow-hidden whitespace-nowrap overflow-ellipsis"
-            >
-              {ownership.ownerAddress}
-            </CustomSnippet>
-            <CustomSnippet label="MAC address" wrapperClass="max-w-[260px]">
-              {ownership.macAddress}
-            </CustomSnippet>
+          <div className="mt-4">
+            <div className="w-full flex flex-row justify-between space-x-24">
+              <div className="bg-[#F8FAFA] dark:bg-[#222222] py-[21px] px-[19px] rounded-[10px] relative flex flex-row justify-between">
+                <div className="min-w-md">
+                  {ownershipDetails.map((detail) => (
+                    <div
+                      key={detail.label}
+                      className="flex flex-row items-center space-x-2"
+                    >
+                      <p className="text-sm font-bold">{detail.label}:</p>
+                      <p>{formatValue(detail.value || "N/A")}</p>
+                    </div>
+                  ))}
+                </div>
+                <div className="flex flex-row items-end">
+                  <Snippet
+                    variant="bordered"
+                    codeString={ownershipInfoText}
+                    hideSymbol={true}
+                    content=""
+                  />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
         {/* Hotspot groups */}

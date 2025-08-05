@@ -12,35 +12,33 @@ export default function SettingsTabs({
   accountInfo: AccountInfo;
 }) {
   return (
-    <div className="w-full min-h-[600px] mt-5">
-      <Tabs
-        fullWidth
-        classNames={{
-          tabList: "border-b-2 p-0 border-gray-200 dark:border-gray-700",
-          panel: "bg-[#ffffff] dark:bg-[#191c1d] rounded-[30px] my-2 p-10",
-          tab: "pb-4",
-          cursor: "w-full",
-          tabContent: "text-lg text-gray-900 dark:text-white",
-        }}
-        variant="underlined"
-        color="primary"
-      >
-        <Tab key="Account" title="Account">
-          <EaseInOutContent>
-            <Account accountInfo={accountInfo} />
-          </EaseInOutContent>
-        </Tab>
-        <Tab key="Billing" title="Billing">
-          <EaseInOutContent>
-            <Billing />
-          </EaseInOutContent>
-        </Tab>
-        <Tab key="Reports" title="Reports">
-          <EaseInOutContent>
-            <Reports />
-          </EaseInOutContent>
-        </Tab>
-      </Tabs>
-    </div>
+    <Tabs
+      fullWidth
+      classNames={{
+        tabList: "border-b-2 p-0 border-gray-200 dark:border-gray-700",
+        panel: "bg-[#ffffff] dark:bg-[#191c1d] rounded-[30px] my-2 p-10",
+        tab: "pb-4",
+        cursor: "w-full",
+        tabContent: "text-lg text-gray-900 dark:text-white",
+      }}
+      variant="underlined"
+      color="primary"
+    >
+      <Tab key="Account" title="Account">
+        <EaseInOutContent>
+          <Account accountInfo={accountInfo} />
+        </EaseInOutContent>
+      </Tab>
+      <Tab key="Billing" title="Billing">
+        <EaseInOutContent>
+          <Billing />
+        </EaseInOutContent>
+      </Tab>
+      <Tab key="Reports" title="Reports">
+        <EaseInOutContent>
+          <Reports />
+        </EaseInOutContent>
+      </Tab>
+    </Tabs>
   );
 }
