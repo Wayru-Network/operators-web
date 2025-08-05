@@ -50,14 +50,6 @@ spec:
           objectName: nas-api-key
           objectType: secret
           objectVersion: ""
-        - |
-          objectName: fas-url
-          objectType: secret
-          objectVersion: ""
-        - |
-          objectName: fas-api-key
-          objectType: secret
-          objectVersion: ""
   secretObjects:
     - secretName: {{ .Values.name }}
       type: Opaque
@@ -78,7 +70,3 @@ spec:
           key: OPERATORS_API_KEY
         - objectName: nas-api-key
           key: NAS_API_KEY
-        - objectName: fas-url
-          key: FAS_URL
-        - objectName: fas-api-key
-          key: FAS_API_KEY
