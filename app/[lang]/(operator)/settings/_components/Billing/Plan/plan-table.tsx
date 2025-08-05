@@ -1,5 +1,5 @@
 import { Router, UserRound } from "lucide-react";
-import { Checkbox } from "@heroui/react";
+import { X } from "lucide-react";
 
 type Plan = {
   name: string;
@@ -27,11 +27,11 @@ const PlanTable = () => {
   ];
 
   return (
-    <div className="flex flex-col w-full mt-2 ml-4 gap-1">
+    <div className="flex flex-col w-full mt-2 gap-1">
       {paged.map((item, index) => (
         <div
           key={index}
-          className="flex flex-row items-center gap-2 justify-between h-8"
+          className="flex flex-row items-center gap-2 justify-between h-9"
         >
           <div className="flex flex-row items-center gap-2 col-span-3">
             {item.type === "hotspot" ? (
@@ -46,7 +46,7 @@ const PlanTable = () => {
             </p>
           </div>
           <div className="flex flex-row items-center gap-2 col-span-3 justify-end">
-            <Checkbox defaultSelected radius="none" size="sm" />
+            <X className="cursor-pointer" size={16} />
           </div>
         </div>
       ))}

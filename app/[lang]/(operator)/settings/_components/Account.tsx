@@ -1,14 +1,13 @@
 "use client";
 
 import React, { useState, useEffect, useTransition } from "react";
-import { Input, Button, Select, SelectItem, Form } from "@heroui/react";
+import { Button, Select, SelectItem, Form } from "@heroui/react";
 import { updateAccountInfoAction } from "../_services/account-info";
 import { industry_type } from "@/lib/generated/prisma";
 import { AccountInfo, AccountInfoUpdate, FormData } from "../_services/types";
-import userLogout from "@/lib/services/logout-service";
+import { CustomInput } from "@/lib/components/custom-input";
 
 const Account = ({ accountInfo }: { accountInfo: AccountInfo }) => {
-  const [language, setLanguage] = useState("en");
   const [mounted, setMounted] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isPending, startTransition] = useTransition();
@@ -64,8 +63,6 @@ const Account = ({ accountInfo }: { accountInfo: AccountInfo }) => {
       industry: accountInfo.company.industry as industry_type | null,
       company_id: accountInfo.company.company_id,
     });
-
-    setLanguage("en");
   }, [accountInfo]);
 
   const languages = [
@@ -236,111 +233,91 @@ const Account = ({ accountInfo }: { accountInfo: AccountInfo }) => {
             <p className="text-base font-semibold w-full align-left">
               Personal Information
             </p>
-            <div className="flex flex-row gap-3 mt-2 items-center w-full">
+            <div className="flex flex-row gap-3 mt-4 items-center w-full">
               <div className="w-1/2">
-                <Input
-                  className="w-full focus:outline-none focus:ring-0 focus-visible:outline-none"
+                <CustomInput
                   value={formData.full_name}
                   onChange={(e) =>
                     handleInputChange("full_name", e.target.value)
                   }
                   label="Full Name"
                   type="text"
-                  variant="bordered"
-                  maxLength={20}
-                  isRequired
-                  errorMessage={errors.full_name}
+                  wrapperClass="max-w-[210px] max-h-[30px]"
+                  placeholder="John Doe"
+                  required
+                  inputClass="!text-sm"
+                  labelClass="!text-sm"
                 />
               </div>
               <div className="w-1/2">
-                <Input
+                <CustomInput
                   className="w-full focus:outline-none focus:ring-0 focus-visible:outline-none"
                   value={formData.email}
                   onChange={(e) => handleInputChange("email", e.target.value)}
                   label="Email Address"
                   type="email"
-                  variant="bordered"
-                  isRequired
+                  wrapperClass="max-w-[210px] max-h-[30px]"
+                  required
+                  inputClass="!text-sm"
+                  labelClass="!text-sm"
                 />
               </div>
             </div>
           </div>
 
-          {/* Language section */}
-          <div className="flex flex-col w-full mt-2">
-            <p className="text-base font-semibold w-full align-left mt-6">
-              Language
-            </p>
-            <div className="flex flex-row w-1/2 mt-2">
-              <Select
-                variant="bordered"
-                size="sm"
-                placeholder={`English (US)`}
-                value={language}
-                onChange={(e) => setLanguage(e.target.value)}
-                classNames={{
-                  trigger:
-                    "!text-black dark:!text-white data-[has-value=true]:!text-black dark:data-[has-value=true]:!text-white",
-                  value: "!text-black dark:!text-white",
-                  listbox: "!text-black dark:!text-white",
-                }}
-              >
-                {languages.map((language) => (
-                  <SelectItem key={language.value}>{language.label}</SelectItem>
-                ))}
-              </Select>
-            </div>
-          </div>
-
           {/* Company Information section */}
-          <div className="flex flex-col w-full mt-2">
+          <div className="flex flex-col w-full mt-10">
             <p className="text-base font-semibold w-full align-left mt-6">
               Company Information (Optional)
             </p>
-            <div className="flex flex-row gap-3 mt-2 items-center w-full">
+            <div className="flex flex-row gap-3 items-center w-full h-[75px]">
               <div className="w-1/2">
-                <Input
-                  className="w-full focus:outline-none focus:ring-0 focus-visible:outline-none"
+                <CustomInput
                   value={formData.company_name}
                   onChange={(e) =>
                     handleInputChange("company_name", e.target.value)
                   }
                   label="Company Name"
+                  placeholder="Pop Bar"
                   type="text"
-                  variant="bordered"
+                  wrapperClass="max-w-[210px] max-h-[30px]"
+                  inputClass="!text-sm"
+                  labelClass="!text-sm"
                 />
               </div>
               <div className="w-1/2">
-                <Input
-                  className="w-full focus:outline-none focus:ring-0 focus-visible:outline-none"
+                <CustomInput
                   value={formData.company_email}
                   onChange={(e) =>
                     handleInputChange("company_email", e.target.value)
                   }
                   label="Business Email"
+                  placeholder="business@email.com"
                   type="email"
-                  variant="bordered"
-                  isInvalid={!!errors.company_email}
-                  errorMessage={errors.company_email}
+                  wrapperClass="max-w-[210px] max-h-[30px]"
+                  inputClass="!text-sm"
+                  labelClass="!text-sm"
                 />
               </div>
             </div>
-            <div className="flex flex-row w-full mt-2">
+            <div className="flex flex-row w-full mt-9 h-[80px]">
               <div className="w-1/2">
-                <Input
-                  className="w-full focus:outline-none focus:ring-0 focus-visible:outline-none"
-                  value={formData.tax_id}
+                <CustomInput
+                  value={formData.tax_id ?? "Tax ID/VAT number"}
                   onChange={(e) => handleInputChange("tax_id", e.target.value)}
                   label="Tax ID/VAT number"
-                  variant="bordered"
+                  wrapperClass="max-w-[210px] max-h-[30px]"
+                  placeholder="543121234"
+                  inputClass="!text-sm"
+                  labelClass="!text-sm"
                 />
               </div>
             </div>
           </div>
 
           {/* Industry section */}
-          <div className="flex flex-col w-full mt-2">
-            <p className="text-base font-semibold w-full align-left mt-6">
+          <div className="flex flex-col w-full mt-0">
+            <p className="text-base font-semibold w-full align-left mt-2">
               Industry
             </p>
             <div className="flex flex-row w-1/2 mt-2">
@@ -386,13 +363,7 @@ const Account = ({ accountInfo }: { accountInfo: AccountInfo }) => {
         <div className="flex flex-col w-full max-w-[200px]">
           <p className="text-base font-semibold w-full align-left">Other</p>
           <div className="flex flex-col gap-3 mt-2 items-center w-full">
-            <Button
-              onPress={userLogout}
-              className="w-full bg-[#751CF6] text-white"
-            >
-              Logout
-            </Button>
-            <Button className="w-full bg-transparent border-2 border-gray-200 dark:border-gray-700 text-color">
+            <Button className="w-full bg-[#751CF6] border-2 border-gray-200 dark:border-gray-700 text-white">
               Delete Account
             </Button>
           </div>

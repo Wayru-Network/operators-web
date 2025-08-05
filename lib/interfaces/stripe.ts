@@ -33,13 +33,13 @@ export interface StripeSubscription {
         },
     } | undefined;
     billing_details?: {
-        interval: string | undefined;
+        interval: Stripe.Price.Recurring.Interval | undefined;
         interval_count: number | undefined;
         amount: number;
         currency: string;
         trial_period_days: number;
         billing_cycle: string;
-        next_payment_attempt: string;
+        next_payment_date: string;
     } | undefined;
     products_amount: number;
 }

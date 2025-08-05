@@ -1,6 +1,6 @@
 "use server";
 
-import { getNextPaymentAttempt } from "../helpers/dates";
+import moment from "moment";
 import { centsToDollars } from "../helpers/numbers";
 import { Prisma } from "../infra/prisma";
 import {
@@ -29,7 +29,7 @@ export async function getCustomerSubscriptions(): Promise<
             expand: [
                 "data.default_payment_method",
                 "data.latest_invoice.payment_intent.payment_method",
-                "data.items.data.price",
+                "data.items.data.price"
             ],
         });
 
@@ -84,18 +84,18 @@ export async function getCustomerSubscriptions(): Promise<
                         trial_period_days: price.recurring?.trial_period_days ?? 7,
                         billing_cycle: `${price.recurring?.interval_count || 1} ${price.recurring?.interval || "month"
                             }`,
-                        next_payment_attempt: getNextPaymentAttempt(sub.latest_invoice as Stripe.Invoice),
+                        next_payment_date: moment(sub.items.data[0].current_period_end * 1000).format("MMM DD, YYYY")
                     }
                     : undefined,
             });
         }
 
-        return subscriptionsWithType.map((sub) => ({
+        const subscriptionsMapped = subscriptionsWithType.map((sub) => ({
             subscription_id: sub.id,
             stripe_customer_id: sub.customer as string,
             status: sub.status,
-            current_period_start: sub.start_date,
-            current_period_end: sub.ended_at || 0,
+            current_period_start: sub.items.data[0].current_period_start,
+            current_period_end: sub.items.data[0].current_period_end,
             trial_end: sub.trial_end || undefined,
             cancel_at_period_end: sub.cancel_at_period_end || false,
             type: sub.type as SubscriptionType,
@@ -113,6 +113,8 @@ export async function getCustomerSubscriptions(): Promise<
                 : undefined,
             billing_details: sub.billing_details,
         }));
+
+        return subscriptionsMapped;
     } catch (error) {
         console.error("get subscriptions error", error);
         return [];

@@ -4,6 +4,7 @@ import { PaymentIcon, PaymentType } from "react-svg-credit-card-payment-icons";
 import PlanTable from "./plan-table";
 import { useBilling } from "../../../contexts/BillingContext";
 import moment from "moment";
+import Stripe from "stripe";
 
 const PlanActive = () => {
   const { subscriptions } = useBilling();
@@ -21,6 +22,15 @@ const PlanActive = () => {
       value: "yearly",
     },
   ];
+
+  const billingCycle = (interval: Stripe.Price.Recurring.Interval) => {
+    if (interval === "month") {
+      return "Monthly";
+    } else if (interval === "year") {
+      return "Yearly";
+    }
+    return "Monthly";
+  };
 
   return (
     <div className=" flex flex-row gap-8 w-full ">
@@ -42,7 +52,10 @@ const PlanActive = () => {
               <div className="flex flex-row">
                 <p className="text-xs font-semibold">Billing cycle:</p>
                 <p className="text-xs font-medium dark:text-gray-300 text-gray-700 ml-1">
-                  {hotspotSubscription?.billing_details?.interval}
+                  {billingCycle(
+                    hotspotSubscription?.billing_details
+                      ?.interval as Stripe.Price.Recurring.Interval
+                  )}
                 </p>
               </div>
               <div className="flex flex-row">
@@ -84,7 +97,7 @@ const PlanActive = () => {
               <div className="flex flex-row">
                 <p className="text-xs font-semibold">Next billing date:</p>
                 <p className="text-xs font-medium dark:text-gray-300 text-gray-700 ml-1">
-                  {hotspotSubscription?.billing_details?.next_payment_attempt ||
+                  {hotspotSubscription?.billing_details?.next_payment_date ||
                     "N/A"}
                 </p>
               </div>
@@ -130,8 +143,20 @@ const PlanActive = () => {
                   className="mr-2"
                 />
                 <div>
-                  <p className="text-sm  font-medium">Mastercard **** 1234</p>
-                  <p className="text-xs  font-normal">Expires October 2025</p>
+                  <p className="text-sm  font-medium">
+                    {hotspotSubscription?.payment_method?.card?.brand
+                      ?.toLowerCase()
+                      .replace(/^\w/, (c) => c.toUpperCase())}{" "}
+                    **** {hotspotSubscription?.payment_method?.card?.last4}
+                  </p>
+                  <p className="text-xs  font-normal">
+                    Expires{" "}
+                    {moment(
+                      Number(
+                        hotspotSubscription?.payment_method?.card?.exp_month
+                      ) * 1000
+                    ).format("MMM DD, YYYY")}
+                  </p>
                 </div>
               </div>
             </div>

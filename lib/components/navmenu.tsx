@@ -75,7 +75,7 @@ function NavLink({
             }
           >
             <Icon
-              size={isCollapsed ? 18 : 14}
+              size={isCollapsed ? 18 : 16}
               className={`${
                 isActive
                   ? "text-white dark:text-black"
