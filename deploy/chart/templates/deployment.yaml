@@ -102,6 +102,13 @@ spec:
                 secretKeyRef:
                   name: {{ .Values.name }}
                   key: NAS_API_KEY
+            - name: FAS_URL
+              value: {{ .Values.fasApiUrl | quote }}
+            - name: FAS_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.name }}
+                  key: FAS_API_KEY
           volumeMounts:
             - name: {{ .Values.name }}-csi-volume
               mountPath: /mnt/secrets
