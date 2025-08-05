@@ -1,5 +1,6 @@
 import { PortalConfig } from "../_components/customize-captive-portal";
 import { Prisma } from "@/lib/infra/prisma";
+
 export default async function validateHotspots(
   newConfig: PortalConfig,
   originalConfig: PortalConfig
@@ -44,6 +45,23 @@ export default async function validateHotspots(
 
   if (!areHotspotsEqual) {
     try {
+      const hotspotsToDisconnect = oldHotspotIds.filter(
+        (id) => !newHotspotIds.includes(id)
+      );
+
+      if (hotspotsToDisconnect.length > 0) {
+        await Prisma.portal_config.update({
+          where: { id: newConfig.id },
+          data: {
+            hotspots: {
+              disconnect: hotspotsToDisconnect.map((id) => ({
+                wayru_device_id: id,
+              })),
+            },
+          },
+        });
+      }
+
       await Promise.all(
         sortedNewIds.map((deviceId) =>
           Prisma.hotspot.upsert({
@@ -70,6 +88,7 @@ export default async function validateHotspots(
       };
     }
   }
+
   return {
     success: false,
   };
