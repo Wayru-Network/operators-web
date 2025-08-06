@@ -1,22 +1,20 @@
 "use client";
 
-import React, { useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import React, { useState } from "react";
 import PlanNotSelected from "./Plan/plan-not-selected";
 import SelectAPlan from "./Plan/select-a-plan";
 import PlanActive from "./Plan/plan-active";
 import { useBilling } from "../../contexts/BillingContext";
 import PlanCheckout from "./Plan/plan-checkout";
-import { Breadcrumbs, BreadcrumbItem } from "@heroui/react";
+import ChangePaymentMethod from "./payment-method/change-payment-method";
+import { Tab, Tabs } from "@heroui/tabs";
+import EaseInOutContent from "@/lib/components/ease-in-out-content";
+import { Spinner } from "@heroui/react";
 
+export type Steps = "step1" | "step2" | "step3" | "step4";
 const Billing = () => {
-  const {
-    billingStatus,
-    changeBillingStatus,
-    subscriptions,
-    billingStatusHistory,
-    goBack,
-  } = useBilling();
+  const { subscriptions, isLoading } = useBilling();
+  const [selected, setSelected] = useState<Steps>("step1");
   // change state to see the different states
   const hotspotSubscription = subscriptions.find(
     (subscription) =>
@@ -24,69 +22,51 @@ const Billing = () => {
       (subscription.status === "active" || subscription.status === "trialing")
   );
 
-  useEffect(() => {
-    if (hotspotSubscription) {
-      changeBillingStatus("plan-active");
-    }
-  }, [hotspotSubscription]);
-
-  const renderBillingStatus = () => {
-    switch (billingStatus) {
-      case "plan-active":
-        return <PlanActive />;
-      case "select-a-plan":
-        return <SelectAPlan />;
-      case "plan-checkout":
-        return <PlanCheckout />;
-      default:
-        return <PlanNotSelected />;
-    }
-  };
+  if (isLoading) {
+    return (
+      <div className="w-full flex flew-col justify-center align-items">
+        <div className="flex flex-col ">
+          <p className="text-lg w-full mb-8 font-semibold">Loading..</p>
+          <Spinner size="lg" />
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="w-full">
-      {billingStatusHistory?.length > 1 &&
-        billingStatus === "plan-checkout" && (
-          <Breadcrumbs className="mb-4 mt-[-30px]">
-            {billingStatusHistory.map(({ component, status }, index) => {
-              const isPreviousStep = index === billingStatusHistory.length - 2;
-              const isCurrentComponent = component === billingStatus;
-
-              return (
-                <BreadcrumbItem
-                  key={component}
-                  isDisabled={isCurrentComponent ? false : !isPreviousStep}
-                  onPress={() => {
-                    if (isPreviousStep) {
-                      goBack();
-                    }
-                  }}
-                  className={
-                    isPreviousStep ? "cursor-pointer" : "cursor-not-allowed"
-                  }
-                >
-                  {status}
-                </BreadcrumbItem>
-              );
-            })}
-          </Breadcrumbs>
-        )}
-
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={billingStatus}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -20 }}
-          transition={{
-            duration: 0.3,
-            ease: "easeInOut",
-          }}
-        >
-          {renderBillingStatus()}
-        </motion.div>
-      </AnimatePresence>
-    </div>
+    <Tabs
+      classNames={{
+        tabList: "!hidden",
+        panel: "p-0 min-h-full mt-[-20px]",
+      }}
+      selectedKey={selected}
+      onSelectionChange={(key) => setSelected(key as Steps)}
+    >
+      <Tab key="step1" title="My subscriptions">
+        <EaseInOutContent>
+          {hotspotSubscription ? (
+            <PlanActive setSelected={setSelected} />
+          ) : (
+            <PlanNotSelected setSelected={setSelected} />
+          )}
+        </EaseInOutContent>
+      </Tab>
+      <Tab key="step2" title="Billing">
+        <EaseInOutContent>
+          <SelectAPlan setSelected={setSelected} />
+        </EaseInOutContent>
+      </Tab>
+      <Tab key="step3" title="Change payment method">
+        <EaseInOutContent>
+          <ChangePaymentMethod setSelected={setSelected} />
+        </EaseInOutContent>
+      </Tab>
+      <Tab key="step4" title="Checkout">
+        <EaseInOutContent>
+          <PlanCheckout setSelected={setSelected} />
+        </EaseInOutContent>
+      </Tab>
+    </Tabs>
   );
 };
 

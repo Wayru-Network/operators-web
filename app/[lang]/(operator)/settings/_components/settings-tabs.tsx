@@ -30,9 +30,7 @@ export default function SettingsTabs({
         </EaseInOutContent>
       </Tab>
       <Tab key="Billing" title="Billing">
-        <EaseInOutContent>
-          <Billing />
-        </EaseInOutContent>
+        <Billing />
       </Tab>
       <Tab key="Reports" title="Reports">
         <EaseInOutContent>

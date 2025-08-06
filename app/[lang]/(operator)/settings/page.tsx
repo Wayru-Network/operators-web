@@ -1,10 +1,7 @@
 import { Metadata } from "next";
 import SettingsTabs from "./_components/settings-tabs";
 import { getAccountInfo } from "./_services/account-info";
-import {
-  getCustomerSubscriptions,
-  getStripeProducts,
-} from "@/lib/services/stripe-service";
+import { getStripeProducts } from "@/lib/services/stripe-service";
 import { BillingProvider } from "./contexts/BillingContext";
 
 export const metadata: Metadata = {
@@ -13,13 +10,12 @@ export const metadata: Metadata = {
 
 export default async function Settings() {
   const accountInfo = await getAccountInfo();
-  const subscriptions = await getCustomerSubscriptions();
   const products = await getStripeProducts();
 
   return (
     <div className="flex flex-col space-y-4">
       <p className="text-2xl pb-4">Settings</p>
-      <BillingProvider subscriptions={subscriptions} products={products}>
+      <BillingProvider products={products}>
         <SettingsTabs accountInfo={accountInfo} />
       </BillingProvider>
     </div>

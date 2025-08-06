@@ -11,7 +11,7 @@ import {
     SubscriptionType,
 } from "../interfaces/stripe";
 import { getSession, updateSession } from "../session/session";
-import { stripe } from "./stripe-config";
+import { stripeServer } from "./stripe-server-config";
 import Stripe from "stripe";
 
 export async function getCustomerSubscriptions(): Promise<
@@ -23,7 +23,7 @@ export async function getCustomerSubscriptions(): Promise<
             return [];
         }
 
-        const subscriptions = await stripe.subscriptions.list({
+        const subscriptions = await stripeServer.subscriptions.list({
             customer: stripeCustomerId,
             status: "all",
             expand: [
@@ -37,7 +37,7 @@ export async function getCustomerSubscriptions(): Promise<
         for (const sub of subscriptions.data) {
             const product_id = sub.items.data[0].price?.product as unknown as string;
             const products_amount = sub.items.data[0].quantity;
-            const product = await stripe.products.retrieve(product_id);
+            const product = await stripeServer.products.retrieve(product_id);
 
             // Get payment method details
             const paymentMethod = sub.default_payment_method as Stripe.PaymentMethod;
@@ -123,11 +123,11 @@ export async function getCustomerSubscriptions(): Promise<
 
 export async function getStripeProducts(): Promise<StripeProduct[]> {
     try {
-        const { data } = await stripe.products.list();
+        const { data } = await stripeServer.products.list();
 
         const products: StripeProduct[] = [];
         for (const product of data) {
-            const prices = await stripe.prices.list({
+            const prices = await stripeServer.prices.list({
                 product: product.id,
                 active: true,
             });
@@ -179,7 +179,7 @@ export const createStripeSubscription = async (
         // if no exist customer, create one
         let stripeCustomer: Stripe.Customer | undefined;
         if (!customer?.stripe_customer_id) {
-            stripeCustomer = await stripe.customers.create({
+            stripeCustomer = await stripeServer.customers.create({
                 email: customer.email ?? "",
                 name: customer.full_name ?? "",
                 metadata: {
@@ -199,14 +199,14 @@ export const createStripeSubscription = async (
                 stripeCustomerId: stripeCustomer.id,
             });
         } else {
-            stripeCustomer = (await stripe.customers.retrieve(customer.stripe_customer_id, {
+            stripeCustomer = (await stripeServer.customers.retrieve(customer.stripe_customer_id, {
                 expand: ["subscriptions"],
             })) as Stripe.Customer;
         }
 
         // create subscription
         const trial_period_days = 1;
-        const subscription = await stripe.subscriptions.create({
+        const subscription = await stripeServer.subscriptions.create({
             customer: stripeCustomer.id,
             items: [{ price: input.price_id, quantity: input.quantity }],
             metadata: {
@@ -245,12 +245,114 @@ export const confirmSubscription = async (subscription_id: string) => {
             return;
         }
 
-        const subscription = await stripe.subscriptions.retrieve(subscription_id);
+        const subscription = await stripeServer.subscriptions.retrieve(subscription_id);
         // refresh the subscription
         await getCustomerSubscriptions();
         return subscription;
     } catch (error) {
         console.error("confirm subscription error", error);
         return null;
+    }
+}
+
+export const changePaymentMethod = async (subscription_id: string) => {
+    try {
+        const { isLoggedIn, stripeCustomerId } = await getSession();
+        if (!isLoggedIn || !stripeCustomerId) {
+            return null;
+        }
+
+        const subscription = await stripeServer.subscriptions.retrieve(subscription_id);
+        if (!subscription) {
+            return null;
+        }
+
+        const setupIntent = await stripeServer.setupIntents.create({
+            customer: stripeCustomerId,
+            payment_method_types: ["card"],
+            usage: "off_session",
+            metadata: {
+                subscription_id: subscription_id,
+            },
+        });
+
+        return {
+            setup_intent_id: setupIntent.id,
+            client_secret: setupIntent.client_secret,
+        };
+    } catch (error) {
+        console.error("change payment method error", error);
+        return null;
+    }
+}
+
+export const confirmChangePaymentMethod = async (setup_intent_id: string) => {
+    try {
+        const { isLoggedIn, stripeCustomerId } = await getSession();
+        if (!isLoggedIn || !stripeCustomerId) {
+            return {
+                success: false,
+                error: "User not logged in",
+                setup_intent_id: null,
+                payment_method_id: null,
+                subscription_id: null,
+            }
+        }
+        const currentPaymentsMethods = await stripeServer.paymentMethods.list({
+            type: 'card',
+            limit: 3,
+            customer: stripeCustomerId
+        })
+
+        const setupIntent = await stripeServer.setupIntents.retrieve(setup_intent_id);
+        if (!setupIntent || setupIntent.status !== 'succeeded') {
+            return {
+                success: false,
+                error: "Setup intent not found or not succeeded",
+                setup_intent_id: null,
+                payment_method_id: null,
+                subscription_id: null,
+            }
+        }
+
+        // update subscription with new payment method
+        const subscription_id = setupIntent.metadata?.subscription_id;
+        if (!subscription_id) {
+            return {
+                success: false,
+                error: "Subscription ID not found",
+                setup_intent_id: null,
+                payment_method_id: null,
+                subscription_id: null,
+            }
+        }
+
+        const newPaymentMethodId = setupIntent.payment_method as string;
+        // delete the others payment methods and save the new payment method
+        for (const payment of currentPaymentsMethods?.data) {
+            if (payment?.id !== newPaymentMethodId) {
+                await stripeServer.paymentMethods.detach(payment?.id)
+            }
+        }
+
+        await stripeServer.subscriptions.update(subscription_id, {
+            default_payment_method: newPaymentMethodId,
+        });
+
+        return {
+            success: true,
+            setup_intent_id: setup_intent_id,
+            payment_method_id: newPaymentMethodId,
+            subscription_id: subscription_id,
+        };
+    } catch (error) {
+        console.error("confirm change payment method error", error);
+        return {
+            success: false,
+            error: error instanceof Error ? error.message : "Unknown error",
+            setup_intent_id: setup_intent_id,
+            payment_method_id: null,
+            subscription_id: null,
+        }
     }
 }

@@ -13,6 +13,10 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
+  if (pathname === "/api/billing/subscriptions") {
+    return NextResponse.next();
+  }
+
   if (pathname === "/api/portal") {
     const authHeader = request.headers.get("authorization");
     if (!authHeader || !authHeader.startsWith("Bearer ")) {

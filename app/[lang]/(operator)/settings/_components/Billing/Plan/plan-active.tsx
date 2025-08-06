@@ -1,16 +1,22 @@
-import { Button, Select, SelectItem } from "@heroui/react";
-import { ArrowDownToLine } from "lucide-react";
+import { Button, Select, SelectItem, Tooltip } from "@heroui/react";
+import { ArrowDownToLine, Trash2 } from "lucide-react";
 import { PaymentIcon, PaymentType } from "react-svg-credit-card-payment-icons";
 import PlanTable from "./plan-table";
 import { useBilling } from "../../../contexts/BillingContext";
 import moment from "moment";
 import Stripe from "stripe";
+import { Steps } from "../Billing";
 
-const PlanActive = () => {
+interface PlanActiveProps {
+  setSelected: (key: Steps) => void;
+}
+
+const PlanActive = ({ setSelected }: PlanActiveProps) => {
   const { subscriptions } = useBilling();
   const hotspotSubscription = subscriptions.find(
     (subscription) => subscription.type === "hotspots"
   );
+  const isDisabledDeletePaymentMethod = true;
 
   const plans = [
     {
@@ -33,7 +39,7 @@ const PlanActive = () => {
   };
 
   return (
-    <div className=" flex flex-row gap-8 w-full ">
+    <div className=" flex flex-row gap-8 w-full">
       {/* Left side */}
       <div className="flex flex-col gap-3 w-1/2">
         <div className="flex flex-col items-center max-w-96 ">
@@ -146,7 +152,7 @@ const PlanActive = () => {
                   <p className="text-sm  font-medium">
                     {hotspotSubscription?.payment_method?.card?.brand
                       ?.toLowerCase()
-                      .replace(/^\w/, (c) => c.toUpperCase())}{" "}
+                      .replace(/^\w/, (c: string) => c.toUpperCase())}{" "}
                     **** {hotspotSubscription?.payment_method?.card?.last4}
                   </p>
                   <p className="text-xs  font-normal">
@@ -159,10 +165,33 @@ const PlanActive = () => {
                   </p>
                 </div>
               </div>
+              <Tooltip
+                isDisabled={!isDisabledDeletePaymentMethod}
+                content="You can't delete your card while you have active plans."
+                placement="right"
+              >
+                <Trash2
+                  onClick={() => {
+                    if (isDisabledDeletePaymentMethod) {
+                      console.log("disabled delete payment method");
+                      return;
+                    }
+                  }}
+                  size={22}
+                  className={`${
+                    isDisabledDeletePaymentMethod
+                      ? "text-gray-400"
+                      : "dark:text-[#ffffff] text-[#000000] cursor-pointer "
+                  }`}
+                />
+              </Tooltip>
             </div>
           </div>
 
-          <Button className="w-full bg-[#000] dark:bg-[#fff] text-white dark:text-black mt-9">
+          <Button
+            onPress={() => setSelected("step3")}
+            className="w-full bg-[#000] dark:bg-[#fff] text-white dark:text-black mt-9"
+          >
             Change
           </Button>
         </div>

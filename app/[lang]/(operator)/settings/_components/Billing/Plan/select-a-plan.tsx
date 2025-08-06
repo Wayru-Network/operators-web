@@ -1,12 +1,15 @@
 import { Button } from "@heroui/react";
 import { Minus, Plus } from "lucide-react";
-import { useState } from "react";
 import { useBilling } from "../../../contexts/BillingContext";
 import PlanNotFound from "./plan-not-found";
+import { Steps } from "../Billing";
 
-const SelectAPlan = () => {
-  const { products, handleHotspotsToAdd, hotspotsToAdd, changeBillingStatus } =
-    useBilling();
+interface SelectAPlanProps {
+  setSelected: (key: Steps) => void;
+}
+
+const SelectAPlan = ({ setSelected }: SelectAPlanProps) => {
+  const { products, handleHotspotsToAdd, hotspotsToAdd } = useBilling();
   const hotspotProduct = products.find(
     (product) => product.type === "hotspots"
   );
@@ -29,10 +32,10 @@ const SelectAPlan = () => {
     <div className=" flex flex-row gap-8 w-full ">
       {/* Left side */}
       <div className="flex flex-col gap-3 w-1/2">
-        <div className="flex flex-col items-center max-w-96">
+        <div className="flex flex-col items-center">
           {/* Current plan section */}
           <div className="flex flex-col w-full">
-            <p className="text-base font-semibold w-full align-left ">
+            <p className="text-lg font-semibold w-full align-left ">
               Current plan
             </p>
             <div className="flex flex-col w-full mt-2 ml-4">
@@ -53,7 +56,7 @@ const SelectAPlan = () => {
 
           {/* Add or remove hotspots section */}
           <div className="flex flex-col w-full mt-2">
-            <p className="text-base font-semibold w-full align-left mt-6">
+            <p className="text-lg font-semibold w-full align-left mt-6">
               Add or remove hotspots
             </p>
             <div className="flex flex-row w-full items-center gap-4 ml-4 mt-2 justify-between max-w-20">
@@ -75,7 +78,7 @@ const SelectAPlan = () => {
 
           {/* New plan review section */}
           <div className="flex flex-col w-full mt-2">
-            <p className="text-base font-semibold w-full align-left mt-6">
+            <p className="text-lg font-semibold w-full align-left mt-6">
               New plan review
             </p>
             <div className="flex flex-row gap-3 mt-2 items-center w-full"></div>
@@ -87,20 +90,27 @@ const SelectAPlan = () => {
                     ${newMonthlyCost}
                   </p>
                 </div>
-                <div className="flex flex-row">
+                {/* <div className="flex flex-row">
                   <p className="text-xs  font-semibold">Change in cost:</p>
                   <p className="text-xs  font-medium ml-1 dark:text-gray-300 text-gray-700">
                     ${newMonthlyCost - 0}
                   </p>
-                </div>
+                </div> */}
               </div>
             </div>
           </div>
-
+        </div>
+        <div className="flex flex-row gap-4">
+          <Button
+            className="w-full bg-[#000] dark:bg-[#fff] text-white dark:text-black mt-9 disabled:opacity-50 disabled:cursor-not-allowed w-1/2"
+            onPress={() => setSelected("step1")}
+          >
+            Back
+          </Button>
           <Button
             disabled={hotspotsToAdd === 0}
-            className="w-full bg-[#000] dark:bg-[#fff] text-white dark:text-black mt-9 disabled:opacity-50 disabled:cursor-not-allowed"
-            onClick={() => changeBillingStatus("plan-checkout")}
+            className="w-full bg-[#000] dark:bg-[#fff] text-white dark:text-black mt-9 disabled:opacity-50 disabled:cursor-not-allowed w-1/2"
+            onPress={() => setSelected("step4")}
           >
             Proceed to checkout
           </Button>

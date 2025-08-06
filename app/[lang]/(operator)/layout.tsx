@@ -29,7 +29,7 @@ export default async function OperatorLayout({ children }: LayoutProps) {
   return (
     <RootLayout>
       <ToastProvider
-        placement="bottom-center"
+        placement="top-right"
         toastProps={{
           classNames: {
             base: "border-none",

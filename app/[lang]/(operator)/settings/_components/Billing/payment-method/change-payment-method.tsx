@@ -7,15 +7,22 @@ import {
   useStripe,
   useElements,
 } from "@stripe/react-stripe-js";
-import { stripeClient } from "@/lib/services/stripe-client-config";
-import { useBilling } from "@/app/[lang]/(operator)/settings/contexts/BillingContext";
-import moment from "moment";
-import { PaymentIcon, PaymentType } from "react-svg-credit-card-payment-icons";
-import { CardBrand } from "@stripe/stripe-js";
-import { useTheme } from "next-themes";
 import { Button } from "@heroui/button";
-import { createStripeSubscription } from "@/lib/services/stripe-service";
+import { PaymentIcon, PaymentType } from "react-svg-credit-card-payment-icons";
+import { useTheme } from "next-themes";
+import { useBilling } from "../../../contexts/BillingContext";
+import {
+  changePaymentMethod,
+  confirmChangePaymentMethod,
+} from "@/lib/services/stripe-service";
+import { CardBrand } from "@stripe/stripe-js";
+import { stripeClient } from "@/lib/services/stripe-client-config";
 import { Steps } from "../Billing";
+import { addToast } from "@heroui/toast";
+
+interface CheckoutFormProps {
+  setSelected: (key: Steps) => void;
+}
 
 interface CheckoutFormProps {
   setSelected: (key: Steps) => void;
@@ -25,15 +32,14 @@ function CheckoutForm({ setSelected }: CheckoutFormProps) {
   const stripe = useStripe();
   const elements = useElements();
   const { theme } = useTheme();
-  const { hotspotsToAdd, products, refreshSubscriptions } = useBilling();
+  const { subscriptions, refreshSubscriptions } = useBilling();
   const [cardBrand, setCardBrand] = useState<CardBrand | undefined>("unknown");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const product = products.find((product) => product.type === "hotspots");
-  const productPriceDetails = product?.priceDetails[0];
-  const productPrice = productPriceDetails?.price ?? 0;
-  const totalPrice = hotspotsToAdd * productPrice;
+  const subscription = subscriptions.find(
+    (subscription) => subscription.type === "hotspots"
+  );
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -44,22 +50,19 @@ function CheckoutForm({ setSelected }: CheckoutFormProps) {
 
     setIsLoading(true);
     setError(null);
-
     try {
       // Create subscription on backend
-      const subscription = await createStripeSubscription({
-        price_id: productPriceDetails?.id || "",
-        plan_id: product?.id || "",
-        quantity: hotspotsToAdd,
-      });
+      const setupIntent = await changePaymentMethod(
+        subscription?.subscription_id || ""
+      );
 
-      if (!subscription?.payment_intent_client_secret) {
+      if (!setupIntent?.client_secret) {
         throw new Error("No payment intent client secret received");
       }
 
       // Confirm the card setup for the subscription
       const { error: confirmError } = await stripe.confirmCardSetup(
-        subscription.payment_intent_client_secret,
+        setupIntent.client_secret,
         {
           payment_method: {
             card: elements.getElement(CardNumberElement)!,
@@ -74,10 +77,22 @@ function CheckoutForm({ setSelected }: CheckoutFormProps) {
         setError(confirmError.message || "Payment failed");
       } else {
         // Payment successful
-        await refreshSubscriptions();
+        const result = await confirmChangePaymentMethod(
+          setupIntent.setup_intent_id
+        );
+        if (result?.success) {
+          // Refresh the subscription data
+          await refreshSubscriptions();
+        }
+        addToast({
+          title: "Payment method changed",
+          description: "New payment method added",
+          color: "default",
+        });
         setSelected("step1");
       }
     } catch (err) {
+      console.error("change payment method error", err);
       setError(err instanceof Error ? err.message : "Payment failed");
     } finally {
       setIsLoading(false);
@@ -85,7 +100,7 @@ function CheckoutForm({ setSelected }: CheckoutFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full ml-4">
+    <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full">
       {/* Card number on top */}
       <div className="flex flex-col mt-5">
         <label className="text-xs font-medium mb-2">Card number</label>
@@ -154,102 +169,47 @@ function CheckoutForm({ setSelected }: CheckoutFormProps) {
       </div>
 
       {error && <div className="text-red-500 text-sm mt-2">{error}</div>}
-
       <div className="flex flex-row gap-4">
         <Button
-          type="submit"
-          className="w-full mt-4"
-          isDisabled={isLoading}
-          onPress={() => setSelected("step2")}
+          type="button"
+          className="w-full mt-4 w-1/2"
+          onPress={() => setSelected("step1")}
+          disabled={isLoading}
         >
-          Back
+          Cancel
         </Button>
         <Button
           type="submit"
-          className="w-full mt-4"
-          disabled={isLoading || !stripe}
+          className="w-full mt-4 w-1/2"
+          disabled={isLoading}
           isLoading={isLoading}
         >
-          {isLoading ? "Processing..." : `Pay $${totalPrice}`}
+          {isLoading ? "Processing..." : `Change`}
         </Button>
       </div>
     </form>
   );
 }
 
-export default function PlanCheckout({ setSelected }: CheckoutFormProps) {
-  const { hotspotsToAdd, products } = useBilling();
-  const product = products.find((product) => product.type === "hotspots");
-  const productPriceDetails = product?.priceDetails[0];
-  const productPrice = productPriceDetails?.price ?? 0;
-  const recurring = productPriceDetails?.recurring;
-  const nextBillingDate = moment()
-    .add(recurring?.interval_count ?? 1, recurring?.interval ?? "month")
-    .format("MMM D, YYYY");
+interface ChangePaymentMethodProps {
+  setSelected: (key: Steps) => void;
+}
 
-  const totalPrice = hotspotsToAdd * productPrice;
-
-  const getRecurringInterval = (interval: string) => {
-    switch (interval) {
-      case "month":
-        return "Monthly";
-      case "year":
-        return "Yearly";
-      default:
-        return "Monthly";
-    }
-  };
-
+export default function ChangePaymentMethod({
+  setSelected,
+}: ChangePaymentMethodProps) {
   return (
     <div className=" flex flex-row gap-8 w-full">
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-3  w-1/2">
         {/* Checkout details */}
         <div className="flex flex-col w-full">
           <p className="text-lg font-semibold w-full align-left">
-            Please review the details of your plan and proceed to checkout.
+            Add your new payment method.
           </p>
-          <div className="flex flex-col w-full mt-3 ml-4 gap-1">
-            <div className="flex flex-row">
-              <p className="text-xs font-semibold">Number of hotspots:</p>
-              <p className="text-xs font-medium dark:text-gray-300 text-gray-700 ml-1">
-                {hotspotsToAdd}
-              </p>
-            </div>
-            <div className="flex flex-row">
-              <p className="text-xs font-semibold">Billing cycle:</p>
-              <p className="text-xs font-medium dark:text-gray-300 text-gray-700 ml-1">
-                {getRecurringInterval(recurring?.interval ?? "month")}
-              </p>
-            </div>
-            <div className="flex flex-row">
-              <p className="text-xs font-semibold">Price per hotspot:</p>
-              <p className="text-xs font-medium dark:text-gray-300 text-gray-700 ml-1">
-                ${productPrice}
-              </p>
-            </div>
-            <div className="flex flex-row">
-              <p className="text-xs font-semibold">Total monthly cost:</p>
-              <p className="text-xs font-medium dark:text-gray-300 text-gray-700 ml-1">
-                ${totalPrice}
-              </p>
-            </div>
-            <div className="flex flex-row">
-              <p className="text-xs font-semibold">Next billing date:</p>
-              <p className="text-xs font-medium dark:text-gray-300 text-gray-700 ml-1">
-                {nextBillingDate}
-              </p>
-            </div>
-          </div>
         </div>
-        {/* Payment method */}
-        <div className="flex flex-col w-full mt-3 gap-1">
-          <p className="text-lg font-semibold w-full align-left">
-            Add your payment method to complete your purchase.
-          </p>
-          <Elements stripe={stripeClient}>
-            <CheckoutForm setSelected={setSelected} />
-          </Elements>
-        </div>
+        <Elements stripe={stripeClient}>
+          <CheckoutForm setSelected={setSelected} />
+        </Elements>
       </div>
     </div>
   );

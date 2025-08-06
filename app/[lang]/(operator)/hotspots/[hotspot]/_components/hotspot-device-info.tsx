@@ -149,9 +149,12 @@ export default function HotspotDeviceInfo({
             <div className="flex flex-row items-end">
               <Snippet
                 variant="bordered"
-                className="rounded-[50px] px-1 py-1 flex flex-row items-center justify-center"
+                className="rounded-full px-1 py-2 flex items-center justify-center h-[40px] w-[40px] dark:border-gray-600 border-gray-300 border-1"
                 codeString={basicInfoText}
                 hideSymbol={true}
+                classNames={{
+                  copyButton: "mr-1",
+                }}
                 content=""
               />
             </div>
@@ -187,8 +190,12 @@ export default function HotspotDeviceInfo({
                 <div className="flex flex-row items-end">
                   <Snippet
                     variant="bordered"
+                    className="rounded-full px-1 py-2 flex items-center justify-center h-[40px] w-[40px] dark:border-gray-600 border-gray-300 border-1"
                     codeString={networkInfoText}
                     hideSymbol={true}
+                    classNames={{
+                      copyButton: "mr-1",
+                    }}
                     content=""
                   />
                 </div>
@@ -218,8 +225,12 @@ export default function HotspotDeviceInfo({
                 <div className="flex flex-row items-end">
                   <Snippet
                     variant="bordered"
+                    className="rounded-full px-1 py-2 flex items-center justify-center h-[40px] w-[40px] dark:border-gray-600 border-gray-300 border-1"
                     codeString={ownershipInfoText}
                     hideSymbol={true}
+                    classNames={{
+                      copyButton: "mr-1",
+                    }}
                     content=""
                   />
                 </div>
