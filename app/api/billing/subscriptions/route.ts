@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { getCustomerSubscriptions } from "@/lib/services/stripe-service";
 import { getSession } from "@/lib/session/session";
 
-export async function GET(request: NextRequest) {
+export async function GET() {
     const session = await getSession();
     if (!session.isLoggedIn || !session.accessToken) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

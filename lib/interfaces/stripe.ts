@@ -1,3 +1,4 @@
+import { Address } from "@stripe/stripe-js";
 import Stripe from "stripe";
 
 export type SubscriptionType = 'hotspots'
@@ -29,7 +30,7 @@ export interface StripeSubscription {
             name: string | null;
             email: string | null;
             phone: string | null;
-            address: any;
+            address: Address | null;
         },
     } | undefined;
     billing_details?: {

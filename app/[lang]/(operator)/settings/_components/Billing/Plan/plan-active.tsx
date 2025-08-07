@@ -1,11 +1,12 @@
-import { Button, Select, SelectItem, Tooltip } from "@heroui/react";
+import { Button, Tooltip } from "@heroui/react";
 import { ArrowDownToLine, Trash2 } from "lucide-react";
 import { PaymentIcon, PaymentType } from "react-svg-credit-card-payment-icons";
-import PlanTable from "./plan-table";
 import { useBilling } from "../../../contexts/BillingContext";
 import moment from "moment";
 import Stripe from "stripe";
 import { Steps } from "../Billing";
+import "./plan.css";
+import AssignPlanHotspots from "./assign-plan-hotspots";
 
 interface PlanActiveProps {
   setSelected: (key: Steps) => void;
@@ -16,18 +17,10 @@ const PlanActive = ({ setSelected }: PlanActiveProps) => {
   const hotspotSubscription = subscriptions.find(
     (subscription) => subscription.type === "hotspots"
   );
-  const isDisabledDeletePaymentMethod = true;
 
-  const plans = [
-    {
-      label: "Monthly",
-      value: "monthly",
-    },
-    {
-      label: "Yearly",
-      value: "yearly",
-    },
-  ];
+  const isDisabledDeletePaymentMethod = true;
+  const currentMonth = moment().format("MMMM");
+  const currentYear = moment().format("YYYY");
 
   const billingCycle = (interval: Stripe.Price.Recurring.Interval) => {
     if (interval === "month") {
@@ -125,8 +118,12 @@ const PlanActive = ({ setSelected }: PlanActiveProps) => {
             </p>
             <div className="flex flex-row w-full items-center gap-4 ml-4 mt-2 justify-between">
               <div>
-                <p className="text-xs  font-small">1 hotspots - Monthly Plan</p>
-                <p className="text-lg  font-medium">February 2025</p>
+                <p className="text-xs  font-small">
+                  {hotspotSubscription?.products_amount} hotspots - Monthly Plan
+                </p>
+                <p className="text-lg  font-medium">
+                  {currentMonth} {currentYear}
+                </p>
               </div>
               <ArrowDownToLine size={22} className="cursor-pointer mr-4" />
             </div>
@@ -198,29 +195,7 @@ const PlanActive = ({ setSelected }: PlanActiveProps) => {
       </div>
 
       {/* Right side */}
-      <div className="flex flex-col gap-3 items-center w-1/2 justify-self-end">
-        {/* Assign plan to hotspots section */}
-        <div className="flex flex-col max-w-96 ">
-          <p className="text-base font-semibold w-full align-left ">
-            Assign plan to hotspots
-          </p>
-          <div className="flex flex-row w-full justify-start mt-3">
-            <Select
-              variant="bordered"
-              size="sm"
-              placeholder={`None`}
-              value={plans[0].value}
-            >
-              {plans.map((plan) => (
-                <SelectItem key={plan.value}>{plan.label}</SelectItem>
-              ))}
-            </Select>
-          </div>
-          <div className="mt-2">
-            <PlanTable />
-          </div>
-        </div>
-      </div>
+      <AssignPlanHotspots />
     </div>
   );
 };

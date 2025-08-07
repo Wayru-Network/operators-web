@@ -1,44 +1,21 @@
-import { Router, UserRound } from "lucide-react";
+import { Hotspot } from "@/app/[lang]/(operator)/hotspots/_services/get-hotspots";
+import { Router } from "lucide-react";
 import { X } from "lucide-react";
 
-type Plan = {
-  name: string;
-  type: "hotspot" | "gateway";
-};
-
-const PlanTable = () => {
-  const paged: Plan[] = [
-    {
-      name: "Pop bar mac 44:35:ab:e5:01",
-      type: "hotspot",
-    },
-    {
-      name: "Peluqueria mac 44:35:ab:e5:01",
-      type: "gateway",
-    },
-    {
-      name: "Tienda barrio mac 44:35:ab:e5:01",
-      type: "gateway",
-    },
-    {
-      name: "Bar bohemia mac 44:35:ab:e5:01",
-      type: "gateway",
-    },
-  ];
-
+interface Props {
+  hotspots: Hotspot[];
+  onRemoveHotspot: (id: number) => void;
+}
+const PlanTable = ({ hotspots, onRemoveHotspot }: Props) => {
   return (
-    <div className="flex flex-col w-full mt-2 gap-1">
-      {paged.map((item, index) => (
+    <div className="flex flex-col w-full mt-2 gap-1 px-1">
+      {hotspots.map((item, index) => (
         <div
           key={index}
           className="flex flex-row items-center gap-2 justify-between h-9"
         >
           <div className="flex flex-row items-center gap-2 col-span-3">
-            {item.type === "hotspot" ? (
-              <Router className="w-4 h-4" />
-            ) : (
-              <UserRound className="w-4 h-4" />
-            )}
+            <Router className="w-4 h-4" />
           </div>
           <div className="flex flex-col col-span-6 justify-start w-60">
             <p className="text-sm font-normal text-left break-words whitespace-normal">
@@ -46,7 +23,11 @@ const PlanTable = () => {
             </p>
           </div>
           <div className="flex flex-row items-center gap-2 col-span-3 justify-end">
-            <X className="cursor-pointer" size={16} />
+            <X
+              className="cursor-pointer"
+              size={16}
+              onClick={() => onRemoveHotspot(item.id)}
+            />
           </div>
         </div>
       ))}

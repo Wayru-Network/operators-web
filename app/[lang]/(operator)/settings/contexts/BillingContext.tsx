@@ -1,21 +1,25 @@
 "use client";
 
-import { StripeProduct } from "@/lib/interfaces/stripe";
-import { createContext, useContext, useState } from "react";
+import { StripeProduct, StripeSubscription } from "@/lib/interfaces/stripe";
+import { createContext, useCallback, useContext, useState } from "react";
 import { useSubscriptions } from "../_hooks/use-subscriptions";
+import { Hotspot } from "../../hotspots/_services/get-hotspots";
 
 interface BillingProviderProps {
   children: React.ReactNode;
   products: StripeProduct[];
+  hotspots: Hotspot[];
 }
 
 type BillingContextType = {
-  subscriptions: any[];
+  subscriptions: StripeSubscription[];
   products: StripeProduct[];
   hotspotsToAdd: number;
   isLoading: boolean;
   handleHotspotsToAdd: (hotspots: number) => void;
   refreshSubscriptions: () => Promise<void>;
+  hotspots: Hotspot[];
+  addHotspot: (h: Hotspot[]) => void;
 };
 
 const BillingContext = createContext<BillingContextType>({
@@ -23,20 +27,30 @@ const BillingContext = createContext<BillingContextType>({
   products: [],
   hotspotsToAdd: 0,
   isLoading: false,
-  handleHotspotsToAdd: (hotspots: number) => {},
+  handleHotspotsToAdd: () => {},
   refreshSubscriptions: async () => {},
+  hotspots: [],
+  addHotspot: () => {},
 });
 
 export const BillingProvider = ({
   children,
   products,
+  hotspots: hotspotsProps,
 }: BillingProviderProps) => {
   const [hotspotsToAdd, setHotspotsToAdd] = useState(0);
   const { subscriptions, isLoading, refreshSubscriptions } = useSubscriptions();
+  const [hotspots, setHotspots] = useState(hotspotsProps);
 
   const handleHotspotsToAdd = (hotspots: number) => {
     setHotspotsToAdd(hotspots);
   };
+
+  const addHotspot = useCallback((newHotspots: Hotspot[]) => {
+    setHotspots((prev) => {
+      return [...newHotspots, ...prev];
+    });
+  }, []);
 
   return (
     <BillingContext.Provider
@@ -49,6 +63,8 @@ export const BillingProvider = ({
         refreshSubscriptions: async () => {
           await refreshSubscriptions();
         },
+        hotspots,
+        addHotspot,
       }}
     >
       {children}

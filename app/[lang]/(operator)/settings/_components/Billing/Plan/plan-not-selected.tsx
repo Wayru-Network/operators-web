@@ -1,9 +1,7 @@
 "use client";
 
 import React from "react";
-import { motion } from "framer-motion";
 import { Button } from "@heroui/react";
-import { useBilling } from "../../../contexts/BillingContext";
 import { Steps } from "../Billing";
 
 interface PlanNotSelectedProps {
