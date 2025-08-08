@@ -7,7 +7,6 @@ export interface SessionPayload extends JWTPayload {
   accessToken?: string;
   refreshToken?: string;
   wallet?: string;
-  stripeCustomerId?: string | null;
   isCollapsed?: boolean;
 }
 

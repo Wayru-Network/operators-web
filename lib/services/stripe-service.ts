@@ -5,119 +5,77 @@ import { centsToDollars } from "../helpers/numbers";
 import { Prisma } from "../infra/prisma";
 import {
     CreateSubscriptionInput,
+    CreateSubscriptionInputWithCustomer,
     StripeProduct,
     StripeProductType,
     StripeSubscription,
     SubscriptionType,
 } from "../interfaces/stripe";
-import { getSession, updateSession } from "../session/session";
+import { getSession } from "../session/session";
 import { stripeServer } from "./stripe-server-config";
 import Stripe from "stripe";
+import { getCustomer, getOrCreateCustomer } from "@/app/api/auth/callback/_services/customer-service";
 
-export async function getCustomerSubscriptions(): Promise<
-    StripeSubscription[]
+export async function getStripeCustomerSubscription(subscriptionId: string): Promise<
+    StripeSubscription | undefined
 > {
     try {
-        const { isLoggedIn, stripeCustomerId } = await getSession();
-        if (!isLoggedIn || !stripeCustomerId) {
-            return [];
+        const { isLoggedIn } = await getSession();
+        if (!isLoggedIn) {
+            return undefined
         }
 
-        const subscriptions = await stripeServer.subscriptions.list({
-            customer: stripeCustomerId,
-            status: "all",
+        const sub = await stripeServer.subscriptions.retrieve(subscriptionId, {
             expand: [
-                "data.default_payment_method",
-                "data.latest_invoice.payment_intent.payment_method",
-                "data.items.data.price"
+                "default_payment_method",
+                "latest_invoice.payment_intent.payment_method",
+                "items.data.price"
             ],
         });
 
-        const subscriptionsWithType = [];
-        for (const sub of subscriptions.data) {
-            const product_id = sub.items.data[0].price?.product as unknown as string;
-            const products_amount = sub.items.data[0].quantity;
-            const product = await stripeServer.products.retrieve(product_id);
+        const product_id = sub.items.data[0].price?.product as unknown as string;
+        const products_amount = sub.items.data[0].quantity;
+        const product = await stripeServer.products.retrieve(product_id);
 
-            // Get payment method details
-            const paymentMethod = sub.default_payment_method as Stripe.PaymentMethod;
+        // Get payment method details
+        const paymentMethod = sub.default_payment_method as Stripe.PaymentMethod;
 
-            // Get billing details from price
-            const price = sub.items.data[0].price as Stripe.Price;
+        // Get billing details from price
+        const price = sub.items.data[0].price as Stripe.Price;
 
-            subscriptionsWithType.push({
-                ...sub,
-                type: product.metadata.type,
-                name: product.name,
-                description: product.description,
-                products_amount: products_amount,
-                payment_method_details: paymentMethod
-                    ? {
-                        id: paymentMethod.id,
-                        type: paymentMethod.type,
-                        card: paymentMethod.card
-                            ? {
-                                brand: paymentMethod.card.brand,
-                                last4: paymentMethod.card.last4,
-                                exp_month: paymentMethod.card.exp_month,
-                                exp_year: paymentMethod.card.exp_year,
-                                country: paymentMethod.card.country,
-                                funding: paymentMethod.card.funding,
-                            }
-                            : undefined,
-                        billing_details: paymentMethod.billing_details
-                            ? {
-                                name: paymentMethod.billing_details.name,
-                                email: paymentMethod.billing_details.email,
-                                phone: paymentMethod.billing_details.phone,
-                                address: paymentMethod.billing_details.address,
-                            }
-                            : undefined,
-                    }
-                    : undefined,
-                billing_details: price
-                    ? {
-                        interval: price.recurring?.interval,
-                        interval_count: price.recurring?.interval_count,
-                        amount: centsToDollars(price.unit_amount || 0),
-                        currency: price.currency,
-                        trial_period_days: price.recurring?.trial_period_days ?? 7,
-                        billing_cycle: `${price.recurring?.interval_count || 1} ${price.recurring?.interval || "month"
-                            }`,
-                        next_payment_date: moment(sub.items.data[0].current_period_end * 1000).format("MMM DD, YYYY")
-                    }
-                    : undefined,
-            });
-        }
-
-        const subscriptionsMapped = subscriptionsWithType.map((sub) => ({
+        const subscription: StripeSubscription = {
             subscription_id: sub.id,
-            stripe_customer_id: sub.customer as string,
             status: sub.status,
-            current_period_start: sub.items.data[0].current_period_start,
-            current_period_end: sub.items.data[0].current_period_end,
-            trial_end: sub.trial_end || undefined,
-            cancel_at_period_end: sub.cancel_at_period_end || false,
-            type: sub.type as SubscriptionType,
-            name: sub.name,
-            description: sub.description || undefined,
-            products_amount: sub.products_amount || 1,
-            last_invoice: sub.latest_invoice as Stripe.Invoice,
-            payment_method: sub.payment_method_details
+            type: product.metadata?.type as SubscriptionType,
+            name: product.name,
+            description: product.description,
+            products_amount: products_amount ?? 1,
+            trial_period_start: sub.trial_start,
+            trial_period_end: sub.trial_end,
+            payment_method: paymentMethod
                 ? {
-                    id: sub.payment_method_details.id,
-                    type: sub.payment_method_details.type as string,
-                    card: sub.payment_method_details.card,
-                    billing_details: sub.payment_method_details.billing_details,
+                    id: paymentMethod.id,
+                    type: paymentMethod.type,
+                    last4: paymentMethod?.card?.last4,
+                    brand: paymentMethod.card?.brand,
+                    exp_month: paymentMethod.card?.exp_month,
+                    exp_year: paymentMethod.card?.exp_year
                 }
                 : undefined,
-            billing_details: sub.billing_details,
-        }));
+            billing_details: price
+                ? {
+                    interval: price.recurring?.interval || 'month',
+                    price_per_item: centsToDollars(price.unit_amount || 0),
+                    next_payment_date: moment(sub.items.data[0].current_period_end * 1000).format("MMM DD, YYYY")
+                }
+                : undefined,
+        }
 
-        return subscriptionsMapped;
+
+        return subscription;
     } catch (error) {
         console.error("get subscriptions error", error);
-        return [];
+        return undefined
     }
 }
 
@@ -157,47 +115,26 @@ export async function getStripeProducts(): Promise<StripeProduct[]> {
 }
 
 export const createStripeSubscription = async (
-    input: CreateSubscriptionInput
+    input: CreateSubscriptionInputWithCustomer
 ) => {
     try {
-        const { isLoggedIn, email } = await getSession();
-        if (!isLoggedIn) {
+        const { isLoggedIn, userId } = await getSession();
+        if (!isLoggedIn || !userId) {
             return;
-        }
-
-        // find customer by email into db
-        const customer = await Prisma.customers.findFirst({
-            where: {
-                email: email ?? "",
-            },
-        });
-
-        if (!customer) {
-            return null;
         }
 
         // if no exist customer, create one
         let stripeCustomer: Stripe.Customer | undefined;
+        const customer = input?.customer
         if (!customer?.stripe_customer_id) {
             stripeCustomer = await stripeServer.customers.create({
-                email: customer.email ?? "",
-                name: customer.full_name ?? "",
+                email: customer.email || "",
+                name: customer.name || "",
                 metadata: {
-                    customer_id: customer.customer_uuid,
+                    customer_id: customer.customer_uuid || "",
                 },
-            });
-            // update customer with stripe customer id
-            await Prisma.customers.update({
-                where: {
-                    customer_uuid: customer.customer_uuid,
-                },
-                data: { stripe_customer_id: stripeCustomer.id },
-            });
+            } as Stripe.CustomerCreateParams);
 
-            // update session with stripe customer id
-            await updateSession({
-                stripeCustomerId: stripeCustomer.id,
-            });
         } else {
             stripeCustomer = (await stripeServer.customers.retrieve(customer.stripe_customer_id, {
                 expand: ["subscriptions"],
@@ -205,26 +142,26 @@ export const createStripeSubscription = async (
         }
 
         // create subscription
-        const trial_period_days = 1;
+        const trial_period_days = 7;
         const subscription = await stripeServer.subscriptions.create({
             customer: stripeCustomer.id,
             items: [{ price: input.price_id, quantity: input.quantity }],
             metadata: {
-                customer_id: customer.customer_uuid,
+                customer_id: customer.customer_uuid || "",
                 plan_id: input.plan_id,
             },
             trial_period_days: trial_period_days,
             payment_behavior: "default_incomplete",
             payment_settings: { save_default_payment_method: "on_subscription" },
             expand: ["pending_setup_intent", "latest_invoice", "customer"],
-        });
+        } as Stripe.SubscriptionCreateParams);
 
         const setupIntent = subscription.pending_setup_intent as Stripe.SetupIntent;
         const latestInvoice = subscription.latest_invoice as Stripe.Invoice;
 
         return {
             subscription_id: subscription.id,
-            stripe_customer_id: subscription.customer as string,
+            stripe_customer_id: stripeCustomer.id,
             status: subscription.status,
             current_period_start: subscription.start_date,
             current_period_end: latestInvoice?.lines?.data[0]?.period?.end,
@@ -246,8 +183,6 @@ export const confirmSubscription = async (subscription_id: string) => {
         }
 
         const subscription = await stripeServer.subscriptions.retrieve(subscription_id);
-        // refresh the subscription
-        await getCustomerSubscriptions();
         return subscription;
     } catch (error) {
         console.error("confirm subscription error", error);
@@ -257,10 +192,17 @@ export const confirmSubscription = async (subscription_id: string) => {
 
 export const changePaymentMethod = async (subscription_id: string) => {
     try {
-        const { isLoggedIn, stripeCustomerId } = await getSession();
-        if (!isLoggedIn || !stripeCustomerId) {
+        const { isLoggedIn, userId } = await getSession();
+        if (!isLoggedIn || !userId) {
             return null;
         }
+
+        // get customer details
+        const customer = await getCustomer(userId)
+        if (!customer || !customer?.stripe_customer_id) {
+            return null
+        }
+        const stripeCustomerId = customer?.stripe_customer_id
 
         const subscription = await stripeServer.subscriptions.retrieve(subscription_id);
         if (!subscription) {
@@ -288,8 +230,8 @@ export const changePaymentMethod = async (subscription_id: string) => {
 
 export const confirmChangePaymentMethod = async (setup_intent_id: string) => {
     try {
-        const { isLoggedIn, stripeCustomerId } = await getSession();
-        if (!isLoggedIn || !stripeCustomerId) {
+        const { isLoggedIn, userId } = await getSession();
+        if (!isLoggedIn || !userId) {
             return {
                 success: false,
                 error: "User not logged in",
@@ -298,6 +240,21 @@ export const confirmChangePaymentMethod = async (setup_intent_id: string) => {
                 subscription_id: null,
             }
         }
+
+        // get customer details
+        const customer = await getCustomer(userId)
+        if (!customer || !customer?.stripe_customer_id) {
+            return {
+                success: false,
+                error: "Stripe customer id not found",
+                setup_intent_id: null,
+                payment_method_id: null,
+                subscription_id: null,
+            }
+        }
+        const stripeCustomerId = customer?.stripe_customer_id
+
+
         const currentPaymentsMethods = await stripeServer.paymentMethods.list({
             type: 'card',
             limit: 3,

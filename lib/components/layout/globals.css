@@ -26,3 +26,7 @@ body {
   color: var(--foreground);
   font-family: Montserrat, Arial, Helvetica, sans-serif;
 }
+
+#search-hotspots-input:focus-visible {
+  outline: none;
+}

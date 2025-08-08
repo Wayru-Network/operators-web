@@ -4,25 +4,20 @@ import React, { useState } from "react";
 import PlanNotSelected from "./Plan/plan-not-selected";
 import SelectAPlan from "./Plan/select-a-plan";
 import PlanActive from "./Plan/plan-active";
-import { useBilling } from "../../contexts/BillingContext";
 import PlanCheckout from "./Plan/plan-checkout";
 import ChangePaymentMethod from "./payment-method/change-payment-method";
 import { Tab, Tabs } from "@heroui/tabs";
 import EaseInOutContent from "@/lib/components/ease-in-out-content";
 import { Spinner } from "@heroui/react";
+import { useCustomerSubscription } from "@/lib/contexts/customer-subscription-context";
 
 export type Steps = "step1" | "step2" | "step3" | "step4";
 const Billing = () => {
-  const { subscriptions, isLoading } = useBilling();
+  const { subscription, isGettingSubscription } = useCustomerSubscription();
   const [selected, setSelected] = useState<Steps>("step1");
-  // change state to see the different states
-  const hotspotSubscription = subscriptions.find(
-    (subscription) =>
-      subscription.type === "hotspots" &&
-      (subscription.status === "active" || subscription.status === "trialing")
-  );
+  const stripeSubscription = subscription?.stripe_subscription;
 
-  if (isLoading) {
+  if (isGettingSubscription) {
     return (
       <div className="w-full flex flew-col justify-center align-items">
         <div className="flex flex-col ">
@@ -44,7 +39,7 @@ const Billing = () => {
     >
       <Tab key="step1" title="My subscriptions">
         <EaseInOutContent>
-          {hotspotSubscription ? (
+          {stripeSubscription ? (
             <PlanActive setSelected={setSelected} />
           ) : (
             <PlanNotSelected setSelected={setSelected} />

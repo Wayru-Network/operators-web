@@ -13,7 +13,7 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  if (pathname === "/api/billing/subscriptions") {
+  if (pathname === "/api/subscriptions") {
     return NextResponse.next();
   }
 

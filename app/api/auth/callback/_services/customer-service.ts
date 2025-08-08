@@ -43,3 +43,13 @@ export async function getOrCreateCustomer(
 
     return customer;
 }
+
+
+export const getCustomer = async (uuid: string) => {
+    const customer = await Prisma.customers.findFirst({
+        where: {
+            customer_uuid: uuid,
+        },
+    });
+    return customer
+}

@@ -1,5 +1,5 @@
 import useSWR from "swr";
-import { StripeSubscription } from "@/lib/interfaces/stripe";
+import { CustomerSubscription } from "@/lib/interfaces/subscriptions";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -11,16 +11,16 @@ const getApiUrl = (path: string) => {
     return path;
 };
 
-export function useSubscriptions() {
+export function useSubscription() {
     const { data, error, isLoading, mutate } = useSWR<{
         success: boolean;
-        subscriptions: StripeSubscription[];
-    }>(getApiUrl("/api/billing/subscriptions"), fetcher, {
+        subscription: CustomerSubscription;
+    }>(getApiUrl("/api/subscriptions"), fetcher, {
         revalidateOnFocus: false,
     });
 
     return {
-        subscriptions: data?.subscriptions ?? [],
+        subscription: data?.subscription,
         isLoading,
         error,
         refreshSubscriptions: mutate,

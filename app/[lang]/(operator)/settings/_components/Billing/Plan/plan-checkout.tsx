@@ -14,8 +14,10 @@ import { PaymentIcon, PaymentType } from "react-svg-credit-card-payment-icons";
 import { CardBrand } from "@stripe/stripe-js";
 import { useTheme } from "next-themes";
 import { Button } from "@heroui/button";
-import { createStripeSubscription } from "@/lib/services/stripe-service";
 import { Steps } from "../Billing";
+import { Switch } from "@heroui/react";
+import { useCustomerSubscription } from "@/lib/contexts/customer-subscription-context";
+import { createCustomerSubscription } from "@/app/api/subscriptions/_services/subscriptions-service";
 
 interface CheckoutFormProps {
   setSelected: (key: Steps) => void;
@@ -25,7 +27,8 @@ function CheckoutForm({ setSelected }: CheckoutFormProps) {
   const stripe = useStripe();
   const elements = useElements();
   const { theme } = useTheme();
-  const { hotspotsToAdd, products, refreshSubscriptions } = useBilling();
+  const { hotspotsToAdd, products } = useBilling();
+  const { refreshSubscriptionState } = useCustomerSubscription();
   const [cardBrand, setCardBrand] = useState<CardBrand | undefined>("unknown");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -47,7 +50,7 @@ function CheckoutForm({ setSelected }: CheckoutFormProps) {
 
     try {
       // Create subscription on backend
-      const subscription = await createStripeSubscription({
+      const subscription = await createCustomerSubscription({
         price_id: productPriceDetails?.id || "",
         plan_id: product?.id || "",
         quantity: hotspotsToAdd,
@@ -74,7 +77,7 @@ function CheckoutForm({ setSelected }: CheckoutFormProps) {
         setError(confirmError.message || "Payment failed");
       } else {
         // Payment successful
-        await refreshSubscriptions();
+        await refreshSubscriptionState();
         setSelected("step1");
       }
     } catch (err) {
@@ -186,7 +189,7 @@ export default function PlanCheckout({ setSelected }: CheckoutFormProps) {
   const nextBillingDate = moment()
     .add(recurring?.interval_count ?? 1, recurring?.interval ?? "month")
     .format("MMM D, YYYY");
-
+  const nextTrialBillingDate = moment().add("days", 7).format("MMM DD, YYYY");
   const totalPrice = hotspotsToAdd * productPrice;
 
   const getRecurringInterval = (interval: string) => {
@@ -208,7 +211,7 @@ export default function PlanCheckout({ setSelected }: CheckoutFormProps) {
           <p className="text-lg font-semibold w-full align-left">
             Please review the details of your plan and proceed to checkout.
           </p>
-          <div className="flex flex-col w-full mt-3 ml-4 gap-1">
+          <div className="flex flex-col w-full mt-3 ml-4 gap-2">
             <div className="flex flex-row">
               <p className="text-xs font-semibold">Number of hotspots:</p>
               <p className="text-xs font-medium dark:text-gray-300 text-gray-700 ml-1">
@@ -234,9 +237,27 @@ export default function PlanCheckout({ setSelected }: CheckoutFormProps) {
               </p>
             </div>
             <div className="flex flex-row">
+              <p className="text-xs font-semibold">Trial period:</p>
+              <p className="text-xs font-medium dark:text-gray-300 text-gray-700 ml-1">
+                7 days
+              </p>
+            </div>
+            <div className="flex flex-row">
+              <p className="text-xs font-semibold">Trial period end:</p>
+              <p className="text-xs font-medium dark:text-gray-300 text-gray-700 ml-1">
+                {nextTrialBillingDate}
+              </p>
+            </div>
+            <div className="flex flex-row">
               <p className="text-xs font-semibold">Next billing date:</p>
               <p className="text-xs font-medium dark:text-gray-300 text-gray-700 ml-1">
-                {nextBillingDate}
+                {nextTrialBillingDate}
+              </p>
+            </div>
+            <div className="flex flex-row items-center justify-between">
+              <p className="text-xs font-semibold">Activate trial period:</p>
+              <p className="text-xs font-medium dark:text-gray-300 text-gray-700 ml-1">
+                <Switch size="sm" />
               </p>
             </div>
           </div>

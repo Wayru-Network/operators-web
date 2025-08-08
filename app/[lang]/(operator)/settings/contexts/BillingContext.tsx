@@ -1,8 +1,7 @@
 "use client";
 
-import { StripeProduct, StripeSubscription } from "@/lib/interfaces/stripe";
+import { StripeProduct } from "@/lib/interfaces/stripe";
 import { createContext, useCallback, useContext, useState } from "react";
-import { useSubscriptions } from "../_hooks/use-subscriptions";
 import { Hotspot } from "../../hotspots/_services/get-hotspots";
 
 interface BillingProviderProps {
@@ -12,23 +11,17 @@ interface BillingProviderProps {
 }
 
 type BillingContextType = {
-  subscriptions: StripeSubscription[];
   products: StripeProduct[];
   hotspotsToAdd: number;
-  isLoading: boolean;
   handleHotspotsToAdd: (hotspots: number) => void;
-  refreshSubscriptions: () => Promise<void>;
   hotspots: Hotspot[];
   addHotspot: (h: Hotspot[]) => void;
 };
 
 const BillingContext = createContext<BillingContextType>({
-  subscriptions: [],
   products: [],
   hotspotsToAdd: 0,
-  isLoading: false,
   handleHotspotsToAdd: () => {},
-  refreshSubscriptions: async () => {},
   hotspots: [],
   addHotspot: () => {},
 });
@@ -39,7 +32,6 @@ export const BillingProvider = ({
   hotspots: hotspotsProps,
 }: BillingProviderProps) => {
   const [hotspotsToAdd, setHotspotsToAdd] = useState(0);
-  const { subscriptions, isLoading, refreshSubscriptions } = useSubscriptions();
   const [hotspots, setHotspots] = useState(hotspotsProps);
 
   const handleHotspotsToAdd = (hotspots: number) => {
@@ -55,14 +47,9 @@ export const BillingProvider = ({
   return (
     <BillingContext.Provider
       value={{
-        subscriptions,
         products,
         hotspotsToAdd,
-        isLoading,
         handleHotspotsToAdd,
-        refreshSubscriptions: async () => {
-          await refreshSubscriptions();
-        },
         hotspots,
         addHotspot,
       }}
