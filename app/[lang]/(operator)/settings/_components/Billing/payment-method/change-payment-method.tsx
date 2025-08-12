@@ -10,7 +10,6 @@ import {
 import { Button } from "@heroui/button";
 import { PaymentIcon, PaymentType } from "react-svg-credit-card-payment-icons";
 import { useTheme } from "next-themes";
-import { useBilling } from "../../../contexts/BillingContext";
 import {
   changePaymentMethod,
   confirmChangePaymentMethod,
@@ -19,6 +18,7 @@ import { CardBrand } from "@stripe/stripe-js";
 import { stripeClient } from "@/lib/services/stripe-client-config";
 import { Steps } from "../Billing";
 import { addToast } from "@heroui/toast";
+import { useCustomerSubscription } from "@/lib/contexts/customer-subscription-context";
 
 interface CheckoutFormProps {
   setSelected: (key: Steps) => void;
@@ -32,14 +32,11 @@ function CheckoutForm({ setSelected }: CheckoutFormProps) {
   const stripe = useStripe();
   const elements = useElements();
   const { theme } = useTheme();
-  const { subscriptions, refreshSubscriptions } = useBilling();
+  const { subscription, refreshSubscriptionState } = useCustomerSubscription();
   const [cardBrand, setCardBrand] = useState<CardBrand | undefined>("unknown");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  const subscription = subscriptions.find(
-    (subscription) => subscription.type === "hotspots"
-  );
+  const paymentMethod = subscription?.stripe_subscription?.payment_method;
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -53,7 +50,7 @@ function CheckoutForm({ setSelected }: CheckoutFormProps) {
     try {
       // Create subscription on backend
       const setupIntent = await changePaymentMethod(
-        subscription?.subscription_id || ""
+        subscription?.stripe_subscription?.subscription_id || ""
       );
 
       if (!setupIntent?.client_secret) {
@@ -82,7 +79,7 @@ function CheckoutForm({ setSelected }: CheckoutFormProps) {
         );
         if (result?.success) {
           // Refresh the subscription data
-          await refreshSubscriptions();
+          await refreshSubscriptionState();
         }
         addToast({
           title: "Payment method changed",
@@ -184,7 +181,7 @@ function CheckoutForm({ setSelected }: CheckoutFormProps) {
           disabled={isLoading}
           isLoading={isLoading}
         >
-          {isLoading ? "Processing..." : `Change`}
+          {isLoading ? "Processing..." : paymentMethod ? `Change` : "Add"}
         </Button>
       </div>
     </form>

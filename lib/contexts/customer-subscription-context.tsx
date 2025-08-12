@@ -25,7 +25,7 @@ export function CustomerSubscriptionProvider({
 
   const refreshSubscriptionState = useCallback(async () => {
     await refreshSubscriptions();
-  }, []);
+  }, [refreshSubscriptions]);
 
   // context value
   const value: CustomerSubscriptionContextType = {

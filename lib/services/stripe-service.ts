@@ -2,9 +2,7 @@
 
 import moment from "moment";
 import { centsToDollars } from "../helpers/numbers";
-import { Prisma } from "../infra/prisma";
 import {
-    CreateSubscriptionInput,
     CreateSubscriptionInputWithCustomer,
     StripeProduct,
     StripeProductType,
@@ -14,7 +12,8 @@ import {
 import { getSession } from "../session/session";
 import { stripeServer } from "./stripe-server-config";
 import Stripe from "stripe";
-import { getCustomer, getOrCreateCustomer } from "@/app/api/auth/callback/_services/customer-service";
+import { getCustomer } from "@/app/api/auth/callback/_services/customer-service";
+import { Prisma } from "../generated/prisma";
 
 export async function getStripeCustomerSubscription(subscriptionId: string): Promise<
     StripeSubscription | undefined
@@ -124,22 +123,9 @@ export const createStripeSubscription = async (
         }
 
         // if no exist customer, create one
-        let stripeCustomer: Stripe.Customer | undefined;
         const customer = input?.customer
-        if (!customer?.stripe_customer_id) {
-            stripeCustomer = await stripeServer.customers.create({
-                email: customer.email || "",
-                name: customer.name || "",
-                metadata: {
-                    customer_id: customer.customer_uuid || "",
-                },
-            } as Stripe.CustomerCreateParams);
-
-        } else {
-            stripeCustomer = (await stripeServer.customers.retrieve(customer.stripe_customer_id, {
-                expand: ["subscriptions"],
-            })) as Stripe.Customer;
-        }
+        const stripeCustomer = await getStripeCustomer()
+        if (!stripeCustomer) return
 
         // create subscription
         const trial_period_days = 7;
@@ -312,4 +298,31 @@ export const confirmChangePaymentMethod = async (setup_intent_id: string) => {
             subscription_id: null,
         }
     }
+}
+
+export const getStripeCustomer = async () => {
+    const { isLoggedIn, userId } = await getSession();
+    if (!isLoggedIn || !userId) {
+        return null
+    }
+
+    // get customer details 
+    const customer = await getCustomer(userId) as Prisma.CustomersGroupByOutputType
+    let stripeCustomer: Stripe.Customer | null = null
+
+    if (customer?.stripe_customer_id) {
+        stripeCustomer = await stripeServer.customers.retrieve(customer.stripe_customer_id, {
+            expand: ["subscriptions"],
+        }) as unknown as Stripe.Customer
+    } else {
+        stripeCustomer = await stripeServer.customers.create({
+            email: customer.email || "",
+            name: customer.full_name || "",
+            metadata: {
+                customer_id: customer.customer_uuid || "",
+            },
+        } as Stripe.CustomerCreateParams)
+    }
+
+    return { ...stripeCustomer, customer_database_id: customer?.id }
 }

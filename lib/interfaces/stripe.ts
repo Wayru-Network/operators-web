@@ -1,4 +1,3 @@
-import { Address } from "@stripe/stripe-js";
 import Stripe from "stripe";
 
 export type SubscriptionType = 'hotspots'

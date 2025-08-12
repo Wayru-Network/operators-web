@@ -14,6 +14,7 @@ interface PlanActiveProps {
 const PlanActive = ({ setSelected }: PlanActiveProps) => {
   const { subscription } = useCustomerSubscription();
   const hotspotSubscription = subscription?.stripe_subscription;
+  const paymentMethod = hotspotSubscription?.payment_method;
 
   const isDisabledDeletePaymentMethod = true;
   const currentMonth = moment().format("MMMM");
@@ -134,48 +135,53 @@ const PlanActive = ({ setSelected }: PlanActiveProps) => {
             <div className="flex flex-row w-full">
               <div className="flex flex-row w-full ml-4 items-center">
                 <PaymentIcon
-                  type={
-                    hotspotSubscription?.payment_method?.brand as PaymentType
-                  }
+                  type={paymentMethod?.brand as PaymentType}
                   format="logo"
                   className="mr-2"
                 />
                 <div>
                   <p className="text-sm  font-medium">
-                    {hotspotSubscription?.payment_method?.brand
+                    {paymentMethod?.brand
                       ?.toLowerCase()
                       .replace(/^\w/, (c: string) => c.toUpperCase())}{" "}
-                    **** {hotspotSubscription?.payment_method?.last4}
+                    **** {paymentMethod?.last4}
                   </p>
-                  <p className="text-xs  font-normal">
-                    Expires{" "}
-                    {moment(
-                      Number(hotspotSubscription?.payment_method?.exp_month) *
-                        1000
-                    ).format("MMM DD, YYYY")}
-                  </p>
+                  {paymentMethod ? (
+                    <p className="text-xs  font-normal">
+                      Expires{" "}
+                      {moment(Number(paymentMethod?.exp_month) * 1000).format(
+                        "MMM DD, YYYY"
+                      )}
+                    </p>
+                  ) : (
+                    <p className="text-xs  font-normal">
+                      Payment method not added
+                    </p>
+                  )}
                 </div>
               </div>
-              <Tooltip
-                isDisabled={!isDisabledDeletePaymentMethod}
-                content="You can't delete your card while you have active plans."
-                placement="right"
-              >
-                <Trash2
-                  onClick={() => {
-                    if (isDisabledDeletePaymentMethod) {
-                      console.log("disabled delete payment method");
-                      return;
-                    }
-                  }}
-                  size={22}
-                  className={`${
-                    isDisabledDeletePaymentMethod
-                      ? "text-gray-400"
-                      : "dark:text-[#ffffff] text-[#000000] cursor-pointer "
-                  }`}
-                />
-              </Tooltip>
+              {paymentMethod && (
+                <Tooltip
+                  isDisabled={!isDisabledDeletePaymentMethod}
+                  content="You can't delete your card while you have active plans."
+                  placement="right"
+                >
+                  <Trash2
+                    onClick={() => {
+                      if (isDisabledDeletePaymentMethod) {
+                        console.log("disabled delete payment method");
+                        return;
+                      }
+                    }}
+                    size={22}
+                    className={`${
+                      isDisabledDeletePaymentMethod
+                        ? "text-gray-400"
+                        : "dark:text-[#ffffff] text-[#000000] cursor-pointer "
+                    }`}
+                  />
+                </Tooltip>
+              )}
             </div>
           </div>
 
@@ -183,7 +189,7 @@ const PlanActive = ({ setSelected }: PlanActiveProps) => {
             onPress={() => setSelected("step3")}
             className="w-full bg-[#000] dark:bg-[#fff] text-white dark:text-black mt-9"
           >
-            Change
+            {paymentMethod ? "Change Payment Method" : "Add Payment Method"}
           </Button>
         </div>
       </div>

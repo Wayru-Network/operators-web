@@ -9,15 +9,14 @@ import {
 } from "@stripe/react-stripe-js";
 import { stripeClient } from "@/lib/services/stripe-client-config";
 import { useBilling } from "@/app/[lang]/(operator)/settings/contexts/BillingContext";
-import moment from "moment";
 import { PaymentIcon, PaymentType } from "react-svg-credit-card-payment-icons";
 import { CardBrand } from "@stripe/stripe-js";
 import { useTheme } from "next-themes";
 import { Button } from "@heroui/button";
 import { Steps } from "../Billing";
-import { Switch } from "@heroui/react";
 import { useCustomerSubscription } from "@/lib/contexts/customer-subscription-context";
 import { createCustomerSubscription } from "@/app/api/subscriptions/_services/subscriptions-service";
+import CheckoutBillingDetails from "./checkout-billing-details";
 
 interface CheckoutFormProps {
   setSelected: (key: Steps) => void;
@@ -186,10 +185,6 @@ export default function PlanCheckout({ setSelected }: CheckoutFormProps) {
   const productPriceDetails = product?.priceDetails[0];
   const productPrice = productPriceDetails?.price ?? 0;
   const recurring = productPriceDetails?.recurring;
-  const nextBillingDate = moment()
-    .add(recurring?.interval_count ?? 1, recurring?.interval ?? "month")
-    .format("MMM D, YYYY");
-  const nextTrialBillingDate = moment().add("days", 7).format("MMM DD, YYYY");
   const totalPrice = hotspotsToAdd * productPrice;
 
   const getRecurringInterval = (interval: string) => {
@@ -236,30 +231,7 @@ export default function PlanCheckout({ setSelected }: CheckoutFormProps) {
                 ${totalPrice}
               </p>
             </div>
-            <div className="flex flex-row">
-              <p className="text-xs font-semibold">Trial period:</p>
-              <p className="text-xs font-medium dark:text-gray-300 text-gray-700 ml-1">
-                7 days
-              </p>
-            </div>
-            <div className="flex flex-row">
-              <p className="text-xs font-semibold">Trial period end:</p>
-              <p className="text-xs font-medium dark:text-gray-300 text-gray-700 ml-1">
-                {nextTrialBillingDate}
-              </p>
-            </div>
-            <div className="flex flex-row">
-              <p className="text-xs font-semibold">Next billing date:</p>
-              <p className="text-xs font-medium dark:text-gray-300 text-gray-700 ml-1">
-                {nextTrialBillingDate}
-              </p>
-            </div>
-            <div className="flex flex-row items-center justify-between">
-              <p className="text-xs font-semibold">Activate trial period:</p>
-              <p className="text-xs font-medium dark:text-gray-300 text-gray-700 ml-1">
-                <Switch size="sm" />
-              </p>
-            </div>
+            <CheckoutBillingDetails setSelected={setSelected} />
           </div>
         </div>
         {/* Payment method */}
