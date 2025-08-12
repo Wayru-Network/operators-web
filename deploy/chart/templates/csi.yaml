@@ -58,6 +58,10 @@ spec:
           objectName: fas-api-key
           objectType: secret
           objectVersion: ""
+        - |
+          objectName: stripe-secret-key
+          objectType: secret
+          objectVersion: ""
   secretObjects:
     - secretName: {{ .Values.name }}
       type: Opaque
