@@ -55,6 +55,8 @@ spec:
               value: {{ .Values.keycloakClientId | quote }}
             - name: APP_URL
               value: {{ .Values.appUrl | quote }}
+            - name: NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+              value: {{ .Values.stripePublicKey | quote }}
             - name: DATABASE_URL
               valueFrom:
                 secretKeyRef:
@@ -109,6 +111,11 @@ spec:
                 secretKeyRef:
                   name: {{ .Values.name }}
                   key: FAS_API_KEY
+            - name: STRIPE_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.name }}
+                  key: STRIPE_SECRET_KEY
           volumeMounts:
             - name: {{ .Values.name }}-csi-volume
               mountPath: /mnt/secrets
