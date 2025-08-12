@@ -162,7 +162,7 @@ export default function HotspotNetworks({
         value={locName}
         type="text"
         wrapperClass="max-w-[470px]"
-        disabled={!isDisabled}
+        disabled={isDisabled}
       />
       <Spacer y={6} />
       <p className="text-lg font-semibold">Network configuration</p>
@@ -175,7 +175,7 @@ export default function HotspotNetworks({
         value={openSSID}
         type="text"
         wrapperClass="max-w-[210px]"
-        disabled={!isDisabled}
+        disabled={isDisabled}
       />
       <Spacer y={8} />
       <div className="flex flex-row space-x-8">
@@ -187,7 +187,7 @@ export default function HotspotNetworks({
           value={privateSSID}
           type="text"
           wrapperClass="max-w-[210px]"
-          disabled={!isDisabled}
+          disabled={isDisabled}
         />
         <CustomInput
           label="New password"
@@ -196,7 +196,7 @@ export default function HotspotNetworks({
           value={newPassword}
           type="password"
           wrapperClass="max-w-[210px]"
-          disabled={!isDisabled}
+          disabled={isDisabled}
         />
         <CustomInput
           label="Confirm password"
@@ -205,7 +205,7 @@ export default function HotspotNetworks({
           value={confirmPassword}
           type="password"
           wrapperClass="max-w-[210px]"
-          disabled={!isDisabled}
+          disabled={isDisabled}
         />
       </div>
       <Spacer y={8} />
@@ -214,7 +214,7 @@ export default function HotspotNetworks({
         className="rounded-[10px] w-[309px]"
         onPress={handleSave}
         isLoading={isSaving}
-        isDisabled={!isDisabled}
+        isDisabled={isDisabled}
       >
         Save changes
       </Button>
