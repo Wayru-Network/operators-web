@@ -135,6 +135,7 @@ export default function HotspotNetworks({
     osServicesVersion || "0.0.0",
     minimumVersion
   );
+  const isDisabled = !isMinimumVersion || !is_subscription_active;
 
   const RenderBanner = () => {
     switch (true) {
@@ -161,7 +162,7 @@ export default function HotspotNetworks({
         value={locName}
         type="text"
         wrapperClass="max-w-[470px]"
-        disabled={!isMinimumVersion}
+        disabled={!isDisabled}
       />
       <Spacer y={6} />
       <p className="text-lg font-semibold">Network configuration</p>
@@ -174,7 +175,7 @@ export default function HotspotNetworks({
         value={openSSID}
         type="text"
         wrapperClass="max-w-[210px]"
-        disabled={!isMinimumVersion}
+        disabled={!isDisabled}
       />
       <Spacer y={8} />
       <div className="flex flex-row space-x-8">
@@ -186,7 +187,7 @@ export default function HotspotNetworks({
           value={privateSSID}
           type="text"
           wrapperClass="max-w-[210px]"
-          disabled={!isMinimumVersion}
+          disabled={!isDisabled}
         />
         <CustomInput
           label="New password"
@@ -195,7 +196,7 @@ export default function HotspotNetworks({
           value={newPassword}
           type="password"
           wrapperClass="max-w-[210px]"
-          disabled={!isMinimumVersion}
+          disabled={!isDisabled}
         />
         <CustomInput
           label="Confirm password"
@@ -204,7 +205,7 @@ export default function HotspotNetworks({
           value={confirmPassword}
           type="password"
           wrapperClass="max-w-[210px]"
-          disabled={!isMinimumVersion}
+          disabled={!isDisabled}
         />
       </div>
       <Spacer y={8} />
@@ -213,7 +214,7 @@ export default function HotspotNetworks({
         className="rounded-[10px] w-[309px]"
         onPress={handleSave}
         isLoading={isSaving}
-        isDisabled={!isMinimumVersion}
+        isDisabled={!isDisabled}
       >
         Save changes
       </Button>
