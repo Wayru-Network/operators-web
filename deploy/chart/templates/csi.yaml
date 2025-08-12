@@ -82,3 +82,5 @@ spec:
           key: FAS_URL
         - objectName: fas-api-key
           key: FAS_API_KEY
+        - objectName: stripe-secret-key
+          key: STRIPE_SECRET_KEY
