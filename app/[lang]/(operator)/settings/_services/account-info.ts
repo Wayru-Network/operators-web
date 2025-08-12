@@ -11,7 +11,7 @@ import { industry_type } from "@/lib/generated/prisma";
 export async function getAccountInfo(): Promise<AccountInfo> {
     try {
         const { isLoggedIn, userId } = await getSession();
-        
+
         if (!isLoggedIn) {
             return defaultAccountInfo;
         }
@@ -24,37 +24,26 @@ export async function getAccountInfo(): Promise<AccountInfo> {
             where: {
                 customer_uuid: userId,
             },
+            include: {
+                companies: true,
+            },
         });
 
         if (!customer) {
             return defaultAccountInfo;
         }
 
-        // get company info
-        const company = await Prisma.companies.findFirst({
-            where: {
-                customer_id: customer.id,
-            },
-        });
-
-        if (!company) {
-            return {
-                ...customer,
-                company: {
-                    ...defaultAccountInfo.company,
-                },
-            };
-        }
+        const company = customer.companies?.length > 0 ? customer.companies[0] : null;
 
         return {
             ...customer,
             company: {
-                company_name: company.name,
-                company_email: company.email,
-                company_tax_id: company.tax_id || "",
-                vat_number: company.vat_number || "",
-                industry: company.industry,
-                company_id: company.id,
+                company_name: company?.name || "",
+                company_email: company?.email || "",
+                company_tax_id: company?.tax_id || "",
+                vat_number: company?.vat_number || "",
+                industry: company?.industry as industry_type,
+                company_id: company?.id || 0,
             },
         };
     } catch (error) {
@@ -65,7 +54,12 @@ export async function getAccountInfo(): Promise<AccountInfo> {
 
 export async function updateAccountInfoAction(accountInfo: Partial<AccountInfoUpdate>): Promise<AccountInfo> {
     try {
-        const { userId } = await getSession();
+        const { userId, isLoggedIn } = await getSession();
+
+        // check if the user is logged in
+        if (!userId || !isLoggedIn) {
+            return defaultAccountInfo;
+        }
 
         await Prisma.$transaction(async (tx) => {
             // Update customer if full_name is provided

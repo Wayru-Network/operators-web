@@ -113,11 +113,6 @@ export async function GET(req: Request) {
   if (email === "diego@wayru.org") email = "diegoserranor@gmail.com";
   if (email === "testlaura@gmail.com") email = "laura1.vizcaino@gmail.com";
 
-  // save customer in db
-  await getOrCreateCustomer(sub, {
-    email: email,
-  });
-
   let walletAddress = "";
 
   try {
@@ -128,7 +123,7 @@ export async function GET(req: Request) {
           "Content-Type": "application/json",
           "X-API-KEY": env.BACKEND_KEY,
         },
-      },
+      }
     );
 
     if (data.ok) {
@@ -136,7 +131,7 @@ export async function GET(req: Request) {
       walletAddress = response.walletAddress || "";
     } else {
       console.log(
-        "Warning: Wallet API request failed, proceeding without wallet",
+        "Warning: Wallet API request failed, proceeding without wallet"
       );
       console.log("- Status:", data.status);
       console.log("- Status text:", data.statusText);
@@ -144,9 +139,14 @@ export async function GET(req: Request) {
   } catch (error) {
     console.log(
       "Warning: Wallet API request error, proceeding without wallet:",
-      error,
+      error
     );
   }
+
+  // save customer in db
+  const customer = await getOrCreateCustomer(sub, {
+    email: email,
+  });
 
   await updateSession({
     accessToken: tokens.access_token,
@@ -155,6 +155,7 @@ export async function GET(req: Request) {
     userId: sub || "",
     email: email || "",
     wallet: walletAddress || "",
+    stripeCustomerId: customer.stripe_customer_id,
   });
 
   console.log("User logged in:", email, "wallet: ", walletAddress);

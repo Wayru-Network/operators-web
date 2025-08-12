@@ -13,7 +13,9 @@ model hotspot {
   wayru_device_id  String           @unique @db.Uuid
   name             String?          @unique
   portal_config_id Int?
+  subscription_id  Int?
   portal_config    portal_config?   @relation(fields: [portal_config_id], references: [id])
+  subscription     subscriptions?   @relation(fields: [subscription_id], references: [id])
   network_configs  network_config[]
 }
 
@@ -70,26 +72,28 @@ model asset {
 }
 
 model companies {
-  id          Int           @id @default(autoincrement())
+  id          Int            @id @default(autoincrement())
   customer_id Int?
-  name        String        @db.VarChar(255)
-  email       String        @unique(map: "companies_company_email_key") @db.VarChar(255)
-  tax_id      String?       @db.VarChar(100)
-  vat_number  String?       @db.VarChar(100)
-  industry    industry_type
-  created_at  DateTime?     @default(now()) @db.Timestamp(6)
-  updated_at  DateTime?     @default(now()) @db.Timestamp(6)
-  customers   customers?    @relation(fields: [customer_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  name        String         @db.VarChar(255)
+  email       String         @unique(map: "companies_company_email_key") @db.VarChar(255)
+  tax_id      String?        @db.VarChar(100)
+  vat_number  String?        @db.VarChar(100)
+  industry    industry_type?
+  created_at  DateTime?      @default(now()) @db.Timestamp(6)
+  updated_at  DateTime?      @default(now()) @db.Timestamp(6)
+  customers   customers?     @relation(fields: [customer_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 }
 
 model customers {
-  id            Int         @id @default(autoincrement())
-  customer_uuid String      @unique @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  full_name     String      @db.VarChar(255)
-  created_at    DateTime?   @default(now()) @db.Timestamp(6)
-  updated_at    DateTime?   @default(now()) @db.Timestamp(6)
-  email         String?     @db.VarChar(150)
-  companies     companies[]
+  id                 Int            @id @default(autoincrement())
+  customer_uuid      String         @unique @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  full_name          String         @db.VarChar(255)
+  created_at         DateTime?      @default(now()) @db.Timestamp(6)
+  updated_at         DateTime?      @default(now()) @db.Timestamp(6)
+  email              String?        @db.VarChar(150)
+  companies          companies[]
+  stripe_customer_id String?        @db.VarChar(100)
+  subscriptions      subscriptions?
 }
 
 enum adFormat {
@@ -107,4 +111,16 @@ enum industry_type {
   telecom
   finance
   technology
+}
+
+model subscriptions {
+  id                     Int      @id @default(autoincrement())
+  customer_id            Int      @unique
+  hotspot_limit          Int
+  stripe_subscription_id String?  @unique @db.VarChar(100)
+  created_at             DateTime @default(now()) @db.Timestamp(6)
+  updated_at             DateTime @updatedAt @db.Timestamp(6)
+
+  customer customers @relation(fields: [customer_id], references: [id], onDelete: Cascade)
+  hotspots hotspot[]
 }

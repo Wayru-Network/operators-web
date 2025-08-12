@@ -1,13 +1,14 @@
 "use client";
 
 import React, { useState, useEffect, useTransition } from "react";
-import { Input, Button, Select, SelectItem } from "@heroui/react";
+import { Button, Select, SelectItem, Form, Spacer } from "@heroui/react";
 import { updateAccountInfoAction } from "../_services/account-info";
 import { industry_type } from "@/lib/generated/prisma";
 import { AccountInfo, AccountInfoUpdate, FormData } from "../_services/types";
+import { CustomInput } from "@/lib/components/custom-input";
+const SPACER_SECTION = 9;
 
 const Account = ({ accountInfo }: { accountInfo: AccountInfo }) => {
-  const [language, setLanguage] = useState("en");
   const [mounted, setMounted] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isPending, startTransition] = useTransition();
@@ -19,18 +20,18 @@ const Account = ({ accountInfo }: { accountInfo: AccountInfo }) => {
     company_name: "",
     company_email: "",
     tax_id: "",
-    industry: "telecom" as industry_type,
+    industry: null,
     company_id: 0,
   });
 
   // Original state to compare changes
-  const [originalData, setOriginalData] = useState({
+  const [originalData, setOriginalData] = useState<FormData>({
     full_name: "",
     email: "",
     company_name: "",
     company_email: "",
     tax_id: "",
-    industry: "telecom",
+    industry: null,
     company_id: 0,
   });
 
@@ -60,18 +61,10 @@ const Account = ({ accountInfo }: { accountInfo: AccountInfo }) => {
         accountInfo.company.company_tax_id ||
         accountInfo.company.vat_number ||
         "",
-      industry: accountInfo.company.industry || "telecom",
+      industry: accountInfo.company.industry as industry_type | null,
       company_id: accountInfo.company.company_id,
     });
-
-    setLanguage("en");
   }, [accountInfo]);
-
-  const languages = [
-    { label: "English (US)", value: "en" },
-    { label: "Spanish", value: "es" },
-    { label: "Portuguese (BR)", value: "pt" },
-  ];
 
   const industries = [
     { label: "Telecom", value: "telecom" },
@@ -207,7 +200,7 @@ const Account = ({ accountInfo }: { accountInfo: AccountInfo }) => {
               company_name: newAccountInfo.company.company_name,
               company_email: newAccountInfo.company.company_email,
               tax_id: newAccountInfo.company.company_tax_id || "",
-              industry: newAccountInfo.company.industry || "telecom",
+              industry: newAccountInfo.company.industry as industry_type,
               company_id: newAccountInfo.company.company_id,
             });
           } catch (error) {
@@ -223,134 +216,97 @@ const Account = ({ accountInfo }: { accountInfo: AccountInfo }) => {
   }
 
   return (
-    <div className="flex flex-row gap-8 w-full">
-      <div className="flex flex-col gap-3 w-1/2">
-        <div className="flex flex-col items-center w-full">
+    <div className="flex flex-row w-full">
+      <Form
+        className="flex flex-col w-1/2"
+        onSubmit={handleSaveChanges}
+        validationErrors={errors}
+      >
+        <div>
           {/* Personal Information section */}
-          <div className="flex flex-col w-full">
-            <p className="text-base font-semibold w-full align-left">
-              Personal Information
-            </p>
-            <div className="flex flex-row gap-3 mt-2 items-center w-full">
-              <div className="w-1/2">
-                <Input
-                  className="w-full focus:outline-none focus:ring-0 focus-visible:outline-none"
-                  value={formData.full_name}
-                  onChange={(e) =>
-                    handleInputChange("full_name", e.target.value)
-                  }
-                  label="Full Name"
-                  type="text"
-                  variant="bordered"
-                  maxLength={20}
-                />
-              </div>
-              <div className="w-1/2">
-                <Input
-                  className="w-full focus:outline-none focus:ring-0 focus-visible:outline-none"
-                  value={formData.email}
-                  onChange={(e) => handleInputChange("email", e.target.value)}
-                  label="Email Address"
-                  type="email"
-                  variant="bordered"
-                  isRequired
-                  disabled={true}
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Language section */}
-          <div className="flex flex-col w-full mt-2">
-            <p className="text-base font-semibold w-full align-left mt-6">
-              Language
-            </p>
-            <div className="flex flex-row w-1/2 mt-2">
-              <Select
-                variant="bordered"
-                size="sm"
-                placeholder={`English (US)`}
-                value={language}
-                onChange={(e) => setLanguage(e.target.value)}
-                classNames={{
-                  trigger:
-                    "!text-black dark:!text-white data-[has-value=true]:!text-black dark:data-[has-value=true]:!text-white",
-                  value: "!text-black dark:!text-white",
-                  listbox: "!text-black dark:!text-white",
-                }}
-              >
-                {languages.map((language) => (
-                  <SelectItem key={language.value}>{language.label}</SelectItem>
-                ))}
-              </Select>
-            </div>
-          </div>
+          <RenderSection
+            title="Personal Information"
+            Input1={
+              <CustomInput
+                value={formData.full_name}
+                onChange={(e) => handleInputChange("full_name", e.target.value)}
+                label="Full Name"
+                type="text"
+                wrapperClass="max-w-[210px] max-h-[30px]"
+                placeholder="John Doe"
+                required
+                inputClass="!text-sm"
+                labelClass="!text-sm"
+              />
+            }
+            Input2={
+              <CustomInput
+                className="w-full focus:outline-none focus:ring-0 focus-visible:outline-none"
+                value={formData.email}
+                onChange={(e) => handleInputChange("email", e.target.value)}
+                label="Email Address"
+                type="email"
+                wrapperClass="max-w-[210px] max-h-[30px]"
+                required
+                inputClass="!text-sm"
+                labelClass="!text-sm"
+              />
+            }
+          />
+          <Spacer y={SPACER_SECTION} />
 
           {/* Company Information section */}
-          <div className="flex flex-col w-full mt-2">
-            <p className="text-base font-semibold w-full align-left mt-6">
-              Company Information (Optional)
-            </p>
-            <div className="flex flex-row gap-3 mt-2 items-center w-full">
-              <div className="w-1/2">
-                <Input
-                  className="w-full focus:outline-none focus:ring-0 focus-visible:outline-none"
-                  value={formData.company_name}
-                  onChange={(e) =>
-                    handleInputChange("company_name", e.target.value)
-                  }
-                  label="Company Name"
-                  type="text"
-                  variant="bordered"
-                />
-              </div>
-              <div className="w-1/2">
-                <Input
-                  className="w-full focus:outline-none focus:ring-0 focus-visible:outline-none"
-                  value={formData.company_email}
-                  onChange={(e) =>
-                    handleInputChange("company_email", e.target.value)
-                  }
-                  label="Business Email"
-                  type="email"
-                  variant="bordered"
-                  isInvalid={!!errors.company_email}
-                  errorMessage={errors.company_email}
-                />
-              </div>
-            </div>
-            <div className="flex flex-row w-full mt-2">
-              <div className="w-1/2">
-                <Input
-                  className="w-full focus:outline-none focus:ring-0 focus-visible:outline-none"
-                  value={formData.tax_id}
-                  onChange={(e) => handleInputChange("tax_id", e.target.value)}
-                  label="Tax ID/VAT number"
-                  variant="bordered"
-                />
-              </div>
-            </div>
-          </div>
+          <RenderSection
+            title="Company Information (Optional)"
+            Input1={
+              <CustomInput
+                value={formData.company_name}
+                onChange={(e) =>
+                  handleInputChange("company_name", e.target.value)
+                }
+                label="Company Name"
+                placeholder="Pop Bar"
+                type="text"
+                wrapperClass="max-w-[210px] max-h-[30px]"
+                inputClass="!text-sm"
+                labelClass="!text-sm"
+              />
+            }
+            Input2={
+              <CustomInput
+                value={formData.company_email}
+                onChange={(e) =>
+                  handleInputChange("company_email", e.target.value)
+                }
+                label="Business Email"
+                placeholder="business@email.com"
+                type="email"
+                wrapperClass="max-w-[210px] max-h-[30px]"
+                inputClass="!text-sm"
+                labelClass="!text-sm"
+              />
+            }
+          />
+          <Spacer y={SPACER_SECTION} />
 
           {/* Industry section */}
-          <div className="flex flex-col w-full mt-2">
-            <p className="text-base font-semibold w-full align-left mt-6">
-              Industry
-            </p>
-            <div className="flex flex-row w-1/2 mt-2">
+          <RenderSection
+            title="Industry"
+            Input1={
               <Select
                 variant="bordered"
+                className="mt-[-10px]"
                 size="sm"
                 placeholder={
                   formData.industry ? formData.industry : "Select Industry"
                 }
-                value={formData.industry}
+                value={formData.industry || ""}
                 onSelectionChange={(e) =>
                   handleInputChange("industry", e?.currentKey as string)
                 }
                 classNames={{
                   trigger:
-                    "!text-black dark:!text-white data-[has-value=true]:!text-black dark:data-[has-value=true]:!text-white",
+                    "!text-black dark:!text-white data-[has-value=true]:!text-black dark:data-[has-value=true]:!text-white !border-neutral-300 !h-[42px]",
                   value: "!text-black dark:!text-white",
                   listbox: "!text-black dark:!text-white",
                 }}
@@ -359,32 +315,53 @@ const Account = ({ accountInfo }: { accountInfo: AccountInfo }) => {
                   <SelectItem key={industry.value}>{industry.label}</SelectItem>
                 ))}
               </Select>
-            </div>
-          </div>
+            }
+          />
 
           {/* Action buttons */}
           {hasChanges() && (
             <Button
-              onPress={handleSaveChanges}
               isLoading={isPending}
               className="w-full mt-4 dark:bg-[#751CF6] bg-[#000] text-white"
+              type="submit"
             >
               {isPending ? "Saving..." : "Save All Changes"}
             </Button>
           )}
         </div>
-      </div>
+      </Form>
 
       <div className="flex flex-col gap-3 items-center w-1/2 justify-self-end">
         {/* Other section */}
         <div className="flex flex-col w-full max-w-[200px]">
           <p className="text-base font-semibold w-full align-left">Other</p>
           <div className="flex flex-col gap-3 mt-2 items-center w-full">
-            <Button className="w-full bg-[#751CF6] text-white">Logout</Button>
-            <Button className="w-full bg-transparent border-2 border-gray-200 dark:border-gray-700 text-color">
+            <Button className="w-full bg-[#751CF6] border-2 border-gray-200 dark:border-gray-700 text-white">
               Delete Account
             </Button>
           </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+interface RenderSectionProps {
+  title: string;
+  Input1: React.ReactNode;
+  Input2?: React.ReactNode;
+}
+
+const RenderSection = ({ title, Input1, Input2 }: RenderSectionProps) => {
+  return (
+    <div>
+      <p className="text-lg font-semibold w-full align-left">{title}</p>
+      {/* Personal Information container */}
+      <div className="mt-8">
+        {/* Personal Information content */}
+        <div className="flex flex-row gap-1.5 rounded-[10px] relative h-[80px]">
+          <div className="w-1/2 relative">{Input1}</div>
+          <div className="w-1/2">{Input2}</div>
         </div>
       </div>
     </div>
