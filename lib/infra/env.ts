@@ -46,6 +46,7 @@ export interface Environment {
 
   // STRIPE
   STRIPE_SECRET_KEY: string;
+  NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: string;
 }
 
 /**
@@ -74,6 +75,7 @@ export function loadEnvironment(): Environment {
     "FAS_URL",
     "FAS_API_KEY",
     "STRIPE_SECRET_KEY",
+    "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY",
   ];
 
   const missingVars: string[] = [];
