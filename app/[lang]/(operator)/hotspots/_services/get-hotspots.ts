@@ -4,6 +4,7 @@ import { getSession } from "@/lib/session/session";
 import { env } from "@/lib/infra/env";
 import ensureHotspots from "./ensure-hotspots";
 import getConnectivity from "@/lib/device/get-connectivity";
+import { getHotspotBySubscription } from "@/app/api/hotspots/_services/hotspots-service";
 
 export interface Hotspot {
   id: number;
@@ -137,7 +138,7 @@ export async function getHotspots(
 }
 
 export async function getHotspotsToAssign(): Promise<Hotspot[]> {
-  const hotspots = await getHotspots(1, 50); // Get all hotspots
-  console.log("Fetched hotspots:", hotspots.data.length);
-  return hotspots.data;
+  const hotspots = await getHotspotBySubscription();
+  console.log("Fetched hotspots:", hotspots?.length);
+  return hotspots as unknown as Hotspot[]
 }

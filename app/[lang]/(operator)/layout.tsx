@@ -14,6 +14,8 @@ import StickyHeader from "@/lib/components/sticky-header";
 import { SidebarProvider } from "@/lib/contexts/sidebar-context";
 import SidebarLogo from "@/lib/components/sidebar-logo";
 import SidebarWrapper from "@/lib/components/sidebar-wrapper";
+import ToggleSidebar from "@/lib/components/toggle-sidebar";
+import { CustomerSubscriptionProvider } from "@/lib/contexts/customer-subscription-context";
 
 export const metadata: Metadata = {
   title: "Operators - Wayru",
@@ -28,7 +30,7 @@ export default async function OperatorLayout({ children }: LayoutProps) {
   return (
     <RootLayout>
       <ToastProvider
-        placement="bottom-center"
+        placement="top-right"
         toastProps={{
           classNames: {
             base: "border-none",
@@ -42,6 +44,7 @@ export default async function OperatorLayout({ children }: LayoutProps) {
             <SidebarLogo />
             <Spacer y={12} />
             <NavMenu />
+            <ToggleSidebar />
           </SidebarWrapper>
           {/* header and page content */}
           <ScrollContainer>
@@ -53,7 +56,9 @@ export default async function OperatorLayout({ children }: LayoutProps) {
               <LogoutButton />
             </StickyHeader>
             {/* Page Content */}
-            {children}
+            <CustomerSubscriptionProvider>
+              {children}
+            </CustomerSubscriptionProvider>
           </ScrollContainer>
         </div>
       </SidebarProvider>

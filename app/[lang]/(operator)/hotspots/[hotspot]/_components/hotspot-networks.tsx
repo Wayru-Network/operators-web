@@ -13,6 +13,8 @@ import {
   HotspotPrivateNetwork,
 } from "../_services/parse-hotspot-config";
 import { Alert } from "@heroui/alert";
+import { useCustomerSubscription } from "@/lib/contexts/customer-subscription-context";
+import { CustomerSubscription } from "@/lib/interfaces/subscriptions";
 
 export interface HotspotNetworksProps {
   locationName?: string;
@@ -125,16 +127,30 @@ export default function HotspotNetworks({
       setIsSaving(false);
     }
   }, [locName, openSSID, privateSSID, newPassword, confirmPassword, hotspot]);
+  const { subscription } = useCustomerSubscription();
+  const { is_subscription_active } = subscription as CustomerSubscription;
 
   const minimumVersion = "2.4.0";
   const isMinimumVersion = isMinimumVersionMet(
     osServicesVersion || "0.0.0",
-    minimumVersion,
+    minimumVersion
   );
+  const isDisabled = !isMinimumVersion || !is_subscription_active;
+
+  const RenderBanner = () => {
+    switch (true) {
+      case !is_subscription_active:
+        return <SubscriptionInactiveBanner />;
+      case !isMinimumVersion:
+        return <MinimumVersionBanner />;
+      default:
+        return <PreviewFeatureBanner />;
+    }
+  };
 
   return (
     <div>
-      {isMinimumVersion ? <PreviewFeatureBanner /> : <MinimumVersionBanner />}
+      {RenderBanner()}
       <Spacer y={4} />
       <p className="text-lg font-semibold">Location name</p>
       <Spacer y={4} />
@@ -146,7 +162,7 @@ export default function HotspotNetworks({
         value={locName}
         type="text"
         wrapperClass="max-w-[470px]"
-        disabled={!isMinimumVersion}
+        disabled={isDisabled}
       />
       <Spacer y={6} />
       <p className="text-lg font-semibold">Network configuration</p>
@@ -159,7 +175,7 @@ export default function HotspotNetworks({
         value={openSSID}
         type="text"
         wrapperClass="max-w-[210px]"
-        disabled={!isMinimumVersion}
+        disabled={isDisabled}
       />
       <Spacer y={8} />
       <div className="flex flex-row space-x-8">
@@ -171,7 +187,7 @@ export default function HotspotNetworks({
           value={privateSSID}
           type="text"
           wrapperClass="max-w-[210px]"
-          disabled={!isMinimumVersion}
+          disabled={isDisabled}
         />
         <CustomInput
           label="New password"
@@ -180,7 +196,7 @@ export default function HotspotNetworks({
           value={newPassword}
           type="password"
           wrapperClass="max-w-[210px]"
-          disabled={!isMinimumVersion}
+          disabled={isDisabled}
         />
         <CustomInput
           label="Confirm password"
@@ -189,7 +205,7 @@ export default function HotspotNetworks({
           value={confirmPassword}
           type="password"
           wrapperClass="max-w-[210px]"
-          disabled={!isMinimumVersion}
+          disabled={isDisabled}
         />
       </div>
       <Spacer y={8} />
@@ -198,7 +214,7 @@ export default function HotspotNetworks({
         className="rounded-[10px] w-[309px]"
         onPress={handleSave}
         isLoading={isSaving}
-        isDisabled={!isMinimumVersion}
+        isDisabled={isDisabled}
       >
         Save changes
       </Button>
@@ -222,6 +238,10 @@ function PreviewFeatureBanner() {
       title={`This is a preview feature. Issues may occur.`}
     />
   );
+}
+
+function SubscriptionInactiveBanner() {
+  return <Alert color="warning" title={`Your subscription is not activated`} />;
 }
 
 // Check if the current version meets the minimum version requirement

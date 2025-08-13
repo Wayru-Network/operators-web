@@ -1,14 +1,10 @@
 import { Prisma } from "@/lib/infra/prisma";
+import { Prisma as PrismaGenerated } from "@/lib/generated/prisma";
 
-interface Customer {
-    email: string;
-    name: string;
-    full_name: string;
-    phone: string;
-}
+
 export async function getOrCreateCustomer(
     uuid: string,
-    customerData: Partial<Customer>
+    customerData: Partial<PrismaGenerated.customersUncheckedCreateInput>
 ) {
     let customer = await Prisma.customers.findFirst({
         where: {
@@ -37,14 +33,23 @@ export async function getOrCreateCustomer(
         company = await Prisma.companies.create({
             data: {
                 customer_id: customer.id,
-                name: customerData.name || "",
-                email: customerData.email || "",
+                name: "",
+                email: "",
                 tax_id: "",
                 vat_number: "",
-                industry: "telecom",
-            },
+            }
         });
     }
 
     return customer;
+}
+
+
+export const getCustomer = async (uuid: string) => {
+    const customer = await Prisma.customers.findFirst({
+        where: {
+            customer_uuid: uuid,
+        },
+    });
+    return customer
 }

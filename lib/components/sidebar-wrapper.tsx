@@ -11,8 +11,8 @@ export default function SidebarWrapper({
 
   return (
     <div
-      className={`transition-all duration-300 ease-in-out bg-[#ffffff] dark:bg-[#191c1d] ${
-        isCollapsed ? "w-[140px] p-4" : "w-[306px]  p-7"
+      className={`relative transition-all duration-400 ease-in-out bg-[#ffffff] dark:bg-[#191c1d] ${
+        isCollapsed ? "w-[100px] p-2" : "w-[306px]  p-7"
       }`}
     >
       {children}

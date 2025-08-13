@@ -50,6 +50,6 @@ export interface FormData {
     company_name: string;
     company_email: string;
     tax_id: string;
-    industry: industry_type;
+    industry: industry_type | null;
     company_id: number;
 }
