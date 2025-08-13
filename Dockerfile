@@ -15,7 +15,7 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
 # Set environment variables for build time
-
+ARG STRIPE_SECRET_KEY
 ENV STRIPE_SECRET_KEY=$STRIPE_SECRET_KEY
 RUN echo "Build arg STRIPE_SECRET_KEY is set: $([ -n "$STRIPE_SECRET_KEY" ] && echo "YES" || echo "NO")"
 RUN echo "Build arg STRIPE_SECRET_KEY length: ${#STRIPE_SECRET_KEY}"
