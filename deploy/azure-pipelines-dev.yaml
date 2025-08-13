@@ -65,8 +65,6 @@ stages:
               dockerfile: $(dockerfilePath)
               containerRegistry: $(dockerRegistryServiceConnection)
               buildContext: "$(Build.SourcesDirectory)"
-              arguments: |
-                --build-arg STRIPE_SECRET_KEY=$MAPPED_STRIPE_SECRET_KEY
               tags: |
                 $(tag)
                 latest
