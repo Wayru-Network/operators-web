@@ -18,6 +18,7 @@ variables:
   containerRegistry: "wayrudev.azurecr.io"
   dockerfilePath: "Dockerfile"
   tag: "$(Build.BuildId)"
+  environment: "operators-web-dev"
   # kubernetesServiceConnection: "operators-web-prod"
   # namespace: "operators"
 
