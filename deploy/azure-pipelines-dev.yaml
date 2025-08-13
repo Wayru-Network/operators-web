@@ -47,10 +47,15 @@ stages:
               else
                 echo "Strings are not equal."
               fi
+              echo "=== Docker Build Debug ==="
+              echo "MAPPED_STRIPE_SECRET_KEY: '$(MAPPED_STRIPE_SECRET_KEY)'"
+              echo "Build arg command: --build-arg STRIPE_SECRET_KEY=$(MAPPED_STRIPE_SECRET_KEY)"
+              echo "=== End Docker Build Debug ==="
               echo "=== End Environment Variables ==="
             env:
               MAPPED_STRIPE_SECRET_KEY: $(STRIPE_SECRET_KEY)
               DEV_VAR: $(DEV_VAR)
+            displayName: "Debug Docker Build Args"
 
           - task: Docker@2
             displayName: Build and push an image to container registry
@@ -61,7 +66,7 @@ stages:
               containerRegistry: $(dockerRegistryServiceConnection)
               buildContext: "$(Build.SourcesDirectory)"
               arguments: |
-                --build-arg STRIPE_SECRET_KEY="$MAPPED_STRIPE_SECRET_KEY"
+                --build-arg STRIPE_SECRET_KEY=$(MAPPED_STRIPE_SECRET_KEY)"
               tags: |
                 $(tag)
                 latest
