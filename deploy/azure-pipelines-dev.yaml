@@ -42,7 +42,7 @@ stages:
               containerRegistry: $(dockerRegistryServiceConnection)
               buildContext: "$(Build.SourcesDirectory)"
               arguments: |
-                --build-arg STRIPE_SECRET_KEY=$(STRIPE_SECRET_KEY)
+                --secret id=stripe_key,env=STRIPE_SECRET_KEY
               tags: |
                 $(tag)
                 latest
