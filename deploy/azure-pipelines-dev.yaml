@@ -36,9 +36,21 @@ stages:
           - script: |
               echo "=== Environment Variables ==="
               echo "STRIPE_SECRET_KEY: $MAPPED_STRIPE_SECRET_KEY"
+              echo "DEV_VAR: $DEV_VAR"
+              if [ "$MAPPED_STRIPE_SECRET_KEY" = "NO_VISIBLE" ]; then
+                echo "String mapped are equal."
+              else
+                echo "String mapped are not equal."
+              fi
+              if [ "$DEV_VAR" = "VISIBLE" ]; then
+                echo "Strings are equal."
+              else
+                echo "Strings are not equal."
+              fi
               echo "=== End Environment Variables ==="
             env:
               MAPPED_STRIPE_SECRET_KEY: $(STRIPE_SECRET_KEY)
+              DEV_VAR: $(DEV_VAR)
 
           - task: Docker@2
             displayName: Build and push an image to container registry
