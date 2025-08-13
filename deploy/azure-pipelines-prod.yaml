@@ -36,21 +36,21 @@ stages:
         pool:
           vmImage: $(vmImageName)
         steps:
-           - task: Docker@2
-            displayName: Build image
-            inputs:
-              command: build
-              repository: $(imageRepository)
-              dockerfile: $(dockerfilePath)
-              containerRegistry: $(dockerRegistryServiceConnection)
-              buildContext: "$(Build.SourcesDirectory)"
-              arguments: |
-                --secret id=stripe_key,env=STRIPE_SECRET_KEY
-              tags: |
-                $(tag)
-                latest
-            env:
-              STRIPE_SECRET_KEY: $(STRIPE_SECRET_KEY)
+          - task: Docker@2
+           displayName: Build image
+           inputs:
+             command: build
+             repository: $(imageRepository)
+             dockerfile: $(dockerfilePath)
+             containerRegistry: $(dockerRegistryServiceConnection)
+             buildContext: "$(Build.SourcesDirectory)"
+             arguments: |
+               --secret id=stripe_key,env=STRIPE_SECRET_KEY
+             tags: |
+               $(tag)
+               latest
+           env:
+             STRIPE_SECRET_KEY: $(STRIPE_SECRET_KEY)
           - task: Docker@2
             displayName: Push image
             inputs:
