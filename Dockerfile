@@ -16,10 +16,10 @@ COPY . .
 
 # Set environment variables for build time
 
-ENV STRIPE_SECRET_KEY=$MAPPED_STRIPE_SECRET_KEY
-RUN echo "Build arg STRIPE_SECRET_KEY is set: $([ -n "$MAPPED_STRIPE_SECRET_KEY" ] && echo "YES" || echo "NO")"
-RUN echo "Build arg STRIPE_SECRET_KEY length: ${#MAPPED_STRIPE_SECRET_KEY}"
-RUN echo "STRIPE_SECRET_KEY=$MAPPED_STRIPE_SECRET_KEY" > .env
+ENV STRIPE_SECRET_KEY=$STRIPE_SECRET_KEY
+RUN echo "Build arg STRIPE_SECRET_KEY is set: $([ -n "$STRIPE_SECRET_KEY" ] && echo "YES" || echo "NO")"
+RUN echo "Build arg STRIPE_SECRET_KEY length: ${#STRIPE_SECRET_KEY}"
+RUN echo "STRIPE_SECRET_KEY=$STRIPE_SECRET_KEY" > .env
 # Generate Prisma client
 RUN corepack enable pnpm && pnpm generate
 RUN corepack enable pnpm && pnpm run build

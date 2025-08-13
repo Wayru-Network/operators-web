@@ -33,40 +33,27 @@ stages:
         pool:
           vmImage: $(vmImageName)
         steps:
-          - script: |
-              echo "=== Environment Variables ==="
-              echo "STRIPE_SECRET_KEY: $MAPPED_STRIPE_SECRET_KEY"
-              echo "DEV_VAR: $DEV_VAR"
-              if [ "$MAPPED_STRIPE_SECRET_KEY" = "NO_VISIBLE" ]; then
-                echo "String mapped are equal."
-              else
-                echo "String mapped are not equal."
-              fi
-              if [ "$DEV_VAR" = "VISIBLE" ]; then
-                echo "Strings are equal."
-              else
-                echo "Strings are not equal."
-              fi
-              echo "=== Docker Build Debug ==="
-              echo "MAPPED_STRIPE_SECRET_KEY: '$MAPPED_STRIPE_SECRET_KEY'"
-              echo "Build arg command: --build-arg STRIPE_SECRET_KEY=$MAPPED_STRIPE_SECRET_KEY"
-              echo "=== End Docker Build Debug ==="
-              echo "=== End Environment Variables ==="
-            env:
-              MAPPED_STRIPE_SECRET_KEY: $(STRIPE_SECRET_KEY)
-              DEV_VAR: $(DEV_VAR)
-            displayName: "Debug Docker Build Args"
-
           - task: Docker@2
-            displayName: Build and push an image to container registry
+            displayName: Build image
             inputs:
-              command: buildAndPush
+              command: build
               repository: $(imageRepository)
               dockerfile: $(dockerfilePath)
               containerRegistry: $(dockerRegistryServiceConnection)
               buildContext: "$(Build.SourcesDirectory)"
+              arguments: |
+                --build-arg STRIPE_SECRET_KEY=$(STRIPE_SECRET_KEY)
               tags: |
                 $(tag)
                 latest
             env:
-              MAPPED_STRIPE_SECRET_KEY: $(STRIPE_SECRET_KEY)
+              STRIPE_SECRET_KEY: $(STRIPE_SECRET_KEY)
+          - task: Docker@2
+            displayName: Push image
+            inputs:
+              command: push
+              repository: $(imageRepository)
+              containerRegistry: $(dockerRegistryServiceConnection)
+              tags: |
+                $(tag)
+                latest
