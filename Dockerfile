@@ -19,10 +19,12 @@ ARG STRIPE_SECRET_KEY
 
 # Set environment variables for build time
 ENV STRIPE_SECRET_KEY=$STRIPE_SECRET_KEY
+RUN echo "STRIPE_SECRET_KEY=$STRIPE_SECRET_KEY" > .env
 # Generate Prisma client
 RUN corepack enable pnpm && pnpm generate
 RUN corepack enable pnpm && pnpm run build
-
+# Remove .env file after build
+RUN rm -f .env
 FROM base AS runner
 WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1

@@ -36,10 +36,11 @@ stages:
         steps:
           - script: |
               echo "=== Environment Variables ==="
-              echo "STRIPE_SECRET_KEY: '$(STRIPE_SECRET_KEY)'"
-              echo "STRIPE_SECRET_KEY length: ${#STRIPE_SECRET_KEY}"
-              echo "Is STRIPE_SECRET_KEY empty? $([ -z "$(STRIPE_SECRET_KEY)" ] && echo "YES" || echo "NO")"
+              echo "STRIPE_SECRET_KEY: $MAPPED_STRIPE_SECRET_KEY"
               echo "=== End Environment Variables ==="
+            env:
+              MAPPED_STRIPE_SECRET_KEY: $(STRIPE_SECRET_KEY)
+
           - task: Docker@2
             displayName: Build and push an image to container registry
             inputs:
@@ -49,7 +50,9 @@ stages:
               containerRegistry: $(dockerRegistryServiceConnection)
               buildContext: "$(Build.SourcesDirectory)"
               arguments: |
-                --build-arg STRIPE_SECRET_KEY=$(STRIPE_SECRET_KEY)
+                --build-arg STRIPE_SECRET_KEY=$MAPPED_STRIPE_SECRET_KEY
               tags: |
                 $(tag)
                 latest
+            env:
+              MAPPED_STRIPE_SECRET_KEY: $(STRIPE_SECRET_KEY)
