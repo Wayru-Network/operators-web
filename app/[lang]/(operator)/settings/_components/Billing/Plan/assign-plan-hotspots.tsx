@@ -23,9 +23,13 @@ export default function AssignPlanHotspots() {
   const [isSearching, setIsSearching] = useState(false);
   const [isSearchInProgress, setIsSearchInProgress] = useState(false);
   const debounceRef = useRef<NodeJS.Timeout | undefined>(undefined);
-  const { hotspots: assignedHotspots, refresh: refreshHotspotsAssigned } =
-    useSubscriptionHotspots();
-  const hotspotLimitToAdd = subscription?.hotspot_limit ?? 0;
+  const {
+    hotspots: assignedHotspots,
+    refresh: refreshHotspotsAssigned,
+    isLoading: isGettingHotspotAssigned,
+  } = useSubscriptionHotspots();
+  const stripeSub = subscription?.stripe_subscription;
+  const hotspotLimitToAdd = stripeSub?.products_amount ?? 0;
   const hotspotLimitReached = hotspotLimitToAdd <= assignedHotspots?.length;
   const [isUpdatingSubscription, startUpdatingSubscription] = useTransition();
   const [inputValue, setInputValue] = useState("");
@@ -96,9 +100,9 @@ export default function AssignPlanHotspots() {
   const handleOnSelectHotspot = (id: number) => {
     // Clear the input after selection
     startUpdatingSubscription(async () => {
+      setInputValue("");
       const hotspotsFiltered = filteredHotspots.find((h) => h.id === id);
-      const alreadyExist = assignedHotspots.find((i) => i.id === id);
-      if (hotspotsFiltered && !alreadyExist) {
+      if (hotspotsFiltered) {
         await addHotspotToSubscription(
           hotspotsFiltered?.wayru_device_id,
           subscription?.id as number
@@ -142,7 +146,7 @@ export default function AssignPlanHotspots() {
             startContent={<Search size={16} />}
             endContent={isSearching && <Spinner size="sm" />}
             selectorIcon={
-              isUpdatingSubscription ? (
+              isUpdatingSubscription || isGettingHotspotAssigned ? (
                 <Spinner size="sm" />
               ) : (
                 <ChevronDown size={18} />
@@ -156,7 +160,7 @@ export default function AssignPlanHotspots() {
             isClearable={false}
             onValueChange={(v) => onChangeInput(v)}
             inputValue={inputValue}
-            menuTrigger="input"
+            //menuTrigger="manual"
             isDisabled={isInputDisabled}
             listboxProps={{
               emptyContent: isSearchInProgress

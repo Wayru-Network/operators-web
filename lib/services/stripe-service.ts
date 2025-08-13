@@ -41,6 +41,19 @@ export async function getStripeCustomerSubscription(subscriptionId: string): Pro
 
         // Get billing details from price
         const price = sub.items.data[0].price as Stripe.Price;
+        const stripeLatestInvoice = sub?.latest_invoice as Stripe.Invoice
+
+        // prepare latest invoice object
+        const totalCents = stripeLatestInvoice.total
+        const latestInvoice = (totalCents > 0 && stripeLatestInvoice.status === "paid") ? {
+            invoice_id: stripeLatestInvoice?.id as string,
+            total_payment: (totalCents / 100).toLocaleString('en-US', {
+                style: 'currency',
+                currency: 'USD'
+            }),
+            createdAt: stripeLatestInvoice?.created,
+            invoice_pdf: stripeLatestInvoice.invoice_pdf as string
+        } : null
 
         const subscription: StripeSubscription = {
             subscription_id: sub.id,
@@ -68,6 +81,7 @@ export async function getStripeCustomerSubscription(subscriptionId: string): Pro
                     next_payment_date: moment(sub.items.data[0].current_period_end * 1000).format("MMM DD, YYYY")
                 }
                 : undefined,
+            latest_invoice: latestInvoice
         }
 
 
