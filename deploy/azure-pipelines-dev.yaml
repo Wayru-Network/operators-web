@@ -48,8 +48,8 @@ stages:
                 echo "Strings are not equal."
               fi
               echo "=== Docker Build Debug ==="
-              echo "MAPPED_STRIPE_SECRET_KEY: '$(MAPPED_STRIPE_SECRET_KEY)'"
-              echo "Build arg command: --build-arg STRIPE_SECRET_KEY=$(MAPPED_STRIPE_SECRET_KEY)"
+              echo "MAPPED_STRIPE_SECRET_KEY: '$MAPPED_STRIPE_SECRET_KEY'"
+              echo "Build arg command: --build-arg STRIPE_SECRET_KEY=$MAPPED_STRIPE_SECRET_KEY"
               echo "=== End Docker Build Debug ==="
               echo "=== End Environment Variables ==="
             env:
