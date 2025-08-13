@@ -1,5 +1,5 @@
 import useSWR from "swr";
-import { MinersByAddressResponse } from "@/app/[lang]/(operator)/hotspots/_services/get-hotspots";
+import { Hotspot, MinersByAddressResponse } from "@/app/[lang]/(operator)/hotspots/_services/get-hotspots";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -28,5 +28,27 @@ export function useHotspots(
     meta: data?.meta,
     isLoading,
     error,
+  };
+}
+
+
+export function useSubscriptionHotspots(fallbackData?: Hotspot[]) {
+  const { data, error, isLoading, mutate } = useSWR<{ data: Hotspot[] }>(
+    "/api/hotspots/subscription",
+    fetcher,
+    {
+      fallbackData: fallbackData ? { data: fallbackData } : undefined,
+      revalidateOnFocus: false,
+    }
+  );
+
+  const refresh = () => mutate();
+
+  return {
+    hotspots: data?.data ?? [],
+    isLoading,
+    error,
+    mutate,
+    refresh,
   };
 }
