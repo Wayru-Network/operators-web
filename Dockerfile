@@ -13,6 +13,12 @@ FROM base AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+
+ARG STRIPE_SECRET_KEY
+
+
+# Set environment variables for build time
+ENV STRIPE_SECRET_KEY=$STRIPE_SECRET_KEY
 # Generate Prisma client
 RUN corepack enable pnpm && pnpm generate
 RUN corepack enable pnpm && pnpm run build
