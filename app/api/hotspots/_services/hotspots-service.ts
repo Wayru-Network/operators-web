@@ -16,7 +16,7 @@ export async function getHotspotBySubscription() {
             return null
         }
 
-        let sub = await Prisma.subscriptions.findFirst({
+        const sub = await Prisma.subscriptions.findFirst({
             where: {
                 customer_id: customer?.id
             }
