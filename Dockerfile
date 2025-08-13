@@ -18,6 +18,9 @@ ARG STRIPE_SECRET_KEY
 
 
 # Set environment variables for build time
+RUN echo "Build arg STRIPE_SECRET_KEY is set: $([ -n "$STRIPE_SECRET_KEY" ] && echo "YES" || echo "NO")"
+RUN echo "Build arg STRIPE_SECRET_KEY length: ${#STRIPE_SECRET_KEY}"
+
 ENV STRIPE_SECRET_KEY=$STRIPE_SECRET_KEY
 RUN echo "STRIPE_SECRET_KEY=$STRIPE_SECRET_KEY" > .env
 # Generate Prisma client
