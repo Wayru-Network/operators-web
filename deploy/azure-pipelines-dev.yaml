@@ -36,7 +36,9 @@ stages:
         steps:
           - script: |
               echo "=== Environment Variables ==="
-              echo "STRIPE_SECRET_KEY: $(STRIPE_SECRET_KEY)"
+              echo "STRIPE_SECRET_KEY: '$(STRIPE_SECRET_KEY)'"
+              echo "STRIPE_SECRET_KEY length: ${#STRIPE_SECRET_KEY}"
+              echo "Is STRIPE_SECRET_KEY empty? $([ -z "$(STRIPE_SECRET_KEY)" ] && echo "YES" || echo "NO")"
               echo "=== End Environment Variables ==="
           - task: Docker@2
             displayName: Build and push an image to container registry
