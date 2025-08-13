@@ -1,14 +1,15 @@
 import { Hotspot } from "@/app/[lang]/(operator)/hotspots/_services/get-hotspots";
 import { Router } from "lucide-react";
 import { X } from "lucide-react";
+import { ScrollShadow } from "@heroui/react";
 
 interface Props {
   hotspots: Hotspot[];
-  onRemoveHotspot: (id: number) => void;
+  onRemoveHotspot: (wayruDeviceId: string) => void;
 }
-const PlanTable = ({ hotspots, onRemoveHotspot }: Props) => {
+const AssignedHotspotsList = ({ hotspots, onRemoveHotspot }: Props) => {
   return (
-    <div className="flex flex-col w-full mt-2 gap-1 px-1">
+    <ScrollShadow visibility="bottom" className="mt-2 gap-1 px-1 h-[390px]">
       {hotspots.map((item, index) => (
         <div
           key={index}
@@ -26,13 +27,13 @@ const PlanTable = ({ hotspots, onRemoveHotspot }: Props) => {
             <X
               className="cursor-pointer"
               size={16}
-              onClick={() => onRemoveHotspot(item.id)}
+              onClick={() => onRemoveHotspot(item.wayru_device_id)}
             />
           </div>
         </div>
       ))}
-    </div>
+    </ScrollShadow>
   );
 };
 
-export default PlanTable;
+export default AssignedHotspotsList;

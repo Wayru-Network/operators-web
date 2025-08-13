@@ -181,3 +181,92 @@ export const createTrialSubscription = async (params: CreateSubscriptionInput) =
         }
     }
 }
+
+export const updateCustomerSubscription = async (params: { quantity: number }) => {
+    try {
+        const { userId } = await getSession();
+        if (!userId) {
+            return {
+                error: true,
+                message: 'User not authenticated',
+            };
+        }
+
+        const customer = await getCustomer(userId);
+        if (!customer) {
+            return {
+                error: true,
+                message: 'Customer not found',
+            };
+        }
+
+        // Get the current subscription
+        const subscription = await Prisma.subscriptions.findFirst({
+            where: {
+                customer_id: customer.id
+            }
+        });
+
+        if (!subscription?.stripe_subscription_id) {
+            return {
+                error: true,
+                message: 'No active subscription found',
+            };
+        }
+
+        // Get the current Stripe subscription to find the subscription item ID
+        const currentStripeSubscription = await stripeServer.subscriptions.retrieve(
+            subscription.stripe_subscription_id
+        );
+
+        if (!currentStripeSubscription.items?.data?.[0]?.id) {
+            return {
+                error: true,
+                message: 'No subscription items found',
+            };
+        }
+
+        const subscriptionItemId = currentStripeSubscription.items.data[0].id;
+
+        // Update the subscription in Stripe
+        const updatedStripeSubscription = await stripeServer.subscriptions.update(
+            subscription.stripe_subscription_id,
+            {
+                items: [{
+                    id: subscriptionItemId,
+                    quantity: params.quantity,
+                }],
+                proration_behavior: 'create_prorations',
+            }
+        );
+
+        if (!updatedStripeSubscription) {
+            return {
+                error: true,
+                message: 'Failed to update Stripe subscription',
+            };
+        }
+
+        // Update the hotspot_limit in our database
+        await Prisma.subscriptions.update({
+            where: {
+                customer_id: customer.id,
+            },
+            data: {
+                hotspot_limit: params.quantity
+            }
+        });
+
+        return {
+            error: false,
+            message: 'Your subscription was updated successfully',
+        };
+    } catch (error) {
+        console.error('Error updating subscription:', error);
+        return {
+            error: true,
+            message: 'Failed to update subscription',
+        };
+    }
+};
+

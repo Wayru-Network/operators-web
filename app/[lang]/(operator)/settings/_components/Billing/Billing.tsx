@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import PlanNotSelected from "./Plan/plan-not-selected";
-import SelectAPlan from "./Plan/select-a-plan";
+import BillingPlanHotspotsStep from "./Plan/billing-plan-hotspot-step";
 import PlanActive from "./Plan/plan-active";
 import PlanCheckout from "./Plan/plan-checkout";
 import ChangePaymentMethod from "./payment-method/change-payment-method";
@@ -48,7 +48,7 @@ const Billing = () => {
       </Tab>
       <Tab key="step2" title="Billing">
         <EaseInOutContent>
-          <SelectAPlan setSelected={setSelected} />
+          <BillingPlanHotspotsStep setSelected={setSelected} />
         </EaseInOutContent>
       </Tab>
       <Tab key="step3" title="Change payment method">

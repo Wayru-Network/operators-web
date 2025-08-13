@@ -6,6 +6,7 @@ import Stripe from "stripe";
 import { Steps } from "../Billing";
 import AssignPlanHotspots from "./assign-plan-hotspots";
 import { useCustomerSubscription } from "@/lib/contexts/customer-subscription-context";
+import { useBilling } from "../../../contexts/BillingContext";
 
 interface PlanActiveProps {
   setSelected: (key: Steps) => void;
@@ -15,10 +16,12 @@ const PlanActive = ({ setSelected }: PlanActiveProps) => {
   const { subscription } = useCustomerSubscription();
   const hotspotSubscription = subscription?.stripe_subscription;
   const paymentMethod = hotspotSubscription?.payment_method;
-
-  const isDisabledDeletePaymentMethod = true;
-  const currentMonth = moment().format("MMMM");
-  const currentYear = moment().format("YYYY");
+  const latestInvoice = hotspotSubscription?.latest_invoice;
+  const { handleHotspotsToAdd } = useBilling();
+  const isDisabledDeletePaymentMethod = !latestInvoice;
+  const invoiceCreatedAt = latestInvoice?.createdAt ?? 0;
+  const currentMonth = moment(invoiceCreatedAt * 1000).format("MMMM");
+  const currentYear = moment(invoiceCreatedAt * 1000).format("YYYY");
 
   const billingCycle = (interval: Stripe.Price.Recurring.Interval) => {
     if (interval === "month") {
@@ -99,7 +102,15 @@ const PlanActive = ({ setSelected }: PlanActiveProps) => {
               </div>
             </div>
             <div className="flex flex-row w-full justify-start mt-3">
-              <Button className="w-1/2 bg-[#000] dark:bg-[#fff] text-white dark:text-black">
+              <Button
+                onPress={() => {
+                  handleHotspotsToAdd(
+                    hotspotSubscription?.products_amount ?? 0
+                  );
+                  setSelected("step2");
+                }}
+                className="w-1/2 bg-[#000] dark:bg-[#fff] text-white dark:text-black"
+              >
                 Adjust plan
               </Button>
               <Button className="w-1/2 bg-[#fff] dark:bg-[#000] text-black dark:text-white ml-2 border border-gray-400 dark:border-gray-700">
@@ -113,17 +124,30 @@ const PlanActive = ({ setSelected }: PlanActiveProps) => {
             <p className="text-base font-semibold w-full align-left mt-6">
               Invoice history
             </p>
-            <div className="flex flex-row w-full items-center gap-4 ml-4 mt-2 justify-between">
-              <div>
-                <p className="text-xs  font-small">
-                  {hotspotSubscription?.products_amount} hotspots - Monthly Plan
-                </p>
-                <p className="text-lg  font-medium">
-                  {currentMonth} {currentYear}
-                </p>
+            {latestInvoice ? (
+              <div className="flex flex-row w-full items-center gap-4 ml-4 mt-2 justify-between">
+                <div>
+                  <p className="text-xs  font-small">
+                    {hotspotSubscription?.products_amount} hotspots - Monthly
+                    Plan
+                  </p>
+                  <p className="text-lg  font-medium">
+                    {currentMonth} {currentYear}
+                  </p>
+                </div>
+                <ArrowDownToLine
+                  onClick={() =>
+                    window.open(latestInvoice?.invoice_pdf, "_blank")
+                  }
+                  size={22}
+                  className="cursor-pointer mr-4"
+                />
               </div>
-              <ArrowDownToLine size={22} className="cursor-pointer mr-4" />
-            </div>
+            ) : (
+              <div className="flex flex-row w-full items-center gap-4 ml-4 mt-2 justify-between">
+                <p className="text-lg  font-medium">N/A</p>
+              </div>
+            )}
           </div>
 
           {/* Payment & billing methods section */}

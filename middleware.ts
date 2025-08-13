@@ -5,15 +5,15 @@ import { SupportedLanguages } from "@/lib/language/language";
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  if (pathname === "/api/auth/callback") {
-    return NextResponse.next();
-  }
+  // available pathnames
+  const availablePathnames = [
+    "/api/auth/callback",
+    "/api/hotspots",
+    "/api/subscriptions",
+    "/api/hotspots/subscription",
+  ];
 
-  if (pathname === "/api/hotspots") {
-    return NextResponse.next();
-  }
-
-  if (pathname === "/api/subscriptions") {
+  if (availablePathnames.includes(pathname)) {
     return NextResponse.next();
   }
 
