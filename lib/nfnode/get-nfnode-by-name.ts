@@ -2,7 +2,7 @@ import { env } from "@/lib/infra/env";
 import { NFNode, NFNodeResponse } from "./types";
 
 export default async function getNFNodeByName(
-  name: string,
+  name: string
 ): Promise<NFNode | null> {
   const url =
     `${env.BACKEND_URL}/api/nfnodes?filters[name][$eq]=${name}` +
@@ -20,12 +20,19 @@ export default async function getNFNodeByName(
     "&fields[11]=wallet" +
     "&fields[12]=nfnode_type" +
     "&fields[13]=nas_id";
-  const response = await fetch(url, {
-    headers: {
-      "Content-Type": "application/json",
-      "X-API-KEY": env.BACKEND_KEY,
-    },
-  });
+
+  let response: Response;
+  try {
+    response = await fetch(url, {
+      headers: {
+        "Content-Type": "application/json",
+        "X-API-KEY": env.BACKEND_KEY,
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching NFNode by name:", error);
+    return null;
+  }
   if (!response.ok) {
     return null;
   }
