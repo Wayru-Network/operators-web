@@ -75,7 +75,7 @@ model companies {
   id          Int            @id @default(autoincrement())
   customer_id Int?
   name        String         @db.VarChar(255)
-  email       String         @unique(map: "companies_company_email_key") @db.VarChar(255)
+  email       String         @db.VarChar(255)
   tax_id      String?        @db.VarChar(100)
   vat_number  String?        @db.VarChar(100)
   industry    industry_type?
