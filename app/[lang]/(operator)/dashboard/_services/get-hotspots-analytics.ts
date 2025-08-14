@@ -26,18 +26,29 @@ export async function getHotspotsAnalytics(
   nasIds: string[],
   period: "last" | "3d" | "7d"
 ): Promise<HotspotsAnalyticsResponse> {
-
-  const hotspotsData = await fetch(
-    `${env.NAS_API_URL}/miner-dashboard?period=${period}`,
-    {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${env.NAS_API_KEY}`,
-      },
-      body: JSON.stringify({nasIds: nasIds}),
-      method: "POST",
-    }
-  );
+  let hotspotsData;
+  try {
+    hotspotsData = await fetch(
+      `${env.NAS_API_URL}/miner-dashboard?period=${period}`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${env.NAS_API_KEY}`,
+        },
+        body: JSON.stringify({ nasIds: nasIds }),
+        method: "POST",
+      }
+    );
+  } catch (error) {
+    console.error("Error fetching hotspots:", error);
+    return {
+      connectionsTotal: 0,
+      trace: [],
+      dataTrafficTotal: 0,
+      dataTrafficTrace: [],
+      unit: "KB",
+    };
+  }
 
   let hotspots: HotspotAnalytics;
   try {
@@ -66,13 +77,8 @@ export async function getHotspotsAnalytics(
     };
   }
 
-  const {
-    connectionsTotal,
-    trace,
-    dataTrafficTotal,
-    dataTrafficTrace,
-    unit,
-  } = hotspots.data;
+  const { connectionsTotal, trace, dataTrafficTotal, dataTrafficTrace, unit } =
+    hotspots.data;
 
   return {
     connectionsTotal,
