@@ -17,12 +17,27 @@ export async function searchHotspots(
   }/api/nfnode/miners-by-query/${wallet}/${encodeURIComponent(
     query
   )}?page=${page}&limit=${limit}`;
-  const res = await fetch(url, {
-    headers: {
-      "Content-Type": "application/json",
-      "X-API-KEY": env.BACKEND_KEY,
-    },
-  });
+
+  let res: Response;
+  try {
+    res = await fetch(url, {
+      headers: {
+        "Content-Type": "application/json",
+        "X-API-KEY": env.BACKEND_KEY,
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching hotspots:", error);
+    return {
+      data: [],
+      meta: {
+        total: 0,
+        pages: 0,
+        page: 0,
+        size: 0,
+      },
+    };
+  }
 
   if (!res.ok) {
     console.error("Search failed:", await res.text());

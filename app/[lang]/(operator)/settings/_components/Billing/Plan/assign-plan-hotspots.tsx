@@ -64,7 +64,20 @@ export default function AssignPlanHotspots() {
       setFilteredHotspots(removeDuplicatedHotspots(localResults));
     } else {
       const url = `/api/hotspots?page=${1}&limit=${50}&q=${query}`;
-      const response = await fetch(url);
+      let response: Response | undefined;
+      try {
+        response = await fetch(url);
+      } catch (error) {
+        console.error("Error fetching hotspots:", error);
+        setIsSearching(false);
+        setIsSearchInProgress(false);
+        return;
+      }
+      if (!response) {
+        setIsSearching(false);
+        setIsSearchInProgress(false);
+        return;
+      }
       const { data } = (await response.json()) as { data: Hotspot[] };
       const deletedDuplicates = removeDuplicatedHotspots([
         ...data,
