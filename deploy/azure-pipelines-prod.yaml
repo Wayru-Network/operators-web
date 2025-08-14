@@ -46,11 +46,13 @@ stages:
               buildContext: "$(Build.SourcesDirectory)"
               arguments: |
                 --secret id=stripe_key,env=STRIPE_SECRET_KEY
+                --secret id=stripe_public_key,env=NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
               tags: |
                 $(tag)
                 latest
             env:
               STRIPE_SECRET_KEY: $(STRIPE_SECRET_KEY)
+              NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: $(NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY)
           - task: Docker@2
             displayName: Push image
             inputs:
