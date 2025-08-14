@@ -17,6 +17,9 @@ COPY . .
 RUN --mount=type=secret,id=stripe_key \
     export STRIPE_SECRET_KEY=$(cat /run/secrets/stripe_key) && \
     echo "STRIPE_SECRET_KEY=$STRIPE_SECRET_KEY" > .env && \
+    --mount=type=secret,id=stripe_public_key \
+    export NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=$(cat /run/secrets/stripe_public_key) && \
+    echo "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=$NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY" >> .env && \
     corepack enable pnpm && pnpm generate && \
     corepack enable pnpm && pnpm run build && \
     rm -f .env
