@@ -13,7 +13,8 @@ FROM base AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-
+RUN echo "STRIPE_SECRET_KEY=$STRIPE_SECRET_KEY"
+RUN echo "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=$NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY" 
 RUN --mount=type=secret,id=stripe_key \
     --mount=type=secret,id=stripe_public_key \
     export STRIPE_SECRET_KEY=$(cat /run/secrets/stripe_key) && \
