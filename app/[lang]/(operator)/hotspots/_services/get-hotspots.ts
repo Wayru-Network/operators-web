@@ -46,15 +46,30 @@ export async function getHotspots(
     };
   }
 
-  const hotspotsData = await fetch(
-    `${env.BACKEND_URL}/api/nfnode/miners-by-address/${wallet}?page=${page}&limit=${limit}`,
-    {
-      headers: {
-        "Content-Type": "application/json",
-        "X-API-KEY": env.BACKEND_KEY,
+  let hotspotsData;
+
+  try {
+    hotspotsData = await fetch(
+      `${env.BACKEND_URL}/api/nfnode/miners-by-address/${wallet}?page=${page}&limit=${limit}`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "X-API-KEY": env.BACKEND_KEY,
+        },
+      }
+    );
+  } catch (error) {
+    console.error("Error fetching hotspots:", error);
+    return {
+      data: [],
+      meta: {
+        total: 0,
+        pages: 0,
+        page: 0,
+        size: 0,
       },
-    }
-  );
+    };
+  }
 
   let hotspots: MinersByAddressResponse;
   try {
@@ -140,5 +155,5 @@ export async function getHotspots(
 export async function getHotspotsToAssignCaptivePortal(): Promise<Hotspot[]> {
   const hotspots = await getHotspotBySubscription();
   console.log("Fetched hotspots:", hotspots?.length);
-  return hotspots as unknown as Hotspot[]
+  return hotspots as unknown as Hotspot[];
 }

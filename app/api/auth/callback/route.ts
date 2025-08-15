@@ -80,18 +80,25 @@ export async function GET(req: Request) {
     code_verifier: codeVerifier,
   });
 
-  const tokenRes = await fetch(TOKEN_ENDPOINT, {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body,
-  });
+  let tokenRes: Response;
 
-  if (!tokenRes.ok) {
-    console.log("auth failure: Token exchange failed");
-    console.log("- Status:", tokenRes.status);
-    console.log("- Status text:", tokenRes.statusText);
-    const errorText = await tokenRes.text();
-    console.log("- Error response:", errorText);
+  try {
+    tokenRes = await fetch(TOKEN_ENDPOINT, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body,
+    });
+
+    if (!tokenRes.ok) {
+      console.log("auth failure: Token exchange failed");
+      console.log("- Status:", tokenRes.status);
+      console.log("- Status text:", tokenRes.statusText);
+      const errorText = await tokenRes.text();
+      console.log("- Error response:", errorText);
+      return NextResponse.redirect(fallbackUrl);
+    }
+  } catch (error) {
+    console.error("Error during token exchange:", error);
     return NextResponse.redirect(fallbackUrl);
   }
 
