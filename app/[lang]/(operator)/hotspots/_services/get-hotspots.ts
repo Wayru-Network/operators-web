@@ -74,7 +74,7 @@ export async function getHotspots(
   let hotspots: MinersByAddressResponse;
   try {
     hotspots = (await hotspotsData.json()) as MinersByAddressResponse;
-    if (!hotspots || hotspots.data.length === 0) {
+    if (!hotspots || !hotspots?.data || hotspots?.data?.length === 0) {
       return {
         data: [],
         meta: {
@@ -98,11 +98,10 @@ export async function getHotspots(
     };
   }
 
-  const wayruDeviceIds = hotspots.data
-    .filter(
-      (hotspot) =>
-        hotspot.wayru_device_id && hotspot.wayru_device_id.trim() !== ""
-    )
+  const wayruDeviceIds = hotspots?.data?.filter(
+    (hotspot) =>
+      hotspot.wayru_device_id && hotspot.wayru_device_id.trim() !== ""
+  )
     .map((hotspot) => hotspot.wayru_device_id);
 
   // Get the device connectivity status

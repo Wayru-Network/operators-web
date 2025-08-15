@@ -53,14 +53,33 @@ export default function CheckoutBillingDetails({ setSelected }: Props) {
     });
   };
 
+  const getRecurringInterval = (interval: string) => {
+    switch (interval) {
+      case "month":
+        return "Monthly";
+      case "year":
+        return "Yearly";
+      default:
+        return "Monthly";
+    }
+  };
+
   // if trial subscription was already used return only the next billing data!!
   if (is_trial_period_used) {
     return (
-      <div className="flex flex-row">
-        <p className="text-xs font-semibold">Next billing date:</p>
-        <p className="text-xs font-medium dark:text-gray-300 text-gray-700 ml-1">
-          {nextBillingDate}
-        </p>
+      <div className="flex flex-col w-full gap-2">
+        <div className="flex flex-row">
+          <p className="text-xs font-semibold">Billing cycle:</p>
+          <p className="text-xs font-medium dark:text-gray-300 text-gray-700 ml-1">
+            {getRecurringInterval(recurring?.interval ?? "month")}
+          </p>
+        </div>
+        <div className="flex flex-row">
+          <p className="text-xs font-semibold">Next billing date:</p>
+          <p className="text-xs font-medium dark:text-gray-300 text-gray-700 ml-1">
+            {nextBillingDate}
+          </p>
+        </div>
       </div>
     );
   }

@@ -12,11 +12,10 @@ export async function searchHotspots(
 ): Promise<MinersByAddressResponse> {
   const { wallet } = await getSession();
 
-  const url = `${
-    env.BACKEND_URL
-  }/api/nfnode/miners-by-query/${wallet}/${encodeURIComponent(
-    query
-  )}?page=${page}&limit=${limit}`;
+  const url = `${env.BACKEND_URL
+    }/api/nfnode/miners-by-query/${wallet}/${encodeURIComponent(
+      query
+    )}?page=${page}&limit=${limit}`;
 
   let res: Response;
   try {
@@ -54,7 +53,7 @@ export async function searchHotspots(
 
   const hotspots = (await res.json()) as MinersByAddressResponse;
 
-  if (!hotspots || hotspots.data.length === 0) {
+  if (!hotspots || hotspots?.data?.length === 0) {
     return {
       data: [],
       meta: {
@@ -110,10 +109,10 @@ export async function searchHotspots(
   return {
     data: hotspots.data,
     meta: {
-      total: hotspots.data.length,
+      total: hotspots?.data?.length,
       pages: hotspots.meta.pages,
       page,
-      size: hotspots.data.length,
+      size: hotspots?.data?.length,
     },
   };
 }

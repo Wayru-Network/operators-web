@@ -6,7 +6,6 @@ import { useBilling } from "../../../contexts/BillingContext";
 import PlanNotFound from "./plan-not-found";
 import { Steps } from "../Billing";
 import { useCustomerSubscription } from "@/lib/contexts/customer-subscription-context";
-import { useTransition } from "react";
 import { useSubscriptionHotspots } from "@/lib/hooks/use-hotspots";
 import { calculateDiscountSummary } from "@/lib/helpers/stripe-helper";
 
@@ -25,7 +24,6 @@ const BillingPlanHotspotsStep = ({ setSelected }: SelectAPlanProps) => {
   const hotspotPrice = hotspotProduct?.priceDetails[0].price_with_fee ?? 0;
   const { totalPriceWithDiscount: currentMonthlyCost } =
     calculateDiscountSummary(currentHotspotsAmount, hotspotPrice);
-  const [isUpdatingSubscription] = useTransition();
   const { hotspots: assignedHotspots } = useSubscriptionHotspots();
   const assignedHotspotsAmount = assignedHotspots?.length;
   const { totalPriceWithDiscount } = calculateDiscountSummary(
@@ -132,24 +130,16 @@ const BillingPlanHotspotsStep = ({ setSelected }: SelectAPlanProps) => {
         <div className="flex flex-row gap-4">
           <Button
             className="w-full bg-[#000] dark:bg-[#fff] text-white dark:text-black mt-9 disabled:opacity-50 disabled:cursor-not-allowed w-1/2"
-            disabled={isUpdatingSubscription}
             onPress={() => setSelected("step1")}
           >
             Back
           </Button>
           <Button
-            isLoading={isUpdatingSubscription}
-            disabled={
-              hotspotsToAdd === currentHotspotsAmount || isUpdatingSubscription
-            }
+            disabled={hotspotsToAdd === currentHotspotsAmount}
             className="w-full bg-[#000] dark:bg-[#fff] text-white dark:text-black mt-9 disabled:opacity-50 disabled:cursor-not-allowed w-1/2"
             onPress={() => setSelected("step4")}
           >
-            {currentHotspotsAmount
-              ? isUpdatingSubscription
-                ? "Updating Subscription"
-                : "Update subscription"
-              : "Proceed to checkout"}
+            Proceed to checkout
           </Button>
         </div>
       </div>
