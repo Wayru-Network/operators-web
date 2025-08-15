@@ -1,8 +1,8 @@
 import CreateCaptivePortal from "./_components/create-captive-portal";
-import { getHotspotsToAssign } from "../../hotspots/_services/get-hotspots";
+import { getHotspotsToAssignCaptivePortal } from "../../hotspots/_services/get-hotspots";
 
 export default async function CaptivePortal() {
   // Fetch portals data from the server
-  const hotspots = await getHotspotsToAssign();
+  const hotspots = await getHotspotsToAssignCaptivePortal();
   return <CreateCaptivePortal hotspots={hotspots} />;
 }

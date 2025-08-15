@@ -152,7 +152,7 @@ export async function getHotspots(
   return hotspots;
 }
 
-export async function getHotspotsToAssign(): Promise<Hotspot[]> {
+export async function getHotspotsToAssignCaptivePortal(): Promise<Hotspot[]> {
   const hotspots = await getHotspotBySubscription();
   console.log("Fetched hotspots:", hotspots?.length);
   return hotspots as unknown as Hotspot[];

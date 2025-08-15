@@ -7,6 +7,7 @@ import { Steps } from "../Billing";
 import AssignPlanHotspots from "./assign-plan-hotspots";
 import { useCustomerSubscription } from "@/lib/contexts/customer-subscription-context";
 import { useBilling } from "../../../contexts/BillingContext";
+import { calculateDiscountSummary } from "@/lib/helpers/stripe-helper";
 
 interface PlanActiveProps {
   setSelected: (key: Steps) => void;
@@ -17,11 +18,19 @@ const PlanActive = ({ setSelected }: PlanActiveProps) => {
   const hotspotSubscription = subscription?.stripe_subscription;
   const paymentMethod = hotspotSubscription?.payment_method;
   const latestInvoice = hotspotSubscription?.latest_invoice;
-  const { handleHotspotsToAdd } = useBilling();
+  const { handleHotspotsToAdd, products } = useBilling();
   const isDisabledDeletePaymentMethod = !latestInvoice;
   const invoiceCreatedAt = latestInvoice?.createdAt ?? 0;
   const currentMonth = moment(invoiceCreatedAt * 1000).format("MMMM");
   const currentYear = moment(invoiceCreatedAt * 1000).format("YYYY");
+  const product = products.find((product) => product.type === "hotspots");
+  const productPriceDetails = product?.priceDetails[0];
+  const products_amount = hotspotSubscription?.products_amount ?? 0;
+  const { unitPriceWithDiscount, totalPriceWithDiscount } =
+    calculateDiscountSummary(
+      products_amount,
+      productPriceDetails?.price_with_fee ?? 0
+    );
 
   const billingCycle = (interval: Stripe.Price.Recurring.Interval) => {
     if (interval === "month") {
@@ -46,7 +55,7 @@ const PlanActive = ({ setSelected }: PlanActiveProps) => {
               <div className="flex flex-row">
                 <p className="text-xs font-semibold">Number of hotspots:</p>
                 <p className="text-xs font-medium dark:text-gray-300 text-gray-700 ml-1">
-                  {hotspotSubscription?.products_amount}
+                  {products_amount}
                 </p>
               </div>
               <div className="flex flex-row">
@@ -61,22 +70,17 @@ const PlanActive = ({ setSelected }: PlanActiveProps) => {
               <div className="flex flex-row">
                 <p className="text-xs font-semibold">Price per hotspot:</p>
                 <p className="text-xs font-medium dark:text-gray-300 text-gray-700 ml-1">
-                  ${hotspotSubscription?.billing_details?.price_per_item}
+                  ${unitPriceWithDiscount.toFixed(2)}
                 </p>
               </div>
               <div className="flex flex-row">
                 <p className="text-xs font-semibold">Total monthly cost:</p>
                 <p className="text-xs font-medium dark:text-gray-300 text-gray-700 ml-1">
-                  $
-                  {(hotspotSubscription?.billing_details?.price_per_item || 0) *
-                    (hotspotSubscription?.products_amount || 0)}
+                  ${totalPriceWithDiscount.toFixed(2)}
                 </p>
               </div>
               {moment().isBefore(
-                moment((hotspotSubscription?.trial_period_end || 0) * 1000).add(
-                  1,
-                  "day"
-                )
+                moment((hotspotSubscription?.trial_period_end || 0) * 1000)
               ) && (
                 <div className="flex flex-row">
                   <p className="text-xs font-semibold">Trial period:</p>
@@ -87,9 +91,7 @@ const PlanActive = ({ setSelected }: PlanActiveProps) => {
                     -{" "}
                     {moment(
                       Number(hotspotSubscription?.trial_period_end) * 1000
-                    )
-                      .add(1, "day")
-                      .format("MMM DD, YYYY")}
+                    ).format("MMM DD, YYYY")}
                   </p>
                 </div>
               )}
@@ -104,9 +106,7 @@ const PlanActive = ({ setSelected }: PlanActiveProps) => {
             <div className="flex flex-row w-full justify-start mt-3">
               <Button
                 onPress={() => {
-                  handleHotspotsToAdd(
-                    hotspotSubscription?.products_amount ?? 0
-                  );
+                  handleHotspotsToAdd(products_amount ?? 0);
                   setSelected("step2");
                 }}
                 className="w-1/2 bg-[#000] dark:bg-[#fff] text-white dark:text-black"
