@@ -3,6 +3,7 @@
 import moment from "moment";
 import { centsToDollars } from "../helpers/numbers";
 import {
+    CreateSubscriptionInput,
     CreateSubscriptionInputWithCustomer,
     StripeProduct,
     StripeProductType,
@@ -13,15 +14,17 @@ import { getSession } from "../session/session";
 import { stripeServer } from "./stripe-server-config";
 import Stripe from "stripe";
 import { getCustomer } from "@/app/api/auth/callback/_services/customer-service";
-import { Prisma } from "../generated/prisma";
+import { Prisma as generatedPrisma } from "../generated/prisma";
+import { calculateDiscountSummary } from "../helpers/stripe-helper";
+import { Prisma } from "../infra/prisma";
 
-export async function getStripeCustomerSubscription(subscriptionId: string): Promise<
-    StripeSubscription | undefined
-> {
+export async function getStripeCustomerSubscription(
+    subscriptionId: string
+): Promise<StripeSubscription | undefined> {
     try {
         const { isLoggedIn } = await getSession();
         if (!isLoggedIn) {
-            return undefined
+            return undefined;
         }
 
         const sub = await stripeServer.subscriptions.retrieve(subscriptionId, {
@@ -41,19 +44,22 @@ export async function getStripeCustomerSubscription(subscriptionId: string): Pro
 
         // Get billing details from price
         const price = sub.items.data[0].price as Stripe.Price;
-        const stripeLatestInvoice = sub?.latest_invoice as Stripe.Invoice
+        const stripeLatestInvoice = sub?.latest_invoice as Stripe.Invoice;
 
         // prepare latest invoice object
-        const totalCents = stripeLatestInvoice.total
-        const latestInvoice = (totalCents > 0 && stripeLatestInvoice.status === "paid") ? {
-            invoice_id: stripeLatestInvoice?.id as string,
-            total_payment: (totalCents / 100).toLocaleString('en-US', {
-                style: 'currency',
-                currency: 'USD'
-            }),
-            createdAt: stripeLatestInvoice?.created,
-            invoice_pdf: stripeLatestInvoice.invoice_pdf as string
-        } : null
+        const totalCents = stripeLatestInvoice.total;
+        const latestInvoice =
+            totalCents > 0 && stripeLatestInvoice.status === "paid"
+                ? {
+                    invoice_id: stripeLatestInvoice?.id as string,
+                    total_payment: (totalCents / 100).toLocaleString("en-US", {
+                        style: "currency",
+                        currency: "USD",
+                    }),
+                    createdAt: stripeLatestInvoice?.created,
+                    invoice_pdf: stripeLatestInvoice.invoice_pdf as string,
+                }
+                : null;
 
         const subscription: StripeSubscription = {
             subscription_id: sub.id,
@@ -71,25 +77,34 @@ export async function getStripeCustomerSubscription(subscriptionId: string): Pro
                     last4: paymentMethod?.card?.last4,
                     brand: paymentMethod.card?.brand,
                     exp_month: paymentMethod.card?.exp_month,
-                    exp_year: paymentMethod.card?.exp_year
+                    exp_year: paymentMethod.card?.exp_year,
                 }
                 : undefined,
             billing_details: price
                 ? {
-                    interval: price.recurring?.interval || 'month',
+                    interval: price.recurring?.interval || "month",
                     price_per_item: centsToDollars(price.unit_amount || 0),
-                    next_payment_date: moment(sub.items.data[0].current_period_end * 1000).format("MMM DD, YYYY")
+                    next_payment_date: moment(
+                        sub.items.data[0].current_period_end * 1000
+                    ).format("MMM DD, YYYY"),
                 }
                 : undefined,
-            latest_invoice: latestInvoice
-        }
-
+            latest_invoice: latestInvoice,
+        };
 
         return subscription;
     } catch (error) {
         console.error("get subscriptions error", error);
-        return undefined
+        return undefined;
     }
+}
+
+const STRIPE_FIXED_FEE = 0.3;
+const STRIPE_PERCENT_FEE = 0.06;
+
+function priceWithoutFee(stripePrice: number): number {
+    const net = (stripePrice - STRIPE_FIXED_FEE) / (1 + STRIPE_PERCENT_FEE);
+    return parseFloat(net.toFixed(2));
 }
 
 export async function getStripeProducts(): Promise<StripeProduct[]> {
@@ -103,13 +118,18 @@ export async function getStripeProducts(): Promise<StripeProduct[]> {
                 active: true,
             });
 
-            const priceDetails = prices.data.map((price) => ({
-                id: price.id,
-                price: centsToDollars(price.unit_amount || 0),
-                currency: price.currency,
-                recurring: price.recurring,
-                active: price.active,
-            }));
+            const priceDetails = prices.data.map((price) => {
+                const priceAmount = centsToDollars(price.unit_amount || 0);
+                return {
+                    id: price.id,
+                    currency: price.currency,
+                    recurring: price.recurring,
+                    active: price.active,
+                    // price amount from stripe include the internal fee
+                    price_with_fee: Number(priceAmount.toFixed(2)),
+                    price_without_fee: priceWithoutFee(priceAmount),
+                };
+            }) as StripeProduct["priceDetails"];
 
             products.push({
                 id: product.id,
@@ -137,9 +157,9 @@ export const createStripeSubscription = async (
         }
 
         // if no exist customer, create one
-        const customer = input?.customer
-        const stripeCustomer = await getStripeCustomer()
-        if (!stripeCustomer) return
+        const customer = input?.customer;
+        const stripeCustomer = await getStripeCustomer();
+        if (!stripeCustomer) return;
 
         // create subscription
         const trial_period_days = 7;
@@ -182,13 +202,15 @@ export const confirmSubscription = async (subscription_id: string) => {
             return;
         }
 
-        const subscription = await stripeServer.subscriptions.retrieve(subscription_id);
+        const subscription = await stripeServer.subscriptions.retrieve(
+            subscription_id
+        );
         return subscription;
     } catch (error) {
         console.error("confirm subscription error", error);
         return null;
     }
-}
+};
 
 export const changePaymentMethod = async (subscription_id: string) => {
     try {
@@ -198,13 +220,16 @@ export const changePaymentMethod = async (subscription_id: string) => {
         }
 
         // get customer details
-        const customer = await getCustomer(userId)
+        const customer = await getCustomer(userId);
         if (!customer || !customer?.stripe_customer_id) {
-            return null
+            return null;
         }
-        const stripeCustomerId = customer?.stripe_customer_id
+        const stripeCustomerId = customer?.stripe_customer_id;
 
-        const subscription = await stripeServer.subscriptions.retrieve(subscription_id);
+        const subscription = await stripeServer.subscriptions.retrieve(
+            subscription_id
+        );
+        console.log('subscription id', subscription.id)
         if (!subscription) {
             return null;
         }
@@ -217,6 +242,10 @@ export const changePaymentMethod = async (subscription_id: string) => {
                 subscription_id: subscription_id,
             },
         });
+        console.log('setupIntent details', {
+            setup_intent_id: setupIntent.id,
+            client_secret: setupIntent.client_secret,
+        })
 
         return {
             setup_intent_id: setupIntent.id,
@@ -226,7 +255,7 @@ export const changePaymentMethod = async (subscription_id: string) => {
         console.error("change payment method error", error);
         return null;
     }
-}
+};
 
 export const confirmChangePaymentMethod = async (setup_intent_id: string) => {
     try {
@@ -238,11 +267,11 @@ export const confirmChangePaymentMethod = async (setup_intent_id: string) => {
                 setup_intent_id: null,
                 payment_method_id: null,
                 subscription_id: null,
-            }
+            };
         }
 
         // get customer details
-        const customer = await getCustomer(userId)
+        const customer = await getCustomer(userId);
         if (!customer || !customer?.stripe_customer_id) {
             return {
                 success: false,
@@ -250,26 +279,27 @@ export const confirmChangePaymentMethod = async (setup_intent_id: string) => {
                 setup_intent_id: null,
                 payment_method_id: null,
                 subscription_id: null,
-            }
+            };
         }
-        const stripeCustomerId = customer?.stripe_customer_id
-
+        const stripeCustomerId = customer?.stripe_customer_id;
 
         const currentPaymentsMethods = await stripeServer.paymentMethods.list({
-            type: 'card',
+            type: "card",
             limit: 3,
-            customer: stripeCustomerId
-        })
+            customer: stripeCustomerId,
+        });
 
-        const setupIntent = await stripeServer.setupIntents.retrieve(setup_intent_id);
-        if (!setupIntent || setupIntent.status !== 'succeeded') {
+        const setupIntent = await stripeServer.setupIntents.retrieve(
+            setup_intent_id
+        );
+        if (!setupIntent || setupIntent.status !== "succeeded") {
             return {
                 success: false,
                 error: "Setup intent not found or not succeeded",
                 setup_intent_id: null,
                 payment_method_id: null,
                 subscription_id: null,
-            }
+            };
         }
 
         // update subscription with new payment method
@@ -281,14 +311,14 @@ export const confirmChangePaymentMethod = async (setup_intent_id: string) => {
                 setup_intent_id: null,
                 payment_method_id: null,
                 subscription_id: null,
-            }
+            };
         }
 
         const newPaymentMethodId = setupIntent.payment_method as string;
         // delete the others payment methods and save the new payment method
         for (const payment of currentPaymentsMethods?.data) {
             if (payment?.id !== newPaymentMethodId) {
-                await stripeServer.paymentMethods.detach(payment?.id)
+                await stripeServer.paymentMethods.detach(payment?.id);
             }
         }
 
@@ -310,24 +340,29 @@ export const confirmChangePaymentMethod = async (setup_intent_id: string) => {
             setup_intent_id: setup_intent_id,
             payment_method_id: null,
             subscription_id: null,
-        }
+        };
     }
-}
+};
 
 export const getStripeCustomer = async () => {
     const { isLoggedIn, userId } = await getSession();
     if (!isLoggedIn || !userId) {
-        return null
+        return null;
     }
 
-    // get customer details 
-    const customer = await getCustomer(userId) as Prisma.CustomersGroupByOutputType
-    let stripeCustomer: Stripe.Customer | null = null
+    // get customer details
+    const customer = (await getCustomer(
+        userId
+    )) as generatedPrisma.CustomersGroupByOutputType;
+    let stripeCustomer: Stripe.Customer | null = null;
 
     if (customer?.stripe_customer_id) {
-        stripeCustomer = await stripeServer.customers.retrieve(customer.stripe_customer_id, {
-            expand: ["subscriptions"],
-        }) as unknown as Stripe.Customer
+        stripeCustomer = (await stripeServer.customers.retrieve(
+            customer.stripe_customer_id,
+            {
+                expand: ["subscriptions"],
+            }
+        )) as unknown as Stripe.Customer;
     } else {
         stripeCustomer = await stripeServer.customers.create({
             email: customer.email || "",
@@ -335,8 +370,286 @@ export const getStripeCustomer = async () => {
             metadata: {
                 customer_id: customer.customer_uuid || "",
             },
-        } as Stripe.CustomerCreateParams)
+        } as Stripe.CustomerCreateParams);
     }
 
-    return { ...stripeCustomer, customer_database_id: customer?.id }
-}
+    return { ...stripeCustomer, customer_database_id: customer?.id };
+};
+
+
+export const createCustomerSubscription = async (
+    params: CreateSubscriptionInput
+) => {
+    const { userId } = await getSession();
+    const customer = await getCustomer(userId as string);
+
+    const stripeSub = await createStripeSubscription({
+        ...params,
+        customer: {
+            name: customer?.full_name,
+            email: customer?.email as string,
+            customer_uuid: customer?.customer_uuid,
+            stripe_customer_id: customer?.stripe_customer_id as string,
+        },
+    });
+    if (!stripeSub) {
+        return {
+            error: true,
+            message: "stripe internal error",
+            payment_intent_client_secret: undefined,
+        };
+    }
+
+    // update the customer with the data
+    await Prisma.customers.update({
+        where: {
+            customer_uuid: userId,
+        },
+        data: {
+            stripe_customer_id: stripeSub?.stripe_customer_id,
+        },
+    });
+
+    // update the subscription of db
+    await Prisma.subscriptions.update({
+        where: {
+            customer_id: customer?.id,
+        },
+        data: {
+            stripe_subscription_id: stripeSub?.subscription_id,
+            hotspot_limit: params?.quantity,
+        },
+    });
+
+    return {
+        error: false,
+        message: "subscription created",
+        payment_intent_client_secret: stripeSub.payment_intent_client_secret,
+    };
+};
+
+export const createTrialSubscription = async (
+    params: CreateSubscriptionInput
+) => {
+    const customer = await getStripeCustomer();
+    if (!customer) {
+        return {
+            error: true,
+            message: "Customer not found",
+        };
+    }
+
+    // check if the user already has a subscription
+    const subDb = await Prisma.subscriptions.findFirst({
+        where: {
+            customer_id: customer?.customer_database_id,
+        },
+    });
+    if (subDb?.stripe_subscription_id) {
+        const stripeSubscription = await getStripeCustomerSubscription(
+            subDb?.stripe_subscription_id
+        );
+        if (stripeSubscription) {
+            return {
+                error: true,
+                message: "Customer already have a subscription",
+            };
+        }
+    }
+
+    try {
+        // if the subscription have more than 1 hotspot add a coupon
+        let coupon: Stripe.Response<Stripe.Coupon> | null = null;
+        if (params.quantity > 1) {
+            const { percentOff } = calculateDiscountSummary(
+                params.quantity,
+                params?.base_price_with_fee
+            );
+
+            coupon = await stripeServer.coupons.create({
+                percent_off: percentOff,
+                currency: "usd",
+                duration: "forever",
+                name: `discount for amount: ${params.quantity} hotspots`,
+            });
+        }
+
+        // Create Stripe subscription with trial period but no payment method
+        const discounts = coupon
+            ? [
+                {
+                    coupon: coupon?.id,
+                },
+            ]
+            : null;
+        const subscription = await stripeServer.subscriptions.create({
+            customer: customer.id as string,
+            items: [
+                {
+                    price: params.price_id,
+                    quantity: params.quantity,
+                },
+            ],
+            trial_period_days: 7,
+            collection_method: "charge_automatically",
+            payment_behavior: "default_incomplete",
+            payment_settings: {
+                save_default_payment_method: "on_subscription",
+            },
+            expand: ["latest_invoice.payment_intent"],
+            discounts: discounts,
+        });
+
+        // Update the subscription in database
+        await Prisma.subscriptions.update({
+            where: {
+                customer_id: customer.customer_database_id,
+            },
+            data: {
+                stripe_subscription_id: subscription.id,
+                hotspot_limit: params.quantity,
+            },
+        });
+
+        return {
+            error: false,
+            message: "Trial subscription created successfully",
+            subscription_id: subscription.id,
+        };
+    } catch (error) {
+        console.error("Error creating trial subscription:", error);
+        return {
+            error: true,
+            message: "Failed to create trial subscription",
+        };
+    }
+};
+
+export const updateHotspotAmountSubscription = async (params: {
+    quantity: number;
+    basePrice: number;
+}) => {
+    try {
+        const { userId } = await getSession();
+        if (!userId) {
+            return {
+                error: true,
+                message: "User not authenticated",
+            };
+        }
+
+        const customer = await getCustomer(userId);
+        if (!customer) {
+            return {
+                error: true,
+                message: "Customer not found",
+            };
+        }
+
+        // Get the current subscription
+        const subscription = await Prisma.subscriptions.findFirst({
+            where: {
+                customer_id: customer.id,
+            },
+        });
+
+        if (!subscription?.stripe_subscription_id) {
+            return {
+                error: true,
+                message: "No active subscription found",
+            };
+        }
+
+        // Get the current Stripe subscription to find the subscription item ID
+        const currentStripeSubscription = await stripeServer.subscriptions.retrieve(
+            subscription.stripe_subscription_id,
+            { expand: ["discounts"] }
+        );
+
+        if (!currentStripeSubscription.items?.data?.[0]?.id) {
+            return {
+                error: true,
+                message: "No subscription items found",
+            };
+        }
+
+        const subscriptionItemId = currentStripeSubscription.items.data[0].id;
+
+        // if subscription has an active coupons delete
+        const discounts = currentStripeSubscription.discounts as Stripe.Discount[];
+        for (const discount of discounts) {
+            try {
+                await stripeServer.coupons.del(discount.coupon.id);
+            } catch (e) {
+                console.warn(`Coupon deleted not found: ${discount.coupon.id}:`, e);
+            }
+        }
+
+        // if the subscription have more than 1 hotspot add a coupon
+        let coupon: Stripe.Response<Stripe.Coupon> | null = null;
+        if (params.quantity > 1) {
+            const { percentOff } = calculateDiscountSummary(
+                params.quantity,
+                params?.basePrice
+            );
+
+            coupon = await stripeServer.coupons.create({
+                percent_off: percentOff,
+                currency: "usd",
+                duration: "forever",
+                name: `discount for amount: ${params.quantity} hotspots`,
+            });
+        }
+
+        // Update the subscription in Stripe
+        const newDiscounts = coupon
+            ? [
+                {
+                    coupon: coupon?.id,
+                },
+            ]
+            : null;
+
+        const updatedStripeSubscription = await stripeServer.subscriptions.update(
+            subscription.stripe_subscription_id,
+            {
+                items: [
+                    {
+                        id: subscriptionItemId,
+                        quantity: params.quantity,
+                    },
+                ],
+                proration_behavior: "create_prorations",
+                discounts: newDiscounts,
+            }
+        );
+
+        if (!updatedStripeSubscription) {
+            return {
+                error: true,
+                message: "Failed to update Stripe subscription",
+            };
+        }
+
+        // Update the hotspot_limit in our database
+        await Prisma.subscriptions.update({
+            where: {
+                customer_id: customer.id,
+            },
+            data: {
+                hotspot_limit: params.quantity,
+            },
+        });
+
+        return {
+            error: false,
+            message: "Your subscription was updated successfully",
+        };
+    } catch (error) {
+        console.error("Error updating subscription:", error);
+        return {
+            error: true,
+            message: "Failed to update subscription",
+        };
+    }
+};

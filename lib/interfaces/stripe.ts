@@ -9,7 +9,8 @@ export interface StripeProduct {
     description: string | null;
     priceDetails: {
         id: string;
-        price: number;
+        price_with_fee: number;
+        price_without_fee: number
         currency: string;
         recurring: Stripe.Price.Recurring | null;
         active: boolean;
@@ -21,6 +22,7 @@ export interface CreateSubscriptionInput {
     plan_id: string;
     price_id: string;
     quantity: number;
+    base_price_with_fee: number
 }
 
 export interface CreateSubscriptionInputWithCustomer
@@ -67,3 +69,11 @@ export interface StripeSubscription {
     trial_period_end: number | null;
     latest_invoice: LatestInvoice | null;
 }
+
+export type DiscountSummary = {
+    unitPriceWithDiscount: number;
+    totalPriceWithDiscount: number;
+    totalPriceWithoutDiscount: number;
+    discountAmount: number;
+    percentOff: number;
+};

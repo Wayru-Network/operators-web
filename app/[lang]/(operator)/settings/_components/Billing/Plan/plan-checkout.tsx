@@ -15,8 +15,13 @@ import { useTheme } from "next-themes";
 import { Button } from "@heroui/button";
 import { Steps } from "../Billing";
 import { useCustomerSubscription } from "@/lib/contexts/customer-subscription-context";
-import { createCustomerSubscription } from "@/app/api/subscriptions/_services/subscriptions-service";
 import CheckoutBillingDetails from "./checkout-billing-details";
+import { calculateDiscountSummary } from "@/lib/helpers/stripe-helper";
+import {
+  createCustomerSubscription,
+  updateHotspotAmountSubscription,
+} from "@/lib/services/stripe-service";
+import { addToast } from "@heroui/toast";
 
 interface CheckoutFormProps {
   setSelected: (key: Steps) => void;
@@ -27,18 +32,47 @@ function CheckoutForm({ setSelected }: CheckoutFormProps) {
   const elements = useElements();
   const { theme } = useTheme();
   const { hotspotsToAdd, products } = useBilling();
-  const { refreshSubscriptionState } = useCustomerSubscription();
+  const { refreshSubscriptionState, subscription } = useCustomerSubscription();
   const [cardBrand, setCardBrand] = useState<CardBrand | undefined>("unknown");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
+  const stripeSub = subscription?.stripe_subscription;
+  const currentHotspotsAmount = stripeSub?.products_amount ?? 0;
   const product = products.find((product) => product.type === "hotspots");
   const productPriceDetails = product?.priceDetails[0];
-  const productPrice = productPriceDetails?.price ?? 0;
+  const productPrice = productPriceDetails?.price_with_fee ?? 0;
   const totalPrice = hotspotsToAdd * productPrice;
+
+  const updateSubscription = async () => {
+    setIsLoading(true);
+    const result = await updateHotspotAmountSubscription({
+      quantity: hotspotsToAdd,
+      basePrice: productPrice,
+    });
+    if (result.error) {
+      addToast({
+        title: "Error updating subscription",
+        description: result.message,
+        color: "danger",
+      });
+    } else {
+      await refreshSubscriptionState();
+      addToast({
+        title: "Subscription updated",
+        description: result.message,
+        color: "default",
+      });
+      setSelected("step1");
+    }
+    setIsLoading(true);
+  };
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+
+    if (currentHotspotsAmount > 0) {
+      return updateSubscription();
+    }
 
     if (!stripe || !elements) {
       return;
@@ -53,6 +87,7 @@ function CheckoutForm({ setSelected }: CheckoutFormProps) {
         price_id: productPriceDetails?.id || "",
         plan_id: product?.id || "",
         quantity: hotspotsToAdd,
+        base_price_with_fee: productPrice,
       });
 
       if (!subscription?.payment_intent_client_secret) {
@@ -172,7 +207,13 @@ function CheckoutForm({ setSelected }: CheckoutFormProps) {
           disabled={isLoading || !stripe}
           isLoading={isLoading}
         >
-          {isLoading ? "Processing..." : `Pay $${totalPrice}`}
+          {isLoading
+            ? currentHotspotsAmount > 0
+              ? "Updating"
+              : "Processing..."
+            : currentHotspotsAmount > 0
+            ? "Update subscription"
+            : `Pay $${totalPrice}`}
         </Button>
       </div>
     </form>
@@ -183,9 +224,10 @@ export default function PlanCheckout({ setSelected }: CheckoutFormProps) {
   const { hotspotsToAdd, products } = useBilling();
   const product = products.find((product) => product.type === "hotspots");
   const productPriceDetails = product?.priceDetails[0];
-  const productPrice = productPriceDetails?.price ?? 0;
+  const productPrice = productPriceDetails?.price_with_fee ?? 0;
   const recurring = productPriceDetails?.recurring;
-  const totalPrice = hotspotsToAdd * productPrice;
+  const { totalPriceWithDiscount, unitPriceWithDiscount } =
+    calculateDiscountSummary(hotspotsToAdd, productPrice);
 
   const getRecurringInterval = (interval: string) => {
     switch (interval) {
@@ -222,13 +264,13 @@ export default function PlanCheckout({ setSelected }: CheckoutFormProps) {
             <div className="flex flex-row">
               <p className="text-xs font-semibold">Price per hotspot:</p>
               <p className="text-xs font-medium dark:text-gray-300 text-gray-700 ml-1">
-                ${productPrice}
+                ${unitPriceWithDiscount}
               </p>
             </div>
             <div className="flex flex-row">
               <p className="text-xs font-semibold">Total monthly cost:</p>
               <p className="text-xs font-medium dark:text-gray-300 text-gray-700 ml-1">
-                ${totalPrice}
+                ${totalPriceWithDiscount.toFixed(2)}
               </p>
             </div>
             <CheckoutBillingDetails setSelected={setSelected} />

@@ -3,10 +3,10 @@ import { useBilling } from "../../../contexts/BillingContext";
 import { Switch, Spinner } from "@heroui/react";
 import { useCustomerSubscription } from "@/lib/contexts/customer-subscription-context";
 import { CustomerSubscription } from "@/lib/interfaces/subscriptions";
-import { createTrialSubscription } from "@/app/api/subscriptions/_services/subscriptions-service";
 import { useTransition } from "react";
 import { Steps } from "../Billing";
 import { addToast } from "@heroui/toast";
+import { createTrialSubscription } from "@/lib/services/stripe-service";
 
 interface Props {
   setSelected: (key: Steps) => void;
@@ -32,6 +32,7 @@ export default function CheckoutBillingDetails({ setSelected }: Props) {
         price_id: productPriceDetails?.id || "",
         plan_id: product?.id || "",
         quantity: hotspotsToAdd,
+        base_price_with_fee: productPriceDetails?.price_with_fee ?? 0,
       });
       if (response.error) {
         addToast({
