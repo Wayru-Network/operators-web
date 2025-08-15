@@ -161,6 +161,29 @@ export const createStripeSubscription = async (
         const stripeCustomer = await getStripeCustomer();
         if (!stripeCustomer) return;
 
+        // if the subscription have more than 1 hotspot add a coupon
+        let coupon: Stripe.Response<Stripe.Coupon> | null = null;
+        if (input.quantity > 1) {
+            const { percentOff } = calculateDiscountSummary(
+                input.quantity,
+                input?.base_price_with_fee
+            );
+
+            coupon = await stripeServer.coupons.create({
+                percent_off: percentOff,
+                currency: "usd",
+                duration: "forever",
+                name: `discount for amount: ${input.quantity} hotspots`,
+            });
+        }
+        const discounts = coupon
+            ? [
+                {
+                    coupon: coupon?.id,
+                },
+            ]
+            : null;
+
         // create subscription
         const trial_period_days = 7;
         const subscription = await stripeServer.subscriptions.create({
@@ -174,6 +197,7 @@ export const createStripeSubscription = async (
             payment_behavior: "default_incomplete",
             payment_settings: { save_default_payment_method: "on_subscription" },
             expand: ["pending_setup_intent", "latest_invoice", "customer"],
+            discounts: discounts
         } as Stripe.SubscriptionCreateParams);
 
         const setupIntent = subscription.pending_setup_intent as Stripe.SetupIntent;
@@ -229,7 +253,6 @@ export const changePaymentMethod = async (subscription_id: string) => {
         const subscription = await stripeServer.subscriptions.retrieve(
             subscription_id
         );
-        console.log('subscription id', subscription.id)
         if (!subscription) {
             return null;
         }
@@ -242,10 +265,6 @@ export const changePaymentMethod = async (subscription_id: string) => {
                 subscription_id: subscription_id,
             },
         });
-        console.log('setupIntent details', {
-            setup_intent_id: setupIntent.id,
-            client_secret: setupIntent.client_secret,
-        })
 
         return {
             setup_intent_id: setupIntent.id,
