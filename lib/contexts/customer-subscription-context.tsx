@@ -7,7 +7,7 @@ import { useSubscription } from "../hooks/use-subscription";
 interface CustomerSubscriptionContextType {
   isGettingSubscription: boolean;
   subscription: CustomerSubscription | undefined;
-  refreshSubscriptionState: () => Promise<void>;
+  refreshSubscriptionState: () => Promise<CustomerSubscription | undefined>;
 }
 
 const CustomerSubscriptionContext = createContext<
@@ -24,7 +24,8 @@ export function CustomerSubscriptionProvider({
   const { isLoading, subscription, refreshSubscriptions } = useSubscription();
 
   const refreshSubscriptionState = useCallback(async () => {
-    await refreshSubscriptions();
+    const sub = await refreshSubscriptions();
+    return sub?.subscription;
   }, [refreshSubscriptions]);
 
   // context value

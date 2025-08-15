@@ -22,6 +22,7 @@ import {
   updateHotspotAmountSubscription,
 } from "@/lib/services/stripe-service";
 import { addToast } from "@heroui/toast";
+import PaymentAndBillingMethod from "../payment-method/payment-and-billing-method";
 
 interface CheckoutFormProps {
   setSelected: (key: Steps) => void;
@@ -32,47 +33,17 @@ function CheckoutForm({ setSelected }: CheckoutFormProps) {
   const elements = useElements();
   const { theme } = useTheme();
   const { hotspotsToAdd, products } = useBilling();
-  const { refreshSubscriptionState, subscription } = useCustomerSubscription();
+  const { refreshSubscriptionState } = useCustomerSubscription();
   const [cardBrand, setCardBrand] = useState<CardBrand | undefined>("unknown");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const stripeSub = subscription?.stripe_subscription;
-  const currentHotspotsAmount = stripeSub?.products_amount ?? 0;
   const product = products.find((product) => product.type === "hotspots");
   const productPriceDetails = product?.priceDetails[0];
-  const productPrice = productPriceDetails?.price_with_fee ?? 0;
-  const totalPrice = hotspotsToAdd * productPrice;
-
-  const updateSubscription = async () => {
-    setIsLoading(true);
-    const result = await updateHotspotAmountSubscription({
-      quantity: hotspotsToAdd,
-      basePrice: productPrice,
-    });
-    if (result.error) {
-      addToast({
-        title: "Error updating subscription",
-        description: result.message,
-        color: "danger",
-      });
-    } else {
-      await refreshSubscriptionState();
-      addToast({
-        title: "Subscription updated",
-        description: result.message,
-        color: "default",
-      });
-      setSelected("step1");
-    }
-    setIsLoading(true);
-  };
+  const productPriceFee = productPriceDetails?.price_with_fee ?? 0;
+  const totalPrice = hotspotsToAdd * productPriceFee;
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-
-    if (currentHotspotsAmount > 0) {
-      return updateSubscription();
-    }
 
     if (!stripe || !elements) {
       return;
@@ -87,7 +58,7 @@ function CheckoutForm({ setSelected }: CheckoutFormProps) {
         price_id: productPriceDetails?.id || "",
         plan_id: product?.id || "",
         quantity: hotspotsToAdd,
-        base_price_with_fee: productPrice,
+        base_price_with_fee: productPriceFee,
       });
 
       if (!subscription?.payment_intent_client_secret) {
@@ -111,7 +82,11 @@ function CheckoutForm({ setSelected }: CheckoutFormProps) {
         setError(confirmError.message || "Payment failed");
       } else {
         // Payment successful
-        await refreshSubscriptionState();
+        const sub = await refreshSubscriptionState();
+        if (!sub?.stripe_subscription?.payment_method) {
+          // if there is not payment method try to refresh again
+          await refreshSubscriptionState();
+        }
         setSelected("step1");
       }
     } catch (err) {
@@ -207,13 +182,7 @@ function CheckoutForm({ setSelected }: CheckoutFormProps) {
           disabled={isLoading || !stripe}
           isLoading={isLoading}
         >
-          {isLoading
-            ? currentHotspotsAmount > 0
-              ? "Updating"
-              : "Processing..."
-            : currentHotspotsAmount > 0
-            ? "Update subscription"
-            : `Pay $${totalPrice}`}
+          {isLoading ? "Processing..." : `Pay $${totalPrice}`}
         </Button>
       </div>
     </form>
@@ -224,25 +193,51 @@ export default function PlanCheckout({ setSelected }: CheckoutFormProps) {
   const { hotspotsToAdd, products } = useBilling();
   const product = products.find((product) => product.type === "hotspots");
   const productPriceDetails = product?.priceDetails[0];
-  const productPrice = productPriceDetails?.price_with_fee ?? 0;
-  const recurring = productPriceDetails?.recurring;
-  const { totalPriceWithDiscount, unitPriceWithDiscount } =
-    calculateDiscountSummary(hotspotsToAdd, productPrice);
+  const productPriceFee = productPriceDetails?.price_with_fee ?? 0;
+  const productPriceNotFee = productPriceDetails?.price_without_fee ?? 0;
+  const { subscription, refreshSubscriptionState } = useCustomerSubscription();
+  const stripeSub = subscription?.stripe_subscription;
+  const currentHotspotsAmount = stripeSub?.products_amount ?? 0;
+  const [isLoading, setIsLoading] = useState(false);
+  const summaryWithFee = calculateDiscountSummary(
+    hotspotsToAdd,
+    productPriceFee
+  );
+  const summaryNotFee = calculateDiscountSummary(
+    hotspotsToAdd,
+    productPriceNotFee
+  );
+  const fee =
+    summaryWithFee.totalPriceWithDiscount -
+    summaryNotFee.unitPriceWithDiscount * hotspotsToAdd;
 
-  const getRecurringInterval = (interval: string) => {
-    switch (interval) {
-      case "month":
-        return "Monthly";
-      case "year":
-        return "Yearly";
-      default:
-        return "Monthly";
+  const updateSubscription = async () => {
+    setIsLoading(true);
+    const result = await updateHotspotAmountSubscription({
+      quantity: hotspotsToAdd,
+      basePrice: productPriceFee,
+    });
+    if (result.error) {
+      addToast({
+        title: "Error updating subscription",
+        description: result.message,
+        color: "danger",
+      });
+    } else {
+      await refreshSubscriptionState();
+      addToast({
+        title: "Subscription updated",
+        description: result.message,
+        color: "default",
+      });
+      setSelected("step1");
     }
+    setIsLoading(true);
   };
 
   return (
     <div className=" flex flex-row gap-8 w-full">
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-3 w-full max-w-150">
         {/* Checkout details */}
         <div className="flex flex-col w-full">
           <p className="text-lg font-semibold w-full align-left">
@@ -256,35 +251,73 @@ export default function PlanCheckout({ setSelected }: CheckoutFormProps) {
               </p>
             </div>
             <div className="flex flex-row">
-              <p className="text-xs font-semibold">Billing cycle:</p>
+              <p className="text-xs font-semibold">Price per hotspot:</p>
               <p className="text-xs font-medium dark:text-gray-300 text-gray-700 ml-1">
-                {getRecurringInterval(recurring?.interval ?? "month")}
+                ${summaryNotFee.unitPriceWithDiscount}
               </p>
             </div>
             <div className="flex flex-row">
-              <p className="text-xs font-semibold">Price per hotspot:</p>
+              <p className="text-xs font-semibold">Sub total:</p>
               <p className="text-xs font-medium dark:text-gray-300 text-gray-700 ml-1">
-                ${unitPriceWithDiscount}
+                $
+                {(hotspotsToAdd * summaryNotFee.unitPriceWithDiscount).toFixed(
+                  2
+                )}
+              </p>
+            </div>
+            <div className="flex flex-row">
+              <p className="text-xs font-semibold">Fee:</p>
+              <p className="text-xs font-medium dark:text-gray-300 text-gray-700 ml-1">
+                ${fee.toFixed(2)}
               </p>
             </div>
             <div className="flex flex-row">
               <p className="text-xs font-semibold">Total monthly cost:</p>
               <p className="text-xs font-medium dark:text-gray-300 text-gray-700 ml-1">
-                ${totalPriceWithDiscount.toFixed(2)}
+                ${summaryWithFee.totalPriceWithDiscount.toFixed(2)}
               </p>
             </div>
             <CheckoutBillingDetails setSelected={setSelected} />
           </div>
         </div>
+
         {/* Payment method */}
-        <div className="flex flex-col w-full mt-3 gap-1">
-          <p className="text-lg font-semibold w-full align-left">
-            Add your payment method to complete your purchase.
-          </p>
-          <Elements stripe={stripeClient}>
-            <CheckoutForm setSelected={setSelected} />
-          </Elements>
-        </div>
+        {currentHotspotsAmount > 0 ? (
+          <PaymentAndBillingMethod
+            setSelected={setSelected}
+            notShowDeleteIcon
+            notShowUpdatePaymentBtn
+          />
+        ) : (
+          <div className="flex flex-col w-full mt-3 gap-1">
+            <p className="text-lg font-semibold w-full align-left">
+              Add your payment method to complete your purchase.
+            </p>
+            <Elements stripe={stripeClient}>
+              <CheckoutForm setSelected={setSelected} />
+            </Elements>
+          </div>
+        )}
+
+        {currentHotspotsAmount > 0 && (
+          <div className="flex flex-row gap-4 mt-3">
+            <Button
+              className="w-full mt-4"
+              isDisabled={isLoading}
+              onPress={() => setSelected("step2")}
+            >
+              Back
+            </Button>
+            <Button
+              className="w-full mt-4"
+              disabled={isLoading}
+              isLoading={isLoading}
+              onPress={updateSubscription}
+            >
+              {isLoading ? "Updating" : "Update subscription"}
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );
