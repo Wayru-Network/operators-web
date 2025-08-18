@@ -83,7 +83,7 @@ export default function PortalsTable({ rows }: { rows: rowCaptivePortal[] }) {
       label: "Assigned Hotspots",
       allowsSorting: true,
     },
-    { key: "conversion-rate", label: "Conversion Rate", allowsSorting: true },
+    //{ key: "conversion-rate", label: "Conversion Rate", allowsSorting: true },
     { key: "last_edit", label: "Last Edit", allowsSorting: true },
     { key: "actions", label: "Actions", allowsSorting: false },
   ];

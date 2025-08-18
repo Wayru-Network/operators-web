@@ -36,7 +36,9 @@ export default function CustomizePortalSettings({
           <Check size={25} />
           <p className="pt-1">
             {config.adFormat.charAt(0).toUpperCase() + config.adFormat.slice(1)}{" "}
-            ad: &quot;{config.adAsset?.file?.name}&quot;
+            {config.adAsset?.file?.name
+              ? `ad: "${config.adAsset.file.name}"`
+              : "ad"}
           </p>
         </div>
         <p className="font-bold pt-4">Duration</p>

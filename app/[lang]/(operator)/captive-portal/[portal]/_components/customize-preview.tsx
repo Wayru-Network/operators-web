@@ -48,11 +48,7 @@ export default function Preview({ config }: { config: PortalConfig }) {
             )}
             {config.voucher && (
               <Button
-                className="w-full text-white dark:text-black rounded-full transition-none"
-                style={{
-                  backgroundColor: colors.button,
-                  color: colors.buttonText,
-                }}
+                className={`w-full text-white dark:text-black rounded-full transition-none bg-[${colors.button}] text-[${colors.buttonText}]`}
               >
                 <Ticket className="mr-1" />
                 Enter voucher code to connect
