@@ -1,16 +1,17 @@
 import { uploadAsset } from "./upload-assets";
-import { Prisma } from "@/lib/infra/prisma";
 import { adFormat } from "@/lib/generated/prisma";
 import { NewPortalConfig } from "../_components/create-captive-portal";
+import { PrismaClient } from "@prisma/client/extension";
 
 export async function insertAdConfig(
   config: NewPortalConfig,
-  portalId: number
+  portalId: number,
+  tx: PrismaClient
 ) {
   if (!config.adAsset || !config.adAsset.file) {
     return { success: false, error: "Ad asset file is required" };
   }
-  const result = await uploadAsset(config.adAsset.file, "ad");
+  const result = await uploadAsset(config.adAsset.file, "ad", tx);
   if (!result.success) return result;
 
   const interaction_time = parseInt(config.interactionTime) || 15;
@@ -19,7 +20,7 @@ export async function insertAdConfig(
     return { success: false, error: "Invalid ad format" };
   }
 
-  await Prisma.ad.create({
+  await tx.ad.create({
     data: {
       ad_asset_id: result.asset?.id,
       portal_config_id: portalId,
