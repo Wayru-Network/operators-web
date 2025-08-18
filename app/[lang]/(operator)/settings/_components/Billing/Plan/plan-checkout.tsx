@@ -232,7 +232,7 @@ export default function PlanCheckout({ setSelected }: CheckoutFormProps) {
       });
       setSelected("step1");
     }
-    setIsLoading(true);
+    setIsLoading(false);
   };
 
   return (

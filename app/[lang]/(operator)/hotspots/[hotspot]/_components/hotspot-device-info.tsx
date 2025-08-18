@@ -57,7 +57,7 @@ export default function HotspotDeviceInfo({
 
   const networkDetails = [
     {
-      label: "Mac address",
+      label: "MAC address",
       value: network.mac,
     },
     {
@@ -98,7 +98,7 @@ export default function HotspotDeviceInfo({
   ];
 
   const formatValue = (value: string) => {
-    if (value.length > 15) {
+    if (value.length > 20) {
       return value.slice(0, 5) + "..." + value.slice(-5);
     }
     return value;
