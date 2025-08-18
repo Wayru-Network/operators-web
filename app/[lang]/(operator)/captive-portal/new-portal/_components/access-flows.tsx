@@ -4,6 +4,7 @@ import { Star } from "lucide-react";
 import { CustomInput } from "@/lib/components/custom-input";
 import { Button } from "@heroui/button";
 import { PortalConfig } from "../../[portal]/_components/customize-captive-portal";
+import { Tooltip } from "@heroui/tooltip";
 
 interface AccessFlowsProps {
   newConfig: NewPortalConfig | PortalConfig;
@@ -37,32 +38,38 @@ export default function AccessFlows({
           </div>
           <Switch isSelected={newConfig.ad} onValueChange={adHandler} />
         </div>
-        <div className="flex flex-row items-center">
-          <Star className="mr-2" size={30} />
-          <div className="flex flex-col justify-center w-full">
-            <p className="font-semibold text-black">Enter voucher code</p>
-            <p className="text-sm text-black">
-              Users enter a valid voucher code to connect
-            </p>
+        <Tooltip content="Coming soon" placement="right" closeDelay={0}>
+          <div className="flex flex-row items-center">
+            <Star className="mr-2" size={30} />
+            <div className="flex flex-col justify-center w-full">
+              <p className="font-semibold text-black">Enter voucher code</p>
+              <p className="text-sm text-black">
+                Users enter a valid voucher code to connect
+              </p>
+            </div>
+            <Switch
+              isSelected={newConfig.voucher}
+              onValueChange={voucherHandler}
+              isDisabled
+            />
           </div>
-          <Switch
-            isSelected={newConfig.voucher}
-            onValueChange={voucherHandler}
-          />
-        </div>
-        <div className="flex flex-row items-center">
-          <Star className="mr-2" size={30} />
-          <div className="flex flex-col justify-center w-full">
-            <p className="font-semibold text-black">Submit user info</p>
-            <p className="text-sm text-black">
-              Collect user information before granting access
-            </p>
+        </Tooltip>
+        <Tooltip content="Coming soon" placement="right" closeDelay={0}>
+          <div className="flex flex-row items-center">
+            <Star className="mr-2" size={30} />
+            <div className="flex flex-col justify-center w-full">
+              <p className="font-semibold text-black">Submit user info</p>
+              <p className="text-sm text-black">
+                Collect user information before granting access
+              </p>
+            </div>
+            <Switch
+              isSelected={newConfig.userInfo}
+              onValueChange={userInfoHandler}
+              isDisabled
+            />
           </div>
-          <Switch
-            isSelected={newConfig.userInfo}
-            onValueChange={userInfoHandler}
-          />
-        </div>
+        </Tooltip>
       </div>
       <p className="font-semibold text-lg">Portal Text Content</p>
       <div className="flex flex-col space-y-10 pt-4">

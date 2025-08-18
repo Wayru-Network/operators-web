@@ -88,8 +88,8 @@ export default function CustomizeCaptivePortal({
 
   // Step 2 - Access Flows states
   const [ad, setAd] = useState(config.ad || false);
-  const [voucher, setVoucher] = useState(config.voucher || false);
-  const [userInfo, setUserInfo] = useState(config.userInfo || false);
+  const [voucher, setVoucher] = useState(false);
+  const [userInfo, setUserInfo] = useState(false);
   const [welcomeMessage, setWelcomeMessage] = useState(
     config.welcomeMessage || ""
   );

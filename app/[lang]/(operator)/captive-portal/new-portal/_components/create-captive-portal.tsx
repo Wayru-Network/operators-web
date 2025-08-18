@@ -59,8 +59,8 @@ export default function CreateCaptivePortal({
 
   // Step 2 - Access Flows states
   const [ad, setAd] = useState(true);
-  const [voucher, setVoucher] = useState(true);
-  const [userInfo, setUserInfo] = useState(true);
+  const [voucher, setVoucher] = useState(false);
+  const [userInfo, setUserInfo] = useState(false);
   const [welcomeMessage, setWelcomeMessage] = useState(
     "Welcome to our portal!"
   );
