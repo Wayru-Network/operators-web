@@ -28,7 +28,7 @@ interface CheckoutFormProps {
   setSelected: (key: Steps) => void;
 }
 
-function CheckoutForm({ setSelected }: CheckoutFormProps) {
+function ChangePaymentForm({ setSelected }: CheckoutFormProps) {
   const stripe = useStripe();
   const elements = useElements();
   const { theme } = useTheme();
@@ -197,7 +197,7 @@ export default function ChangePaymentMethod({
 }: ChangePaymentMethodProps) {
   return (
     <div className=" flex flex-row gap-8 w-full">
-      <div className="flex flex-col gap-3  w-1/2">
+      <div className="flex flex-col gap-3 md:w-full lg:w-1/2">
         {/* Checkout details */}
         <div className="flex flex-col w-full">
           <p className="text-lg font-semibold w-full align-left">
@@ -205,7 +205,7 @@ export default function ChangePaymentMethod({
           </p>
         </div>
         <Elements stripe={stripeClient}>
-          <CheckoutForm setSelected={setSelected} />
+          <ChangePaymentForm setSelected={setSelected} />
         </Elements>
       </div>
     </div>

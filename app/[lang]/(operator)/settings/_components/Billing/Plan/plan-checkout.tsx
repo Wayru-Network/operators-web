@@ -286,7 +286,7 @@ export default function PlanCheckout({ setSelected }: CheckoutFormProps) {
           <PaymentAndBillingMethod
             setSelected={setSelected}
             notShowDeleteIcon
-            notShowUpdatePaymentBtn
+            notShowBtn
           />
         ) : (
           <div className="flex flex-col w-full mt-3 gap-1">

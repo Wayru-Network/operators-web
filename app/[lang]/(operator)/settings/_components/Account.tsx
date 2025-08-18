@@ -216,13 +216,13 @@ const Account = ({ accountInfo }: { accountInfo: AccountInfo }) => {
   }
 
   return (
-    <div className="flex flex-row w-full">
+    <div className="flex md:flex-col lg:flex-row w-full gap-8">
       <Form
-        className="flex flex-col w-1/2"
+        className="flex flex-col md:w-full w-2/3"
         onSubmit={handleSaveChanges}
         validationErrors={errors}
       >
-        <div>
+        <div className="w-full">
           {/* Personal Information section */}
           <RenderSection
             title="Personal Information"
@@ -232,7 +232,7 @@ const Account = ({ accountInfo }: { accountInfo: AccountInfo }) => {
                 onChange={(e) => handleInputChange("full_name", e.target.value)}
                 label="Full Name"
                 type="text"
-                wrapperClass="max-w-[210px] max-h-[30px]"
+                wrapperClass="w-full max-h-[30px]"
                 placeholder="John Doe"
                 required
                 inputClass="!text-sm"
@@ -246,7 +246,7 @@ const Account = ({ accountInfo }: { accountInfo: AccountInfo }) => {
                 onChange={(e) => handleInputChange("email", e.target.value)}
                 label="Email Address"
                 type="email"
-                wrapperClass="max-w-[210px] max-h-[30px]"
+                wrapperClass="w-full max-h-[30px]"
                 required
                 inputClass="!text-sm"
                 labelClass="!text-sm"
@@ -267,7 +267,7 @@ const Account = ({ accountInfo }: { accountInfo: AccountInfo }) => {
                 label="Company Name"
                 placeholder="Pop Bar"
                 type="text"
-                wrapperClass="max-w-[210px] max-h-[30px]"
+                wrapperClass="w-full max-h-[30px]"
                 inputClass="!text-sm"
                 labelClass="!text-sm"
               />
@@ -281,7 +281,7 @@ const Account = ({ accountInfo }: { accountInfo: AccountInfo }) => {
                 label="Business Email"
                 placeholder="business@email.com"
                 type="email"
-                wrapperClass="max-w-[210px] max-h-[30px]"
+                wrapperClass="w-full max-h-[30px]"
                 inputClass="!text-sm"
                 labelClass="!text-sm"
               />
@@ -306,7 +306,7 @@ const Account = ({ accountInfo }: { accountInfo: AccountInfo }) => {
                 }
                 classNames={{
                   trigger:
-                    "!text-black dark:!text-white data-[has-value=true]:!text-black dark:data-[has-value=true]:!text-white !border-neutral-300 !h-[42px]",
+                    "!text-black dark:!text-white data-[has-value=true]:!text-black dark:data-[has-value=true]:!text-white !border-neutral-300 !h-[48px]",
                   value: "!text-black dark:!text-white",
                   listbox: "!text-black dark:!text-white",
                 }}
@@ -331,11 +331,11 @@ const Account = ({ accountInfo }: { accountInfo: AccountInfo }) => {
         </div>
       </Form>
 
-      <div className="flex flex-col gap-3 items-center w-1/2 justify-self-end">
+      <div className="flex flex-col items-start md:w-full lg:w-1/3 justify-self-end">
         {/* Other section */}
-        <div className="flex flex-col w-full max-w-[200px]">
+        <div className="flex flex-col w-full">
           <p className="text-base font-semibold w-full align-left">Other</p>
-          <div className="flex flex-col gap-3 mt-2 items-center w-full">
+          <div className="flex flex-col gap-3 md:mt-3 lg:mt-8 items-center w-full">
             <Button className="w-full bg-[#751CF6] border-2 border-gray-200 dark:border-gray-700 text-white">
               Delete Account
             </Button>
@@ -354,12 +354,12 @@ interface RenderSectionProps {
 
 const RenderSection = ({ title, Input1, Input2 }: RenderSectionProps) => {
   return (
-    <div>
+    <div className="w-full">
       <p className="text-lg font-semibold w-full align-left">{title}</p>
       {/* Personal Information container */}
-      <div className="mt-8">
+      <div className="mt-8 w-full">
         {/* Personal Information content */}
-        <div className="flex flex-row gap-1.5 rounded-[10px] relative h-[80px]">
+        <div className="flex flex-row gap-5 rounded-[10px] relative h-[80px] w-full">
           <div className="w-1/2 relative">{Input1}</div>
           <div className="w-1/2">{Input2}</div>
         </div>

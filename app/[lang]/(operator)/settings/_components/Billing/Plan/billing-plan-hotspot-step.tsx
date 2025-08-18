@@ -51,10 +51,9 @@ const BillingPlanHotspotsStep = ({ setSelected }: SelectAPlanProps) => {
   }
 
   return (
-    <div className=" flex flex-row gap-8 w-full ">
-      {/* Left side */}
-      <div className="flex flex-col gap-3 w-1/2">
-        <div className="flex flex-col items-center">
+    <div className=" flex flex-row gap-8 w-full">
+      <div className="flex flex-col gap-3 md:w-full lg:w-1/2">
+        <div className="flex flex-col items-center w-full">
           {/* Current plan section */}
           <div className="flex flex-col w-full">
             <p className="text-lg font-semibold w-full align-left ">
@@ -143,9 +142,6 @@ const BillingPlanHotspotsStep = ({ setSelected }: SelectAPlanProps) => {
           </Button>
         </div>
       </div>
-
-      {/* Right side */}
-      <div className="flex flex-col gap-3 items-center w-1/2 justify-self-end"></div>
     </div>
   );
 };

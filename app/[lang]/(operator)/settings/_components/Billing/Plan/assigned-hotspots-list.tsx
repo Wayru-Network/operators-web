@@ -9,7 +9,10 @@ interface Props {
 }
 const AssignedHotspotsList = ({ hotspots, onRemoveHotspot }: Props) => {
   return (
-    <ScrollShadow visibility="bottom" className="mt-2 gap-1 px-1 h-[390px]">
+    <ScrollShadow
+      visibility="none"
+      className="mt-2 gap-1 px-1 md:w-full lg:w-[300px] md:max-h-[150px] lg:max-h-[390px]"
+    >
       {hotspots.map((item, index) => (
         <div
           key={index}

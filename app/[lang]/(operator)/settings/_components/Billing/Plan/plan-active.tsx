@@ -48,10 +48,10 @@ const PlanActive = ({ setSelected }: PlanActiveProps) => {
   };
 
   return (
-    <div className=" flex flex-row gap-8 w-full">
+    <div className="flex md:flex-col lg:flex-row gap-8 w-full">
       {/* Left side */}
-      <div className="flex flex-col gap-3 w-1/2">
-        <div className="flex flex-col items-center max-w-96 ">
+      <div className="flex flex-col gap-3 lg:w-1/2 md:w-full">
+        <div className="flex flex-col items-center w-full lg:max-w-96 ">
           {/* Subscription for your hotspots section */}
           <div className="flex flex-col w-full">
             <p className="text-base font-semibold w-full align-left ">
