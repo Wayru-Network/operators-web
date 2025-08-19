@@ -89,7 +89,7 @@ export default function HotspotNetworks({
     setIsSaving(true);
     try {
       const formData: HotspotNetworksFormData = {
-        locationName: locName,
+        locationName: locName === locationName ? "" : locName,
         openNetwork: {
           ssid: openSSID,
         },
@@ -126,7 +126,15 @@ export default function HotspotNetworks({
     } finally {
       setIsSaving(false);
     }
-  }, [locName, openSSID, privateSSID, newPassword, confirmPassword, hotspot]);
+  }, [
+    locName,
+    locationName,
+    openSSID,
+    privateSSID,
+    newPassword,
+    confirmPassword,
+    hotspot,
+  ]);
   const { subscription } = useCustomerSubscription();
   const { is_subscription_active } = subscription as CustomerSubscription;
 
