@@ -156,7 +156,7 @@ export default function HotspotNetworks({
       <Spacer y={4} />
       <CustomInput
         label="Rename hotspot"
-        placeholder="Pop bar"
+        placeholder={locName === "" ? "Pop Bar" : locName}
         helper={helperText}
         onChange={(e) => setLocName(e.target.value)}
         value={locName}
