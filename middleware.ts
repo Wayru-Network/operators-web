@@ -11,7 +11,6 @@ export function middleware(request: NextRequest) {
     "/api/hotspots",
     "/api/subscriptions",
     "/api/hotspots/subscription",
-    "/api/subscriptions/revoke",
   ];
 
   if (availablePathnames.includes(pathname)) {
