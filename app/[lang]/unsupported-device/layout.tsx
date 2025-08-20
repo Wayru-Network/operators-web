@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import UnsupportedScreen from "./page";
 
 export const metadata: Metadata = {
-  title: "unsupported - device",
+  title: "unsupported - Wayru",
   description: "return a screen describing that the device is not supported",
 };
 

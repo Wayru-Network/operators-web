@@ -226,7 +226,7 @@ export default function PlanCheckout({ setSelected }: CheckoutFormProps) {
     } else {
       await refreshSubscriptionState();
       addToast({
-        title: "Subscription updated",
+        title: "Success",
         description: result.message,
         color: "default",
       });
@@ -314,7 +314,13 @@ export default function PlanCheckout({ setSelected }: CheckoutFormProps) {
               isLoading={isLoading}
               onPress={updateSubscription}
             >
-              {isLoading ? "Updating" : "Update subscription"}
+              {isLoading
+                ? stripeSub?.cancel_at
+                  ? "Activating"
+                  : "Updating"
+                : stripeSub?.cancel_at
+                ? "Activate subscription"
+                : "Update subscription"}
             </Button>
           </div>
         )}

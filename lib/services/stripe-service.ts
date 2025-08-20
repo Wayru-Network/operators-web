@@ -645,6 +645,8 @@ export const updateHotspotAmountSubscription = async (params: {
                 ],
                 proration_behavior: "create_prorations",
                 discounts: newDiscounts,
+                cancel_at_period_end: false,
+                cancellation_details: undefined
             }
         );
 
