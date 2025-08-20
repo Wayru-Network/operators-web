@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Button } from "@heroui/react";
-import { Steps } from "../Billing";
+import { Steps } from "../../billing-tab";
 import PaymentAndBillingMethod from "../payment-method/payment-and-billing-method";
 
 interface PlanNotSelectedProps {

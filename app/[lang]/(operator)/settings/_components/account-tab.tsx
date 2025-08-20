@@ -8,7 +8,7 @@ import { AccountInfo, AccountInfoUpdate, FormData } from "../_services/types";
 import { CustomInput } from "@/lib/components/custom-input";
 const SPACER_SECTION = 9;
 
-const Account = ({ accountInfo }: { accountInfo: AccountInfo }) => {
+const AccountTab = ({ accountInfo }: { accountInfo: AccountInfo }) => {
   const [mounted, setMounted] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isPending, startTransition] = useTransition();
@@ -368,4 +368,4 @@ const RenderSection = ({ title, Input1, Input2 }: RenderSectionProps) => {
   );
 };
 
-export default Account;
+export default AccountTab;

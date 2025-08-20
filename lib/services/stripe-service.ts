@@ -31,7 +31,7 @@ export async function getStripeCustomerSubscription(
             expand: [
                 "default_payment_method",
                 "latest_invoice.payment_intent.payment_method",
-                "items.data.price"
+                "items.data.price",
             ],
         });
 
@@ -70,6 +70,12 @@ export async function getStripeCustomerSubscription(
             products_amount: products_amount ?? 1,
             trial_period_start: sub.trial_start,
             trial_period_end: sub.trial_end,
+            current_period_end:
+                sub?.items?.data?.length > 0
+                    ? sub?.items?.data[0].current_period_end
+                    : null,
+            cancel_at: sub.cancel_at,
+            cancellation_reason: sub?.cancellation_details?.reason,
             payment_method: paymentMethod
                 ? {
                     id: paymentMethod.id,
@@ -197,7 +203,7 @@ export const createStripeSubscription = async (
             payment_behavior: "default_incomplete",
             payment_settings: { save_default_payment_method: "on_subscription" },
             expand: ["pending_setup_intent", "latest_invoice", "customer"],
-            discounts: discounts
+            discounts: discounts,
         } as Stripe.SubscriptionCreateParams);
 
         const setupIntent = subscription.pending_setup_intent as Stripe.SetupIntent;
@@ -394,7 +400,6 @@ export const getStripeCustomer = async () => {
 
     return { ...stripeCustomer, customer_database_id: customer?.id };
 };
-
 
 export const createCustomerSubscription = async (
     params: CreateSubscriptionInput
@@ -669,6 +674,51 @@ export const updateHotspotAmountSubscription = async (params: {
         return {
             error: true,
             message: "Failed to update subscription",
+        };
+    }
+};
+
+export const cancelSubscription = async ({ subId, feedback, comment }: {
+    subId: string;
+    feedback?: Stripe.Subscription.CancellationDetails.Feedback;
+    comment?: string
+}) => {
+    try {
+        const currentSub = await stripeServer.subscriptions.retrieve(subId);
+        if (!currentSub) {
+            return {
+                error: true,
+                message: "Subscription not found",
+            };
+        }
+
+        // check sub status
+        if (currentSub.status === "canceled") {
+            return {
+                error: true,
+                message: "Subscription already canceled",
+            };
+        }
+
+        // update current sub
+        await stripeServer.subscriptions.update(subId, {
+            cancel_at_period_end: true,
+            cancellation_details: {
+                feedback,
+                comment
+            },
+        });
+
+        return {
+            error: false,
+            message:
+                "Subscription is going to be canceled when the current period end",
+        };
+    } catch (e) {
+        console.log("Err cancelSubscription", e);
+        return {
+            error: false,
+            message: "Error canceling subscription",
         };
     }
 };

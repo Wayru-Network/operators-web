@@ -4,6 +4,7 @@ import {
   HotspotOpenNetwork,
   HotspotPrivateNetwork,
 } from "../_services/parse-hotspot-config";
+import useWindowDimensions from "@/lib/hooks/use-dimension";
 
 export interface DeviceInfoProps {
   basic: {
@@ -35,6 +36,7 @@ export default function HotspotDeviceInfo({
   network,
   ownership,
 }: DeviceInfoProps) {
+  const { isMd } = useWindowDimensions();
   const basicInfoText = `Hotspot name: ${basic.name}
     Location name: ${basic.locationName}
     Model: ${basic.model}
@@ -98,8 +100,8 @@ export default function HotspotDeviceInfo({
   ];
 
   const formatValue = (value: string) => {
-    if (value.length > 20) {
-      return value.slice(0, 5) + "..." + value.slice(-5);
+    if (value.length > 20 && isMd) {
+      return value.slice(0, 10) + "..." + value.slice(-10);
     }
     return value;
   };
@@ -111,7 +113,7 @@ export default function HotspotDeviceInfo({
         {/* Top */}
         <div className="w-full flex flex-row justify-between space-x-24">
           {/* Basic info */}
-          <div className="bg-[#F8FAFA] dark:bg-[#222222] py-[21px] px-[19px] rounded-[10px] relative flex flex-row justify-between">
+          <div className="bg-[#F8FAFA] dark:bg-[#222222] py-[21px] md:px-[10px] lg:px-[19px] rounded-[10px] relative flex flex-row justify-between w-full">
             <div className="min-w-md">
               <div className="flex flex-row items-center space-x-2">
                 <p className="text-sm font-bold">Hotspot name:</p>
@@ -175,7 +177,7 @@ export default function HotspotDeviceInfo({
           <p className="text-lg font-semibold">Network details</p>
           <div className="mt-4">
             <div className="w-full flex flex-row justify-between space-x-24">
-              <div className="bg-[#F8FAFA] dark:bg-[#222222] py-[21px] px-[19px] rounded-[10px] relative flex flex-row justify-between">
+              <div className="bg-[#F8FAFA] dark:bg-[#222222] py-[21px] md:px-[10px] lg:px-[19px]] rounded-[10px] relative flex flex-row justify-between w-full">
                 <div className="min-w-md">
                   {networkDetails.map((detail) => (
                     <div
@@ -210,7 +212,7 @@ export default function HotspotDeviceInfo({
           <p className="text-lg font-semibold">Ownership</p>
           <div className="mt-4">
             <div className="w-full flex flex-row justify-between space-x-24">
-              <div className="bg-[#F8FAFA] dark:bg-[#222222] py-[21px] px-[19px] rounded-[10px] relative flex flex-row justify-between">
+              <div className="bg-[#F8FAFA] dark:bg-[#222222] py-[21px] md:px-[10px] lg:px-[19px] rounded-[10px] relative flex flex-row justify-between w-full">
                 <div className="min-w-md">
                   {ownershipDetails.map((detail) => (
                     <div

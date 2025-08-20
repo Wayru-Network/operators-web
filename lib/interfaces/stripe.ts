@@ -68,6 +68,9 @@ export interface StripeSubscription {
     trial_period_start: number | null;
     trial_period_end: number | null;
     latest_invoice: LatestInvoice | null;
+    cancel_at?: number | null
+    cancellation_reason?: string | null
+    current_period_end?: number | null
 }
 
 export type DiscountSummary = {

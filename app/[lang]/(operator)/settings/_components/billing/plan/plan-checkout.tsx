@@ -13,7 +13,7 @@ import { PaymentIcon, PaymentType } from "react-svg-credit-card-payment-icons";
 import { CardBrand } from "@stripe/stripe-js";
 import { useTheme } from "next-themes";
 import { Button } from "@heroui/button";
-import { Steps } from "../Billing";
+import { Steps } from "../../billing-tab";
 import { useCustomerSubscription } from "@/lib/contexts/customer-subscription-context";
 import CheckoutBillingDetails from "./checkout-billing-details";
 import { calculateDiscountSummary } from "@/lib/helpers/stripe-helper";

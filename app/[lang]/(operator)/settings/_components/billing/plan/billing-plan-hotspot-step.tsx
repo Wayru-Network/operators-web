@@ -4,7 +4,7 @@ import { Button, Tooltip } from "@heroui/react";
 import { Minus, Plus } from "lucide-react";
 import { useBilling } from "../../../contexts/BillingContext";
 import PlanNotFound from "./plan-not-found";
-import { Steps } from "../Billing";
+import { Steps } from "../../billing-tab";
 import { useCustomerSubscription } from "@/lib/contexts/customer-subscription-context";
 import { useSubscriptionHotspots } from "@/lib/hooks/use-hotspots";
 import { calculateDiscountSummary } from "@/lib/helpers/stripe-helper";
@@ -72,6 +72,14 @@ const BillingPlanHotspotsStep = ({ setSelected }: SelectAPlanProps) => {
                   ${currentMonthlyCost.toFixed(2)}
                 </p>
               </div>
+              {stripeSub?.cancel_at && (
+                <div className="flex flex-row">
+                  <p className="text-xs font-semibold">Status:</p>
+                  <p className="text-xs font-medium dark:text-gray-300 text-gray-700 ml-1">
+                    cancelled
+                  </p>
+                </div>
+              )}
             </div>
           </div>
 

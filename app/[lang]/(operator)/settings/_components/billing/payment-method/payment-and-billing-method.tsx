@@ -4,7 +4,7 @@ import { Tooltip } from "@heroui/tooltip";
 import { Trash2 } from "lucide-react";
 import moment from "moment";
 import { PaymentIcon, PaymentType } from "react-svg-credit-card-payment-icons";
-import { Steps } from "../Billing";
+import { Steps } from "../../billing-tab";
 
 interface PlanActiveProps {
   setSelected: (key: Steps) => void;
@@ -76,8 +76,8 @@ export default function PaymentAndBillingMethod({
             )}
           </div>
         ) : (
-          <div>
-            <p className="text-xs font-medium mt-2">None</p>
+          <div className="flex flex-row w-full items-center gap-4 ml-4 mt-2 justify-between">
+            <p className="text-md  font-medium">None</p>
           </div>
         )}
       </div>

@@ -1,18 +1,18 @@
 "use client";
 
 import React, { useState } from "react";
-import PlanNotSelected from "./Plan/plan-not-selected";
-import BillingPlanHotspotsStep from "./Plan/billing-plan-hotspot-step";
-import PlanActive from "./Plan/plan-active";
-import PlanCheckout from "./Plan/plan-checkout";
-import ChangePaymentMethod from "./payment-method/change-payment-method";
+import PlanNotSelected from "./billing/plan/plan-not-selected";
+import BillingPlanHotspotsStep from "./billing/plan/billing-plan-hotspot-step";
+import PlanDetails from "./billing/plan/plan-details";
+import PlanCheckout from "./billing/plan/plan-checkout";
+import ChangePaymentMethod from "./billing/payment-method/change-payment-method";
 import { Tab, Tabs } from "@heroui/tabs";
 import EaseInOutContent from "@/lib/components/ease-in-out-content";
 import { Spinner } from "@heroui/react";
 import { useCustomerSubscription } from "@/lib/contexts/customer-subscription-context";
 
 export type Steps = "step1" | "step2" | "step3" | "step4";
-const Billing = () => {
+const BillingTab = () => {
   const { subscription, isGettingSubscription } = useCustomerSubscription();
   const [selected, setSelected] = useState<Steps>("step1");
   const stripeSubscription = subscription?.stripe_subscription;
@@ -40,7 +40,7 @@ const Billing = () => {
       <Tab key="step1" title="My subscriptions">
         <EaseInOutContent>
           {stripeSubscription ? (
-            <PlanActive setSelected={setSelected} />
+            <PlanDetails setSelected={setSelected} />
           ) : (
             <PlanNotSelected setSelected={setSelected} />
           )}
@@ -65,4 +65,4 @@ const Billing = () => {
   );
 };
 
-export default Billing;
+export default BillingTab;

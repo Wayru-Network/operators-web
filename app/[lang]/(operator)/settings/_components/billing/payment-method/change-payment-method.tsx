@@ -16,7 +16,7 @@ import {
 } from "@/lib/services/stripe-service";
 import { CardBrand } from "@stripe/stripe-js";
 import { stripeClient } from "@/lib/services/stripe-client-config";
-import { Steps } from "../Billing";
+import { Steps } from "../../billing-tab";
 import { addToast } from "@heroui/toast";
 import { useCustomerSubscription } from "@/lib/contexts/customer-subscription-context";
 

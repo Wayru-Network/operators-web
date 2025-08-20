@@ -183,18 +183,20 @@ export default function PortalsTable({ rows }: { rows: rowCaptivePortal[] }) {
             )}
           </TableBody>
         </Table>
-        <Pagination
-          total={pageCount}
-          page={page}
-          onChange={setPage}
-          showControls
-          className="flex justify-center"
-          classNames={{
-            item: "dark:text-white text-black",
-            prev: "dark:text-white text-black",
-            next: "dark:text-white text-black",
-          }}
-        />
+        {pageCount > 1 && (
+          <Pagination
+            total={pageCount}
+            page={page}
+            onChange={setPage}
+            showControls
+            className="flex justify-center"
+            classNames={{
+              item: "dark:text-white text-black",
+              prev: "dark:text-white text-black",
+              next: "dark:text-white text-black",
+            }}
+          />
+        )}
       </div>
     </div>
   );
