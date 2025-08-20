@@ -21,7 +21,7 @@ const defaultSettings: HotspotNetworksFormData = {
   },
   privateNetwork: {
     ssid: "Wayru Operator",
-    password: "988Dh283zX",
+    password: "default-password",
   },
 };
 
