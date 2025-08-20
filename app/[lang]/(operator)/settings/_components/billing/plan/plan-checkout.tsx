@@ -285,8 +285,8 @@ export default function PlanCheckout({ setSelected }: CheckoutFormProps) {
         {currentHotspotsAmount > 0 ? (
           <PaymentAndBillingMethod
             setSelected={setSelected}
-            notShowDeleteIcon
-            notShowBtn
+            hideDeleteIcon
+            hideButton
           />
         ) : (
           <div className="flex flex-col w-full mt-3 gap-1">

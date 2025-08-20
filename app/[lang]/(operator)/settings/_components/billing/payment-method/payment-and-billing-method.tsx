@@ -5,22 +5,45 @@ import { Trash2 } from "lucide-react";
 import moment from "moment";
 import { PaymentIcon, PaymentType } from "react-svg-credit-card-payment-icons";
 import { Steps } from "../../billing-tab";
+import { useTransition } from "react";
+import { deleteCustomerPaymentMethod } from "@/lib/services/stripe-service";
+import { addToast } from "@heroui/toast";
 
 interface PlanActiveProps {
   setSelected: (key: Steps) => void;
-  notShowDeleteIcon?: boolean;
-  notShowBtn?: boolean;
+  hideDeleteIcon?: boolean;
+  hideButton?: boolean;
 }
 export default function PaymentAndBillingMethod({
   setSelected,
-  notShowDeleteIcon,
-  notShowBtn,
+  hideDeleteIcon,
+  hideButton,
 }: PlanActiveProps) {
-  const { subscription } = useCustomerSubscription();
+  const { subscription, refreshSubscriptionState } = useCustomerSubscription();
   const hotspotSubscription = subscription?.stripe_subscription;
-  const latestInvoice = hotspotSubscription?.latest_invoice;
-  const isDisabledDeletePaymentMethod = !latestInvoice;
+  const isActivePlan = hotspotSubscription?.cancel_at ? false : true;
   const paymentMethod = hotspotSubscription?.payment_method;
+  const [isDeletingPaymentMethod, startTransition] = useTransition();
+
+  const deletePayment = async () => {
+    startTransition(async () => {
+      const response = await deleteCustomerPaymentMethod();
+      if (response.error) {
+        addToast({
+          title: "Error",
+          description: response?.message,
+          color: "danger",
+        });
+      } else {
+        await refreshSubscriptionState();
+        addToast({
+          title: "Success",
+          description: response?.message,
+          color: "default",
+        });
+      }
+    });
+  };
 
   return (
     <div className="w-full">
@@ -52,22 +75,25 @@ export default function PaymentAndBillingMethod({
                 </p>
               </div>
             </div>
-            {!notShowDeleteIcon && (
+            {!hideDeleteIcon && (
               <Tooltip
-                isDisabled={!isDisabledDeletePaymentMethod}
-                content="You can't delete your card while you have active plans."
+                content={
+                  isActivePlan
+                    ? "You can't delete your card while you have active plans."
+                    : "Delete payment method"
+                }
                 placement="right"
               >
                 <Trash2
                   onClick={() => {
-                    if (isDisabledDeletePaymentMethod) {
-                      console.log("disabled delete payment method");
+                    if (isActivePlan || isDeletingPaymentMethod) {
                       return;
                     }
+                    deletePayment();
                   }}
                   size={22}
                   className={`${
-                    isDisabledDeletePaymentMethod
+                    isActivePlan
                       ? "text-gray-400"
                       : "dark:text-[#ffffff] text-[#000000] cursor-pointer "
                   }`}
@@ -82,12 +108,18 @@ export default function PaymentAndBillingMethod({
         )}
       </div>
 
-      {!notShowBtn && (
+      {!hideButton && (
         <Button
           onPress={() => setSelected("step3")}
           className="w-full bg-[#000] dark:bg-[#fff] text-white dark:text-black mt-9"
+          isLoading={isDeletingPaymentMethod}
+          isDisabled={isDeletingPaymentMethod}
         >
-          {paymentMethod ? "Change Payment Method" : "Add Payment Method"}
+          {isDeletingPaymentMethod
+            ? "Deleting payment method"
+            : paymentMethod
+            ? "Change Payment Method"
+            : "Add Payment Method"}
         </Button>
       )}
     </div>

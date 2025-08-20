@@ -16,11 +16,11 @@ interface PlanActiveProps {
 const PlanDetails = ({ setSelected }: PlanActiveProps) => {
   const { subscription } = useCustomerSubscription();
   const hotspotSubscription = subscription?.stripe_subscription;
-  const latestInvoice = hotspotSubscription?.latest_invoice;
-  const invoiceCreatedAt = latestInvoice?.createdAt ?? 0;
-  const currentMonth = moment(invoiceCreatedAt * 1000).format("MMMM");
-  const currentYear = moment(invoiceCreatedAt * 1000).format("YYYY");
+  const currentMonth = moment().format("MMMM");
+  const currentYear = moment().format("YYYY");
   const { onOpen, isOpen, onClose } = useDisclosure();
+  // TODO: enable this when we have a invoicing method
+  const latestInvoice = false;
 
   return (
     <div className="flex md:flex-col lg:flex-row gap-8 w-full">
@@ -58,9 +58,7 @@ const PlanDetails = ({ setSelected }: PlanActiveProps) => {
                   </p>
                 </div>
                 <ArrowDownToLine
-                  onClick={() =>
-                    window.open(latestInvoice?.invoice_pdf, "_blank")
-                  }
+                  onClick={() => window.open(latestInvoice, "_blank")}
                   size={22}
                   className="cursor-pointer mr-4"
                 />

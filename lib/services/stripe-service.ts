@@ -30,7 +30,6 @@ export async function getStripeCustomerSubscription(
         const sub = await stripeServer.subscriptions.retrieve(subscriptionId, {
             expand: [
                 "default_payment_method",
-                "latest_invoice.payment_intent.payment_method",
                 "items.data.price",
             ],
         });
@@ -44,22 +43,6 @@ export async function getStripeCustomerSubscription(
 
         // Get billing details from price
         const price = sub.items.data[0].price as Stripe.Price;
-        const stripeLatestInvoice = sub?.latest_invoice as Stripe.Invoice;
-
-        // prepare latest invoice object
-        const totalCents = stripeLatestInvoice.total;
-        const latestInvoice =
-            totalCents > 0 && stripeLatestInvoice.status === "paid"
-                ? {
-                    invoice_id: stripeLatestInvoice?.id as string,
-                    total_payment: (totalCents / 100).toLocaleString("en-US", {
-                        style: "currency",
-                        currency: "USD",
-                    }),
-                    createdAt: stripeLatestInvoice?.created,
-                    invoice_pdf: stripeLatestInvoice.invoice_pdf as string,
-                }
-                : null;
 
         const subscription: StripeSubscription = {
             subscription_id: sub.id,
@@ -95,7 +78,6 @@ export async function getStripeCustomerSubscription(
                     ).format("MMM DD, YYYY"),
                 }
                 : undefined,
-            latest_invoice: latestInvoice,
         };
 
         return subscription;
@@ -724,3 +706,37 @@ export const cancelSubscription = async ({ subId, feedback, comment }: {
         };
     }
 };
+
+export const deleteCustomerPaymentMethod = async () => {
+    try {
+        const customer = await getStripeCustomer()
+        if (!customer) {
+            return {
+                error: true,
+                message: "Customer not found"
+            }
+        }
+
+        // get current payment methods
+        const paymentMethods = await stripeServer.paymentMethods.list({
+            type: 'card',
+            limit: 5,
+            customer: customer?.id
+        })
+
+        for (const paymentMethod of paymentMethods?.data) {
+            await stripeServer.paymentMethods.detach(paymentMethod.id)
+        }
+
+        return {
+            error: false,
+            message: "Payment method deleted"
+        }
+    } catch (e) {
+        console.log('error deleteCustomerPaymentMethod', e)
+        return {
+            error: true,
+            message: "error deleting payment method"
+        }
+    }
+}

@@ -31,6 +31,9 @@ const BillingPlanHotspotsStep = ({ setSelected }: SelectAPlanProps) => {
     hotspotPrice
   );
   const isNewMonthlyCost = currentHotspotsAmount != hotspotsToAdd;
+  const isButtonDisabled = stripeSub?.cancel_at
+    ? false
+    : hotspotsToAdd === currentHotspotsAmount;
 
   const handleHotspotsCountChange = (type: "add" | "remove") => {
     const hotspotsToRemove = hotspotsToAdd - 1;
@@ -142,7 +145,7 @@ const BillingPlanHotspotsStep = ({ setSelected }: SelectAPlanProps) => {
             Back
           </Button>
           <Button
-            disabled={hotspotsToAdd === currentHotspotsAmount}
+            disabled={isButtonDisabled}
             className="w-full bg-[#000] dark:bg-[#fff] text-white dark:text-black mt-9 disabled:opacity-50 disabled:cursor-not-allowed w-1/2"
             onPress={() => setSelected("step4")}
           >

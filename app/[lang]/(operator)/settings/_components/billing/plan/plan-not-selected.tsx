@@ -59,7 +59,7 @@ const PlanNotSelected = ({ setSelected }: PlanNotSelectedProps) => {
 
           {/* Payment & billing section */}
           <div className="flex flex-col w-full">
-            <PaymentAndBillingMethod setSelected={setSelected} notShowBtn />
+            <PaymentAndBillingMethod setSelected={setSelected} hideButton />
           </div>
         </div>
       </div>
