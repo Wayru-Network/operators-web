@@ -19,7 +19,7 @@ import { stripeClient } from "@/lib/services/stripe-client-config";
 import { Steps } from "../../billing-tab";
 import { addToast } from "@heroui/toast";
 import { useCustomerSubscription } from "@/lib/contexts/customer-subscription-context";
-import { Spinner } from "@heroui/react";
+import { LoadingInputWrapper } from "@/lib/components/loading-input-wrapper";
 
 interface CheckoutFormProps {
   setSelected: (key: Steps) => void;
@@ -98,21 +98,26 @@ function ChangePaymentForm({ setSelected }: CheckoutFormProps) {
     }
   };
 
-  const SpinnerActive = () => (
-    <div className="absolute right-1.5">
-      <Spinner size="sm" />
-    </div>
-  );
-
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full">
       {/* Card number on top */}
       <div className="flex flex-col mt-5">
         <label className="text-xs font-medium mb-2">Card number</label>
         <div className="relative w-full">
-          <div className="flex flex-row w-full relative items-center">
+          <LoadingInputWrapper
+            isLoading={isLoadingInputs}
+            startContent={
+              <PaymentIcon
+                type={cardBrand as PaymentType}
+                format="logo"
+                className="mr-2"
+                width={25}
+                height={25}
+              />
+            }
+          >
             <CardNumberElement
-              className="p-3 border border-gray-300 rounded-md pl-10 w-full h-11"
+              className="p-3 border border-gray-300 rounded-md  pl-10 w-full h-11"
               onReady={() => setLoadingInput(false)}
               options={{
                 disableLink: true,
@@ -129,17 +134,7 @@ function ChangePaymentForm({ setSelected }: CheckoutFormProps) {
                 setCardBrand(event.brand);
               }}
             />
-            {isLoadingInputs && <SpinnerActive />}
-          </div>
-          <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
-            <PaymentIcon
-              type={cardBrand as PaymentType}
-              format="logo"
-              className="mr-2"
-              width={25}
-              height={25}
-            />
-          </div>
+          </LoadingInputWrapper>
         </div>
       </div>
 
@@ -147,7 +142,7 @@ function ChangePaymentForm({ setSelected }: CheckoutFormProps) {
       <div className="flex gap-4 mt-3">
         <div className="flex-1">
           <label className="text-xs font-medium mb-2">Expiry date</label>
-          <div className="flex flex-row w-full relative items-center">
+          <LoadingInputWrapper isLoading={isLoadingInputs}>
             <CardExpiryElement
               className="p-3 border border-gray-300 rounded-md w-full h-11"
               options={{
@@ -161,12 +156,11 @@ function ChangePaymentForm({ setSelected }: CheckoutFormProps) {
                 disabled: isLoadingInputs,
               }}
             />
-            {isLoadingInputs && <SpinnerActive />}
-          </div>
+          </LoadingInputWrapper>
         </div>
         <div className="flex-1">
           <label className="text-xs font-medium mb-2">CVC</label>
-          <div className="flex flex-row w-full relative items-center">
+          <LoadingInputWrapper isLoading={isLoadingInputs}>
             <CardCvcElement
               className="p-3 border border-gray-300 rounded-md w-full h-11"
               options={{
@@ -180,8 +174,7 @@ function ChangePaymentForm({ setSelected }: CheckoutFormProps) {
                 disabled: isLoadingInputs,
               }}
             />
-            {isLoadingInputs && <SpinnerActive />}
-          </div>
+          </LoadingInputWrapper>
         </div>
       </div>
 

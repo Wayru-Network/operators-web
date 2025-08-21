@@ -1,8 +1,8 @@
 import { useCustomerSubscription } from "@/lib/contexts/customer-subscription-context";
-import moment from "moment";
 import { Button } from "@heroui/button";
 import { Steps } from "../../../billing-tab";
 import { useBilling } from "../../../../contexts/BillingContext";
+import { formatMillisecondsToDate } from "@/lib/helpers/dates";
 
 interface Props {
   setSelected: (key: Steps) => void;
@@ -25,7 +25,7 @@ export default function PlanCancelledDetails({ setSelected }: Props) {
           </p>
           <p className="text-xs font-medium dark:text-gray-300 text-gray-700 ml-1">
             The service will stop on{" "}
-            {moment(Number(cancelAt) * 1000).format("MMM DD, YYYY")}
+            {cancelAt && formatMillisecondsToDate(cancelAt)}
           </p>
         </div>
       </div>

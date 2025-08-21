@@ -2,9 +2,9 @@ import { useCustomerSubscription } from "@/lib/contexts/customer-subscription-co
 import { useBilling } from "../../../../contexts/BillingContext";
 import { calculateDiscountSummary } from "@/lib/helpers/stripe-helper";
 import Stripe from "stripe";
-import moment from "moment";
 import { Button } from "@heroui/button";
 import { Steps } from "../../../billing-tab";
+import { formatMillisecondsToDate } from "@/lib/helpers/dates";
 
 interface Props {
   setSelected: (key: Steps) => void;
@@ -89,19 +89,17 @@ export default function PlanActiveDetails({
             )}
           </p>
         </div>
-        {moment().isBefore(
-          moment((hotspotSubscription?.trial_period_end || 0) * 1000)
-        ) && (
+        {subscription?.is_trialing && (
           <div className="flex flex-row">
             <p className="text-xs font-semibold">Trial period:</p>
             <p className="text-xs font-medium dark:text-gray-300 text-gray-700 ml-1">
-              {moment(
-                Number(hotspotSubscription?.trial_period_start) * 1000
-              ).format("MMM DD, YYYY")}{" "}
-              -{" "}
-              {moment(
-                Number(hotspotSubscription?.trial_period_end) * 1000
-              ).format("MMM DD, YYYY")}
+              {formatMillisecondsToDate(
+                hotspotSubscription?.trial_period_start ?? 0
+              )}
+              {" - "}
+              {formatMillisecondsToDate(
+                hotspotSubscription?.trial_period_end ?? 0
+              )}
             </p>
           </div>
         )}

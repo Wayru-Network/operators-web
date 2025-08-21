@@ -8,6 +8,7 @@ import { Steps } from "../../billing-tab";
 import { useCustomerSubscription } from "@/lib/contexts/customer-subscription-context";
 import { useSubscriptionHotspots } from "@/lib/hooks/use-hotspots";
 import { calculateDiscountSummary } from "@/lib/helpers/stripe-helper";
+import { AnimatePresence, motion } from "framer-motion";
 
 interface SelectAPlanProps {
   setSelected: (key: Steps) => void;
@@ -21,19 +22,28 @@ const BillingPlanHotspotsStep = ({ setSelected }: SelectAPlanProps) => {
   const { subscription } = useCustomerSubscription();
   const stripeSub = subscription?.stripe_subscription;
   const currentHotspotsAmount = stripeSub?.products_amount ?? 0;
-  const hotspotPrice = hotspotProduct?.priceDetails[0].price_with_fee ?? 0;
+  const hotspotPriceWithFee =
+    hotspotProduct?.priceDetails[0].price_with_fee ?? 0;
   const { totalPriceWithDiscount: currentMonthlyCost } =
-    calculateDiscountSummary(currentHotspotsAmount, hotspotPrice);
+    calculateDiscountSummary(currentHotspotsAmount, hotspotPriceWithFee);
   const { hotspots: assignedHotspots } = useSubscriptionHotspots();
   const assignedHotspotsAmount = assignedHotspots?.length;
   const { totalPriceWithDiscount } = calculateDiscountSummary(
     hotspotsToAdd,
-    hotspotPrice
+    hotspotPriceWithFee
   );
   const isNewMonthlyCost = currentHotspotsAmount != hotspotsToAdd;
   const isButtonDisabled = stripeSub?.cancel_at
     ? false
     : hotspotsToAdd === currentHotspotsAmount;
+  const newHotspotsToAddAmount =
+    currentHotspotsAmount > 0 && hotspotsToAdd > currentHotspotsAmount
+      ? hotspotsToAdd - currentHotspotsAmount
+      : 0;
+  const hotspotsToRemoveAmount =
+    currentHotspotsAmount > 0 && hotspotsToAdd < currentHotspotsAmount
+      ? currentHotspotsAmount - hotspotsToAdd
+      : 0;
 
   const handleHotspotsCountChange = (type: "add" | "remove") => {
     const hotspotsToRemove = hotspotsToAdd - 1;
@@ -62,7 +72,7 @@ const BillingPlanHotspotsStep = ({ setSelected }: SelectAPlanProps) => {
             <p className="text-lg font-semibold w-full align-left ">
               Current plan
             </p>
-            <div className="flex flex-col w-full mt-2 ml-4">
+            <div className="flex flex-col w-full mt-2 ml-4 gap-1">
               <div className="flex flex-row">
                 <p className="text-xs font-semibold">Active hotspots:</p>
                 <p className="text-xs font-medium dark:text-gray-300 text-gray-700 ml-1">
@@ -126,13 +136,78 @@ const BillingPlanHotspotsStep = ({ setSelected }: SelectAPlanProps) => {
             </p>
             <div className="flex flex-row gap-3 mt-2 items-center w-full"></div>
             <div className="flex flex-row w-full">
-              <div className="flex flex-col w-full ml-4">
-                <div className="flex flex-row">
-                  <p className="text-xs  font-semibold">New monthly cost:</p>
-                  <p className="text-xs  font-medium ml-1 dark:text-gray-300 text-gray-700">
-                    ${isNewMonthlyCost ? totalPriceWithDiscount.toFixed(2) : 0}
-                  </p>
-                </div>
+              <div className="flex flex-col w-full ml-4 gap-1">
+                <AnimatePresence>
+                  {currentHotspotsAmount > 0 &&
+                  currentHotspotsAmount != hotspotsToAdd ? (
+                    <motion.div
+                      key="reason-details"
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.3, ease: "easeInOut" }}
+                      style={{ overflow: "hidden" }}
+                      className="gap-2"
+                    >
+                      <div className="flex flex-col w-full gap-1">
+                        <div className="flex flex-row">
+                          <p className="text-xs  font-semibold">
+                            Current Activate hotspot:
+                          </p>
+                          <p className="text-xs  font-medium ml-1 dark:text-gray-300 text-gray-700">
+                            {currentHotspotsAmount}{" "}
+                          </p>
+                        </div>
+                        <div className="flex flex-row">
+                          <p className="text-xs  font-semibold">
+                            Hotspots to{" "}
+                            {newHotspotsToAddAmount > 0 ? "add" : "remove"}:
+                          </p>
+                          <p className="text-xs  font-medium ml-1 dark:text-gray-300 text-gray-700">
+                            {newHotspotsToAddAmount > 0
+                              ? newHotspotsToAddAmount
+                              : hotspotsToRemoveAmount}
+                          </p>
+                        </div>
+                        <div className="flex flex-row">
+                          <p className="text-xs  font-semibold">
+                            Total hotspots:
+                          </p>
+                          <p className="text-xs  font-medium ml-1 dark:text-gray-300 text-gray-700">
+                            {hotspotsToAdd > currentHotspotsAmount
+                              ? currentHotspotsAmount +
+                                (hotspotsToAdd - currentHotspotsAmount)
+                              : currentHotspotsAmount -
+                                (currentHotspotsAmount - hotspotsToAdd)}
+                          </p>
+                        </div>
+                        <div className="flex flex-row">
+                          <p className="text-xs  font-semibold">
+                            New monthly cost:
+                          </p>
+                          <p className="text-xs  font-medium ml-1 dark:text-gray-300 text-gray-700">
+                            $
+                            {isNewMonthlyCost
+                              ? totalPriceWithDiscount.toFixed(2)
+                              : 0}
+                          </p>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ) : (
+                    <div className="flex flex-row">
+                      <p className="text-xs  font-semibold">
+                        New monthly cost:
+                      </p>
+                      <p className="text-xs  font-medium ml-1 dark:text-gray-300 text-gray-700">
+                        $
+                        {isNewMonthlyCost
+                          ? totalPriceWithDiscount.toFixed(2)
+                          : 0}
+                      </p>
+                    </div>
+                  )}
+                </AnimatePresence>
               </div>
             </div>
           </div>

@@ -8,6 +8,7 @@ import { Steps } from "../../billing-tab";
 import { addToast } from "@heroui/toast";
 import { createTrialSubscription } from "@/lib/services/stripe-service";
 import { dateConstants } from "@/lib/constants/date";
+import { formatMillisecondsToDate } from "@/lib/helpers/dates";
 
 interface Props {
   setSelected: (key: Steps) => void;
@@ -25,10 +26,9 @@ export default function CheckoutBillingDetails({ setSelected }: Props) {
   const stripeSub = subscription?.stripe_subscription;
   // get next billing date
   const nextBillingDate = stripeSub?.cancel_at
-    ? moment(Number(stripeSub?.cancel_at) * 1000).format(formatDate)
-    : moment()
-        .add(recurring?.interval_count ?? 1, recurring?.interval ?? "month")
-        .format(formatDate);
+    ? formatMillisecondsToDate(stripeSub?.cancel_at)
+    : stripeSub?.billing_details?.next_payment_date;
+
   // get next trial billing date
   const nextTrialBillingDate = moment().add(7, "days").format(formatDate);
   const [isLoading, startTransition] = useTransition();

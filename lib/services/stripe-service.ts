@@ -28,10 +28,7 @@ export async function getStripeCustomerSubscription(
         }
 
         const sub = await stripeServer.subscriptions.retrieve(subscriptionId, {
-            expand: [
-                "default_payment_method",
-                "items.data.price",
-            ],
+            expand: ["default_payment_method", "items.data.price"],
         });
 
         const product_id = sub.items.data[0].price?.product as unknown as string;
@@ -43,6 +40,10 @@ export async function getStripeCustomerSubscription(
 
         // Get billing details from price
         const price = sub.items.data[0].price as Stripe.Price;
+        const today = moment();
+        const next_payment_date = moment(
+            sub.items.data[0].current_period_end * 1000
+        );
 
         const subscription: StripeSubscription = {
             subscription_id: sub.id,
@@ -50,7 +51,7 @@ export async function getStripeCustomerSubscription(
             type: product.metadata?.type as SubscriptionType,
             name: product.name,
             description: product.description,
-            products_amount: products_amount ?? 1,
+            products_amount: products_amount ?? 0,
             trial_period_start: sub.trial_start,
             trial_period_end: sub.trial_end,
             current_period_end:
@@ -73,9 +74,8 @@ export async function getStripeCustomerSubscription(
                 ? {
                     interval: price.recurring?.interval || "month",
                     price_per_item: centsToDollars(price.unit_amount || 0),
-                    next_payment_date: moment(
-                        sub.items.data[0].current_period_end * 1000
-                    ).format("MMM DD, YYYY"),
+                    next_payment_date: next_payment_date.format("MMM DD, YYYY"),
+                    days_until_next_billing: next_payment_date.diff(today, "days"),
                 }
                 : undefined,
         };
@@ -628,7 +628,7 @@ export const updateHotspotAmountSubscription = async (params: {
                 proration_behavior: "create_prorations",
                 discounts: newDiscounts,
                 cancel_at_period_end: false,
-                cancellation_details: undefined
+                cancellation_details: undefined,
             }
         );
 
@@ -662,10 +662,14 @@ export const updateHotspotAmountSubscription = async (params: {
     }
 };
 
-export const cancelSubscription = async ({ subId, feedback, comment }: {
+export const cancelSubscription = async ({
+    subId,
+    feedback,
+    comment,
+}: {
     subId: string;
     feedback?: Stripe.Subscription.CancellationDetails.Feedback;
-    comment?: string
+    comment?: string;
 }) => {
     try {
         const currentSub = await stripeServer.subscriptions.retrieve(subId);
@@ -689,7 +693,7 @@ export const cancelSubscription = async ({ subId, feedback, comment }: {
             cancel_at_period_end: true,
             cancellation_details: {
                 feedback,
-                comment
+                comment,
             },
         });
 
@@ -709,34 +713,105 @@ export const cancelSubscription = async ({ subId, feedback, comment }: {
 
 export const deleteCustomerPaymentMethod = async () => {
     try {
-        const customer = await getStripeCustomer()
+        const customer = await getStripeCustomer();
         if (!customer) {
             return {
                 error: true,
-                message: "Customer not found"
-            }
+                message: "Customer not found",
+            };
         }
 
         // get current payment methods
         const paymentMethods = await stripeServer.paymentMethods.list({
-            type: 'card',
+            type: "card",
             limit: 5,
-            customer: customer?.id
-        })
+            customer: customer?.id,
+        });
 
         for (const paymentMethod of paymentMethods?.data) {
-            await stripeServer.paymentMethods.detach(paymentMethod.id)
+            await stripeServer.paymentMethods.detach(paymentMethod.id);
         }
 
         return {
             error: false,
-            message: "Payment method deleted"
-        }
+            message: "Payment method deleted",
+        };
     } catch (e) {
-        console.log('error deleteCustomerPaymentMethod', e)
+        console.log("error deleteCustomerPaymentMethod", e);
         return {
             error: true,
-            message: "error deleting payment method"
-        }
+            message: "error deleting payment method",
+        };
     }
-}
+};
+
+export const createPaymentIntent = async ({
+    amount_usd,
+    metadata,
+    payment_method_id,
+}: {
+    amount_usd: number;
+    metadata?: Stripe.MetadataParam;
+    payment_method_id?: string;
+}) => {
+    try {
+        const customer = await getStripeCustomer()
+        if (!customer) {
+            return {
+                error: true,
+                message: "ECustomer not found",
+                payment_intent_id: null,
+                client_secret: null,
+            };
+        }
+
+        const paymentIntent = await stripeServer.paymentIntents.create({
+            amount: Math.round(amount_usd * 100),
+            currency: "usd",
+            metadata,
+            payment_method_types: ["card"],
+            customer: customer?.id,
+        });
+
+        if (!paymentIntent) {
+            return {
+                error: true,
+                message: "Error creating payment intent",
+                payment_intent_id: null,
+                client_secret: null,
+            };
+        }
+
+        if (payment_method_id) {
+            const confirmedIntent = await stripeServer.paymentIntents.confirm(
+                paymentIntent.id,
+                {
+                    payment_method: payment_method_id,
+                    off_session: true,
+                }
+            );
+
+            return {
+                error: false,
+                status: confirmedIntent.status,
+                payment_intent_id: confirmedIntent.id,
+            };
+        }
+
+        return {
+            error: false,
+            message: "Payment intent created",
+            payment_intent_id: paymentIntent.id,
+            client_secret: paymentIntent.client_secret,
+        };
+    } catch (error) {
+        console.log("error createPaymentIntent", error);
+        return {
+            error: true,
+            message:
+                error instanceof Error ? error.message : "Unknown confirmation error",
+            payment_intent_id: null,
+            client_secret: null,
+        };
+    }
+};

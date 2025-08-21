@@ -47,6 +47,7 @@ interface BillingDetails {
     interval: Stripe.Price.Recurring.Interval;
     price_per_item: number;
     next_payment_date: string;
+    days_until_next_billing: number
 }
 
 /* interface LatestInvoice {
