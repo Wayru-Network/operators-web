@@ -89,7 +89,7 @@ export default function HotspotNetworks({
     setIsSaving(true);
     try {
       const formData: HotspotNetworksFormData = {
-        locationName: locName,
+        locationName: locName === locationName ? "" : locName,
         openNetwork: {
           ssid: openSSID,
         },
@@ -126,7 +126,15 @@ export default function HotspotNetworks({
     } finally {
       setIsSaving(false);
     }
-  }, [locName, openSSID, privateSSID, newPassword, confirmPassword, hotspot]);
+  }, [
+    locName,
+    locationName,
+    openSSID,
+    privateSSID,
+    newPassword,
+    confirmPassword,
+    hotspot,
+  ]);
   const { subscription } = useCustomerSubscription();
   const { is_subscription_active } = subscription as CustomerSubscription;
 
@@ -156,7 +164,7 @@ export default function HotspotNetworks({
       <Spacer y={4} />
       <CustomInput
         label="Rename hotspot"
-        placeholder="Pop bar"
+        placeholder={locName === "" ? "Pop Bar" : locName}
         helper={helperText}
         onChange={(e) => setLocName(e.target.value)}
         value={locName}
@@ -178,7 +186,7 @@ export default function HotspotNetworks({
         disabled={isDisabled}
       />
       <Spacer y={8} />
-      <div className="flex flex-row space-x-8">
+      <div className="flex md:flex-col lg:flex-row space-x-8 md:space-y-8 lg:space-y-0">
         <CustomInput
           label="SSID private network"
           placeholder="Private WiFi"
@@ -186,7 +194,7 @@ export default function HotspotNetworks({
           onChange={(e) => setPrivateSSID(e.target.value)}
           value={privateSSID}
           type="text"
-          wrapperClass="max-w-[210px]"
+          wrapperClass="lg:max-w-[210px] md:w-full"
           disabled={isDisabled}
         />
         <CustomInput
@@ -195,7 +203,7 @@ export default function HotspotNetworks({
           onChange={(e) => setNewPassword(e.target.value)}
           value={newPassword}
           type="password"
-          wrapperClass="max-w-[210px]"
+          wrapperClass="lg:max-w-[210px] md:w-full"
           disabled={isDisabled}
         />
         <CustomInput
@@ -204,14 +212,14 @@ export default function HotspotNetworks({
           onChange={(e) => setConfirmPassword(e.target.value)}
           value={confirmPassword}
           type="password"
-          wrapperClass="max-w-[210px]"
+          wrapperClass="lg:max-w-[210px] md:w-full"
           disabled={isDisabled}
         />
       </div>
       <Spacer y={8} />
 
       <Button
-        className="rounded-[10px] w-[309px]"
+        className="rounded-[10px] md:w-full lg:w-[309px]"
         onPress={handleSave}
         isLoading={isSaving}
         isDisabled={isDisabled}

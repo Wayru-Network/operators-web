@@ -17,6 +17,7 @@ export interface Hotspot {
   nfnode_type: string;
   wayru_device_id: string;
   assigned_portal?: string;
+  location_name?: string;
 }
 export interface MinersByAddressResponse {
   data: Hotspot[];
@@ -98,10 +99,11 @@ export async function getHotspots(
     };
   }
 
-  const wayruDeviceIds = hotspots?.data?.filter(
-    (hotspot) =>
-      hotspot.wayru_device_id && hotspot.wayru_device_id.trim() !== ""
-  )
+  const wayruDeviceIds = hotspots?.data
+    ?.filter(
+      (hotspot) =>
+        hotspot.wayru_device_id && hotspot.wayru_device_id.trim() !== ""
+    )
     .map((hotspot) => hotspot.wayru_device_id);
 
   // Get the device connectivity status
@@ -139,6 +141,7 @@ export async function getHotspots(
 
   const portalMap = new Map();
   portals.forEach((hotspot) => {
+    portalMap.set(hotspot.name, hotspot.location_name);
     if (hotspot.portal_config_id && hotspot.portal_config) {
       portalMap.set(hotspot.wayru_device_id, hotspot.portal_config.portal_name);
     }
@@ -146,6 +149,7 @@ export async function getHotspots(
 
   hotspots.data.forEach((hotspot) => {
     hotspot.assigned_portal = portalMap.get(hotspot.wayru_device_id) || "None";
+    hotspot.location_name = portalMap.get(hotspot.name) || "Unknown";
   });
 
   return hotspots;

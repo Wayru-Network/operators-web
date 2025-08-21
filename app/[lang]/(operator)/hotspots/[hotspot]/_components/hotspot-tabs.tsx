@@ -12,6 +12,8 @@ export interface HotspotTabsProps {
 }
 
 export default function HotspotTabs({ info, networks }: HotspotTabsProps) {
+  const isDisabledCaptivePortal = true;
+
   return (
     <Tabs
       fullWidth
@@ -35,11 +37,13 @@ export default function HotspotTabs({ info, networks }: HotspotTabsProps) {
           <HotspotNetworks {...networks} />
         </EaseInOutContent>
       </Tab>
-      <Tab key="captive-portal" title="Captive Portal">
-        <EaseInOutContent>
-          <HotspotCaptivePortal />
-        </EaseInOutContent>
-      </Tab>
+      {!isDisabledCaptivePortal && (
+        <Tab key="captive-portal" title="Captive Portal">
+          <EaseInOutContent>
+            <HotspotCaptivePortal />
+          </EaseInOutContent>
+        </Tab>
+      )}
     </Tabs>
   );
 }

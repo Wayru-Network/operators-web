@@ -1,8 +1,8 @@
 "use client";
 import { Tab, Tabs } from "@heroui/tabs";
-import Account from "./Account";
-import Billing from "./Billing/Billing";
-import Reports from "./Reports";
+import AccountTab from "./account-tab";
+import BillingTab from "./billing-tab";
+import ReportsTab from "./reports-tab";
 import { AccountInfo } from "../_services/types";
 import EaseInOutContent from "@/lib/components/ease-in-out-content";
 
@@ -11,6 +11,9 @@ export default function SettingsTabs({
 }: {
   accountInfo: AccountInfo;
 }) {
+  // remove this when the reports feature be ready
+  const isDisabledReports = true;
+
   return (
     <Tabs
       fullWidth
@@ -26,17 +29,19 @@ export default function SettingsTabs({
     >
       <Tab key="Account" title="Account">
         <EaseInOutContent>
-          <Account accountInfo={accountInfo} />
+          <AccountTab accountInfo={accountInfo} />
         </EaseInOutContent>
       </Tab>
       <Tab key="Billing" title="Billing">
-        <Billing />
+        <BillingTab />
       </Tab>
-      <Tab key="Reports" title="Reports">
-        <EaseInOutContent>
-          <Reports />
-        </EaseInOutContent>
-      </Tab>
+      {!isDisabledReports && (
+        <Tab key="Reports" title="Reports">
+          <EaseInOutContent>
+            <ReportsTab />
+          </EaseInOutContent>
+        </Tab>
+      )}
     </Tabs>
   );
 }

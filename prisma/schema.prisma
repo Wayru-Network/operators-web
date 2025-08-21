@@ -12,6 +12,7 @@ model hotspot {
   id               Int              @id @default(autoincrement())
   wayru_device_id  String           @unique @db.Uuid
   name             String?          @unique
+  location_name    String?
   portal_config_id Int?
   subscription_id  Int?
   portal_config    portal_config?   @relation(fields: [portal_config_id], references: [id])

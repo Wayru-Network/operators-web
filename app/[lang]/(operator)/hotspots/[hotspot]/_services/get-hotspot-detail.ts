@@ -44,7 +44,7 @@ export async function getHotspotDetail(name: string): Promise<HotspotDetail> {
     info: {
       basic: {
         name: name,
-        locationName: "",
+        locationName: hotspot.location_name || "",
         model: device?.model || nfnode?.model || "",
         brand: device?.brand || "",
         osName: device?.os_name || "",
@@ -66,7 +66,7 @@ export async function getHotspotDetail(name: string): Promise<HotspotDetail> {
       },
     },
     networks: {
-      locationName: "",
+      locationName: hotspot.location_name || "",
       osServicesVersion: device?.os_services_version || "",
       openNetwork: openNetwork,
       privateNetwork: privateNetwork,

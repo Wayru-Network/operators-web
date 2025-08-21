@@ -11,7 +11,7 @@ import updateDeviceConfig from "@/lib/device_config/update-device-config";
 import { validateDeviceConfig } from "@/lib/device_config/validate-device-config";
 
 export default async function saveHotspotNetworks(
-  newData: HotspotNetworksFormData,
+  newData: HotspotNetworksFormData
 ): Promise<SaveHotspotNetworksResponse> {
   try {
     console.log("Location name:", newData.locationName);
@@ -26,12 +26,20 @@ export default async function saveHotspotNetworks(
       return { success: false, error: "Hotspot not found" };
     }
 
+    // Update Location Name
+    if (newData.locationName && newData.locationName.trim() !== "") {
+      await Prisma.hotspot.update({
+        where: { id: hotspot.id },
+        data: { location_name: newData.locationName },
+      });
+    }
+
     // Check for existing configs
     const existingOpenConfig = hotspot.network_configs.find(
-      (config) => config.type === "open",
+      (config) => config.type === "open"
     );
     const existingPrivateConfig = hotspot.network_configs.find(
-      (config) => config.type === "private",
+      (config) => config.type === "private"
     );
 
     // Handle open network configuration
@@ -70,7 +78,7 @@ export default async function saveHotspotNetworks(
           "open-network-config",
           openConfig,
           true,
-          0,
+          0
         );
 
         if (deviceConfigId) {
@@ -91,7 +99,7 @@ export default async function saveHotspotNetworks(
           "open-network-config",
           openConfig,
           true,
-          0,
+          0
         );
 
         if (deviceConfigId) {
@@ -152,7 +160,7 @@ export default async function saveHotspotNetworks(
           "private-network-config",
           privateConfig,
           true,
-          0,
+          0
         );
 
         if (deviceConfigId) {
@@ -173,7 +181,7 @@ export default async function saveHotspotNetworks(
           "private-network-config",
           privateConfig,
           true,
-          0,
+          0
         );
 
         if (deviceConfigId) {
