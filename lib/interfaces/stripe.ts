@@ -47,14 +47,15 @@ interface BillingDetails {
     interval: Stripe.Price.Recurring.Interval;
     price_per_item: number;
     next_payment_date: string;
+    days_until_next_billing: number
 }
 
-interface LatestInvoice {
+/* interface LatestInvoice {
     invoice_id: string;
     total_payment: string;
     createdAt: number;
     invoice_pdf: string
-}
+} */
 
 export interface StripeSubscription {
     subscription_id: string;
@@ -67,7 +68,9 @@ export interface StripeSubscription {
     billing_details?: BillingDetails;
     trial_period_start: number | null;
     trial_period_end: number | null;
-    latest_invoice: LatestInvoice | null;
+    cancel_at?: number | null
+    cancellation_reason?: string | null
+    current_period_end?: number | null
 }
 
 export type DiscountSummary = {

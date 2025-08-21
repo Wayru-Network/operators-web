@@ -16,7 +16,7 @@ export const getSubscriptionStatusDetails = (sub?: StripeSubscription) => {
 
     // Check if trial period was already used
     const is_trial_period_used = sub.trial_period_end
-        ? moment().isAfter(sub.trial_period_end)
+        ? moment().isAfter(sub.trial_period_end) || sub.status !== 'trialing'
         : false;
 
     // Check subscription status

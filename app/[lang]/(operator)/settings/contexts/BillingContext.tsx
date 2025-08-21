@@ -1,30 +1,19 @@
 "use client";
 
-import { StripeProduct } from "@/lib/interfaces/stripe";
 import { createContext, useCallback, useContext, useState } from "react";
 import { Hotspot } from "../../hotspots/_services/get-hotspots";
+import {
+  BillingContextType,
+  BillingProviderProps,
+  CustomerAction,
+  CustomerContext,
+  GetProratedPrice,
+  HotspotChange,
+  SubscriptionStatus,
+} from "../_components/interfaces/billing-context";
+import { useCustomerSubscription } from "@/lib/contexts/customer-subscription-context";
 
-interface BillingProviderProps {
-  children: React.ReactNode;
-  products: StripeProduct[];
-  hotspots: Hotspot[];
-}
-
-type BillingContextType = {
-  products: StripeProduct[];
-  hotspotsToAdd: number;
-  handleHotspotsToAdd: (hotspots: number) => void;
-  hotspots: Hotspot[];
-  addHotspot: (h: Hotspot[]) => void;
-};
-
-const BillingContext = createContext<BillingContextType>({
-  products: [],
-  hotspotsToAdd: 0,
-  handleHotspotsToAdd: () => {},
-  hotspots: [],
-  addHotspot: () => {},
-});
+const BillingContext = createContext<BillingContextType | null>(null);
 
 export const BillingProvider = ({
   children,
@@ -33,6 +22,8 @@ export const BillingProvider = ({
 }: BillingProviderProps) => {
   const [hotspotsToAdd, setHotspotsToAdd] = useState(0);
   const [hotspots, setHotspots] = useState(hotspotsProps);
+  const { subscription } = useCustomerSubscription();
+  const stripeSubscription = subscription?.stripe_subscription;
 
   const handleHotspotsToAdd = (hotspots: number) => {
     setHotspotsToAdd(hotspots);
@@ -44,6 +35,59 @@ export const BillingProvider = ({
     });
   }, []);
 
+  const getCustomerContext = (): CustomerContext => {
+    const currentHotspotsAmount = stripeSubscription?.products_amount ?? 0;
+    const hasHotspots = currentHotspotsAmount > 0;
+    const isSame = hotspotsToAdd === currentHotspotsAmount;
+    const isAdding = hotspotsToAdd > currentHotspotsAmount;
+    const isRemoving = hotspotsToAdd < currentHotspotsAmount;
+    const status = stripeSubscription?.status;
+
+    const isCanceling = !!stripeSubscription?.cancel_at;
+    const isExpired = isCanceling && status !== "active";
+    const hasPaymentMethod = !!stripeSubscription?.payment_method;
+
+    let subscriptionStatus: SubscriptionStatus = "active";
+    if (isCanceling) subscriptionStatus = isExpired ? "expired" : "canceling";
+
+    let hotspotChange: HotspotChange = "same";
+    if (isAdding) hotspotChange = "adding";
+    if (isRemoving) hotspotChange = "removing";
+
+    let action: CustomerAction = "activating";
+
+    if (hasHotspots) {
+      if (isAdding) {
+        action = isCanceling ? "reactivate_adding" : "update_adding";
+      } else if (isRemoving) {
+        action = isCanceling ? "reactivate_removing" : "update_removing";
+      } else if (isSame && isCanceling) {
+        action = isExpired
+          ? "reactivating_checkout"
+          : "reactivating_not_checkout";
+      }
+    }
+
+    const requiresPaymentMethod =
+      // Checkout is required unless removing with active subscription
+      !(subscriptionStatus === "active" && isRemoving) && !hasPaymentMethod;
+
+    return {
+      action,
+      subscriptionStatus,
+      hotspotChange,
+      requiresPaymentMethod,
+    };
+  };
+
+  const getProratedPrice = ({
+    unitPrice,
+    daysUntilNextBilling,
+    newHotspotsToAddAmount,
+  }: GetProratedPrice) => {
+    return (unitPrice / 30) * daysUntilNextBilling * newHotspotsToAddAmount;
+  };
+
   return (
     <BillingContext.Provider
       value={{
@@ -52,6 +96,8 @@ export const BillingProvider = ({
         handleHotspotsToAdd,
         hotspots,
         addHotspot,
+        customerContext: getCustomerContext(),
+        getProratedPrice,
       }}
     >
       {children}

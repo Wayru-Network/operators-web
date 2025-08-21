@@ -135,10 +135,8 @@ export default function AssignPlanHotspots() {
   };
 
   return (
-    <div className="flex flex-col max-w-96">
-      <p className="text-base font-semibold w-full align-left">
-        Assign plan to hotspots
-      </p>
+    <div className="flex flex-col md:w-full lg:max-w-96 md:mt-1">
+      <p className="text-base font-semibold w-full">Assign plan to hotspots</p>
       <Tooltip
         isDisabled={!hotspotLimitReached}
         content={"Update your plan if you want to add more hotspots"}
@@ -155,7 +153,7 @@ export default function AssignPlanHotspots() {
             size="sm"
             placeholder={`Search Hotspot`}
             id="search-hotspots-input"
-            className="w-[300px]"
+            className="md:w-full lg:w-[300px]"
             startContent={<Search size={16} />}
             endContent={isSearching && <Spinner size="sm" />}
             selectorIcon={
@@ -192,11 +190,12 @@ export default function AssignPlanHotspots() {
           </Autocomplete>
         </div>
       </Tooltip>
-
-      <AssignedHotspotsList
-        hotspots={assignedHotspots}
-        onRemoveHotspot={onRemoveHotspot}
-      />
+      <div className="w-full flex flex-row">
+        <AssignedHotspotsList
+          hotspots={assignedHotspots}
+          onRemoveHotspot={onRemoveHotspot}
+        />
+      </div>
     </div>
   );
 }
