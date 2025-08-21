@@ -1,11 +1,9 @@
-import React, { useState } from "react";
+import React from "react";
 import { useBilling } from "@/app/[lang]/(operator)/settings/contexts/BillingContext";
 import { Steps } from "../../billing-tab";
 import { useCustomerSubscription } from "@/lib/contexts/customer-subscription-context";
 import CheckoutBillingDetails from "./checkout-billing-details";
 import { calculateDiscountSummary } from "@/lib/helpers/stripe-helper";
-import { updateHotspotAmountSubscription } from "@/lib/services/stripe-service";
-import { addToast } from "@heroui/toast";
 import PaymentAndBillingMethod from "../payment-method/payment-and-billing-method";
 import CheckoutForm from "./checkout/checkout-form";
 import { Elements } from "@stripe/react-stripe-js";
@@ -26,10 +24,9 @@ export default function PlanCheckout({ setSelected }: CheckoutFormProps) {
   const productPriceDetails = product?.priceDetails[0];
   const productPriceFee = productPriceDetails?.price_with_fee ?? 0;
   const productPriceNotFee = productPriceDetails?.price_without_fee ?? 0;
-  const { subscription, refreshSubscriptionState } = useCustomerSubscription();
+  const { subscription } = useCustomerSubscription();
   const stripeSub = subscription?.stripe_subscription;
   const currentHotspotsAmount = stripeSub?.products_amount ?? 0;
-  const [isLoading, setIsLoading] = useState(false);
   const summaryWithFee = calculateDiscountSummary(
     hotspotsToAdd,
     productPriceFee

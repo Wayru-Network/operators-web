@@ -45,8 +45,8 @@ export default function ProratedOneTimeDetails() {
       <p className="text-xs font-medium ml-1 dark:text-gray-300 text-gray-700 mt-1">
         You are adding <strong>{newHotspotsToAddAmount}</strong> hotspot
         {newHotspotsToAddAmount > 1 ? "s" : ""}. Since your next billing date is{" "}
-        <strong>{stripeSub?.billing_details?.next_payment_date}</strong>, you'll
-        be charged a one-time prorated fee for the remaining{" "}
+        <strong>{stripeSub?.billing_details?.next_payment_date}</strong>, you
+        will be charged a one-time prorated fee for the remaining{" "}
         <strong>{daysUntilNextBilling} days</strong> of this cycle.
       </p>
       <p className="text-xs font-medium ml-1 dark:text-gray-300 text-gray-700 mt-1">
