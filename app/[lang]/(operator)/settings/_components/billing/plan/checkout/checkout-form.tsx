@@ -19,36 +19,64 @@ import { PaymentIcon, PaymentType } from "react-svg-credit-card-payment-icons";
 import { Button } from "@heroui/react";
 import { LoadingInputWrapper } from "@/lib/components/loading-input-wrapper";
 import { addToast } from "@heroui/toast";
+import { calculateDiscountSummary } from "@/lib/helpers/stripe-helper";
 
 interface CheckoutFormProps {
   setSelected: (key: Steps) => void;
-  totalPrice: number | string;
   isRequired?: boolean;
-  isUniquePayment?: boolean;
-  newHotspotsAmount?: number;
 }
 export default function CheckoutForm({
   setSelected,
-  totalPrice,
   isRequired,
-  isUniquePayment,
-  newHotspotsAmount,
 }: CheckoutFormProps) {
   const stripe = useStripe();
   const elements = useElements();
   const { theme } = useTheme();
-  const { hotspotsToAdd, products } = useBilling();
-  const { refreshSubscriptionState } = useCustomerSubscription();
+  const {
+    hotspotsToAdd,
+    products,
+    customerContext,
+    newHotspotsToAddAmount,
+    getProratedPrice,
+  } = useBilling();
+  const { refreshSubscriptionState, subscription } = useCustomerSubscription();
+  const stripeSub = subscription?.stripe_subscription;
   const [cardBrand, setCardBrand] = useState<CardBrand | undefined>("unknown");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const product = products.find((product) => product.type === "hotspots");
   const productPriceDetails = product?.priceDetails[0];
   const productPriceFee = productPriceDetails?.price_with_fee ?? 0;
+  const productPriceNotFee = productPriceDetails?.price_without_fee ?? 0;
   const [cardNumberComplete, setCardNumberComplete] = useState(false);
   const [cardExpiryComplete, setCardExpiryComplete] = useState(false);
   const [cardCvcComplete, setCardCvcComplete] = useState(false);
   const [isLoadingInputs, setIsLoadingInputs] = useState(true);
+  const summaryWithFee = calculateDiscountSummary(
+    hotspotsToAdd,
+    productPriceFee
+  );
+  const summaryNotFee = calculateDiscountSummary(
+    newHotspotsToAddAmount,
+    productPriceNotFee
+  );
+  const priceToPay = getProratedPrice({
+    unitPrice: summaryNotFee?.unitPriceWithDiscount,
+    daysUntilNextBilling:
+      stripeSub?.billing_details?.days_until_next_billing ?? 0,
+  });
+  // get the prorated fee and payment
+  const proratedFee =
+    summaryWithFee.totalPriceWithDiscount -
+    summaryNotFee.unitPriceWithDiscount * newHotspotsToAddAmount;
+  const proratedPayment = priceToPay + proratedFee;
+
+  // total payment var
+  const totalToPay =
+    customerContext?.action === "activating"
+      ? summaryWithFee.totalPriceWithDiscount
+      : proratedPayment;
+  const isUniquePayment = newHotspotsToAddAmount > 0;
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -72,11 +100,11 @@ export default function CheckoutForm({
       // create a unique payment
       if (isUniquePayment) {
         const paymentIntent = await createPaymentIntent({
-          amount_usd: Number(totalPrice),
+          amount_usd: Number(totalToPay),
           metadata: {
             reason:
               "Unique payment for purchase of " +
-              newHotspotsAmount +
+              newHotspotsToAddAmount +
               " new hotspots",
           },
         });
@@ -249,7 +277,9 @@ export default function CheckoutForm({
           disabled={isLoading || !stripe}
           isLoading={isLoading}
         >
-          {isLoading ? "Processing..." : `Pay $${totalPrice}`}
+          {isLoading
+            ? "Processing..."
+            : `Pay $${Number(totalToPay).toFixed(2)}`}
         </Button>
       </div>
     </form>

@@ -15,7 +15,9 @@ export type Steps = "step1" | "step2" | "step3" | "step4";
 const BillingTab = () => {
   const { subscription, isGettingSubscription } = useCustomerSubscription();
   const [selected, setSelected] = useState<Steps>("step1");
-  const stripeSubscription = subscription?.stripe_subscription;
+  const stripeSubscription =
+    subscription?.stripe_subscription &&
+    subscription?.stripe_subscription?.status !== "canceled";
 
   if (isGettingSubscription) {
     return (

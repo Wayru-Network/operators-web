@@ -43,14 +43,14 @@ export default function CheckoutBillingDetails({ setSelected }: Props) {
       });
       if (response.error) {
         addToast({
-          title: "subscription not created",
+          title: "Error",
           description: response.message,
           color: "danger",
         });
         return;
       }
       addToast({
-        title: "subscription created",
+        title: "Success",
         description: response.message,
         color: "default",
       });

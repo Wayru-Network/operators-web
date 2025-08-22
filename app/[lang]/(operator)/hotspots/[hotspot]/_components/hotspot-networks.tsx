@@ -173,7 +173,7 @@ export default function HotspotNetworks({
         disabled={isDisabled}
       />
       <Spacer y={6} />
-      <p className="text-lg font-semibold">Network configuration</p>
+      <p className="text-lg font-semibold mt-4">Open Network configuration</p>
       <Spacer y={4} />
       <CustomInput
         label="SSID open network"
@@ -186,6 +186,9 @@ export default function HotspotNetworks({
         disabled={isDisabled}
       />
       <Spacer y={8} />
+      <p className="text-lg font-semibold mb-4">
+        Private Network configuration
+      </p>
       <div className="flex md:flex-col lg:flex-row space-x-8 md:space-y-8 lg:space-y-0">
         <CustomInput
           label="SSID private network"

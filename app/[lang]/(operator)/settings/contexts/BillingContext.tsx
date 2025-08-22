@@ -24,6 +24,11 @@ export const BillingProvider = ({
   const [hotspots, setHotspots] = useState(hotspotsProps);
   const { subscription } = useCustomerSubscription();
   const stripeSubscription = subscription?.stripe_subscription;
+  const currentHotspotsAmount = stripeSubscription?.products_amount ?? 0;
+  const newHotspotsToAddAmount =
+    currentHotspotsAmount > 0 && hotspotsToAdd > currentHotspotsAmount
+      ? hotspotsToAdd - currentHotspotsAmount
+      : 0;
 
   const handleHotspotsToAdd = (hotspots: number) => {
     setHotspotsToAdd(hotspots);
@@ -69,8 +74,11 @@ export const BillingProvider = ({
     }
 
     const requiresPaymentMethod =
-      // Checkout is required unless removing with active subscription
-      !(subscriptionStatus === "active" && isRemoving) && !hasPaymentMethod;
+      // customer is in trialing period, don't need a payment method
+      stripeSubscription?.status === "trialing"
+        ? false
+        : // Checkout is required unless removing with active subscription
+          !(subscriptionStatus === "active" && isRemoving) && !hasPaymentMethod;
 
     return {
       action,
@@ -83,7 +91,6 @@ export const BillingProvider = ({
   const getProratedPrice = ({
     unitPrice,
     daysUntilNextBilling,
-    newHotspotsToAddAmount,
   }: GetProratedPrice) => {
     return (unitPrice / 30) * daysUntilNextBilling * newHotspotsToAddAmount;
   };
@@ -98,6 +105,7 @@ export const BillingProvider = ({
         addHotspot,
         customerContext: getCustomerContext(),
         getProratedPrice,
+        newHotspotsToAddAmount,
       }}
     >
       {children}

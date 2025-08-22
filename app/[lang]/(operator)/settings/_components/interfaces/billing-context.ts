@@ -39,6 +39,10 @@ export type BillingContextType = {
     * Function to get prorated price
     */
     getProratedPrice: (props: GetProratedPrice) => number
+    /**
+   * amount of new hotspot to add a current subscription
+   */
+    newHotspotsToAddAmount: number
 };
 
 export type SubscriptionStatus = "active" | "canceling" | "expired";
@@ -62,5 +66,4 @@ export interface CustomerContext {
 export interface GetProratedPrice {
     unitPrice: number;
     daysUntilNextBilling: number;
-    newHotspotsToAddAmount: number;
 }

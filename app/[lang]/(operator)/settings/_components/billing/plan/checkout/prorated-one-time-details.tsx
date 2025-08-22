@@ -31,12 +31,15 @@ export default function ProratedOneTimeDetails() {
   const priceToPay = getProratedPrice({
     unitPrice: summaryNotFee?.unitPriceWithDiscount,
     daysUntilNextBilling,
-    newHotspotsToAddAmount,
   });
 
   const totalPayment = priceToPay + fee;
 
-  if (newHotspotsToAddAmount === 0 || stripeSub?.status === "trialing")
+  if (
+    newHotspotsToAddAmount === 0 ||
+    stripeSub?.status === "trialing" ||
+    daysUntilNextBilling <= 0
+  )
     return undefined;
 
   return (

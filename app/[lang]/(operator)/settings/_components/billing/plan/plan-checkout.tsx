@@ -59,12 +59,7 @@ export default function PlanCheckout({ setSelected }: CheckoutFormProps) {
             Add your payment method to complete your purchase.
           </p>
           <Elements stripe={stripeClient}>
-            <CheckoutForm
-              setSelected={setSelected}
-              totalPrice={fee + 8.66}
-              isRequired
-              isUniquePayment={newHotspotsToAddAmount > 0}
-            />
+            <CheckoutForm setSelected={setSelected} isRequired />
           </Elements>
         </div>
       );
