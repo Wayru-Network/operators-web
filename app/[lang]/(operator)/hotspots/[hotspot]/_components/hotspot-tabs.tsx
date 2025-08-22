@@ -5,6 +5,7 @@ import HotspotDeviceInfo, { DeviceInfoProps } from "./hotspot-device-info";
 import HotspotNetworks, { HotspotNetworksProps } from "./hotspot-networks";
 import HotspotCaptivePortal from "./hotspot-captive-portal";
 import EaseInOutContent from "@/lib/components/ease-in-out-content";
+import { useState } from "react";
 
 export interface HotspotTabsProps {
   info: DeviceInfoProps;
@@ -13,6 +14,10 @@ export interface HotspotTabsProps {
 
 export default function HotspotTabs({ info, networks }: HotspotTabsProps) {
   const isDisabledCaptivePortal = true;
+
+  const [locationName, setLocationName] = useState(
+    info.basic.locationName || ""
+  );
 
   return (
     <Tabs
@@ -29,12 +34,19 @@ export default function HotspotTabs({ info, networks }: HotspotTabsProps) {
     >
       <Tab key="device-info" title="Device Information">
         <EaseInOutContent>
-          <HotspotDeviceInfo {...info} />
+          <HotspotDeviceInfo
+            {...info}
+            basic={{ ...info.basic, locationName }}
+          />
         </EaseInOutContent>
       </Tab>
       <Tab key="networks" title="Networks">
         <EaseInOutContent>
-          <HotspotNetworks {...networks} />
+          <HotspotNetworks
+            {...networks}
+            locationName={locationName}
+            onLocationNameChange={setLocationName}
+          />
         </EaseInOutContent>
       </Tab>
       {!isDisabledCaptivePortal && (

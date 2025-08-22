@@ -25,6 +25,7 @@ export interface HotspotNetworksProps {
   osServicesVersion?: string;
   openNetwork: HotspotOpenNetwork;
   privateNetwork: HotspotPrivateNetwork;
+  onLocationNameChange?: (name: string) => void;
 }
 
 export default function HotspotNetworks({
@@ -32,6 +33,7 @@ export default function HotspotNetworks({
   osServicesVersion,
   openNetwork,
   privateNetwork,
+  onLocationNameChange,
 }: HotspotNetworksProps) {
   const [locName, setLocName] = useState(locationName || "");
   const [openSSID, setOpenSSID] = useState(openNetwork.ssid || "");
@@ -172,6 +174,7 @@ export default function HotspotNetworks({
           description: "Location name updated successfully",
           color: "success",
         });
+        onLocationNameChange?.(locName);
       } else {
         addToast({
           title: "Error",
