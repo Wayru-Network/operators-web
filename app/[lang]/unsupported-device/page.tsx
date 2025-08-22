@@ -35,8 +35,7 @@ export default function UnsupportedDevice() {
             Looks like you are on mobile device!
           </span>
           <span className="text-base text-center">
-            Please open this app on a desktop device for having a better
-            experience.
+            Please open this app on a desktop device for a better experience.
           </span>
         </div>
       </div>
