@@ -6,7 +6,10 @@ import { Spacer } from "@heroui/spacer";
 import { addToast } from "@heroui/toast";
 import { useCallback, useState } from "react";
 import saveHotspotNetworks from "../_services/save-hotspot-networks";
-import { HotspotNetworksFormData } from "../_types/hotspot-networks";
+import {
+  HotspotNetworksFormData,
+  LocationNameFormData,
+} from "../_types/hotspot-networks";
 import { useParams } from "next/navigation";
 import {
   HotspotOpenNetwork,
@@ -15,6 +18,7 @@ import {
 import { Alert } from "@heroui/alert";
 import { useCustomerSubscription } from "@/lib/contexts/customer-subscription-context";
 import { CustomerSubscription } from "@/lib/interfaces/subscriptions";
+import saveLocationName from "../_services/save-location-name";
 
 export interface HotspotNetworksProps {
   locationName?: string;
@@ -135,6 +139,57 @@ export default function HotspotNetworks({
     confirmPassword,
     hotspot,
   ]);
+
+  const handleLocationSave = useCallback(async () => {
+    if (!locName.trim()) {
+      addToast({
+        title: "Warning",
+        description: "Location name cannot be empty",
+        color: "warning",
+      });
+      return;
+    }
+
+    if (locName === locationName) {
+      addToast({
+        title: "Warning",
+        description: "Location name is unchanged",
+        color: "warning",
+      });
+      return;
+    }
+
+    const formData: LocationNameFormData = {
+      locationName: locName,
+      name: hotspot,
+    };
+
+    try {
+      const result = await saveLocationName(formData);
+      if (result.success) {
+        addToast({
+          title: "Success",
+          description: "Location name updated successfully",
+          color: "success",
+        });
+      } else {
+        addToast({
+          title: "Error",
+          description: result.error || "Failed to update location name",
+          color: "danger",
+        });
+      }
+    } catch (error) {
+      console.error("Error updating location name:", error);
+      addToast({
+        title: "Error",
+        description:
+          "An unexpected error occurred while updating location name",
+        color: "danger",
+      });
+    }
+  }, [locName, locationName, hotspot]);
+
   const { subscription } = useCustomerSubscription();
   const { is_subscription_active } = subscription as CustomerSubscription;
 
@@ -173,6 +228,14 @@ export default function HotspotNetworks({
         disabled={isDisabled}
       />
       <Spacer y={6} />
+      <Button
+        className="rounded-[10px] md:w-full lg:w-[309px]"
+        onPress={handleLocationSave}
+        isLoading={isSaving}
+        isDisabled={isDisabled}
+      >
+        Save changes
+      </Button>
       <p className="text-lg font-semibold mt-4">Open Network configuration</p>
       <Spacer y={4} />
       <CustomInput
