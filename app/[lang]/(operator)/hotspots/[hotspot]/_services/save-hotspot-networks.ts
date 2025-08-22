@@ -14,8 +14,6 @@ export default async function saveHotspotNetworks(
   newData: HotspotNetworksFormData
 ): Promise<SaveHotspotNetworksResponse> {
   try {
-    console.log("Location name:", newData.locationName);
-
     // Check if hotspot exists
     const hotspot = await Prisma.hotspot.findUnique({
       where: { name: newData.name },
@@ -24,14 +22,6 @@ export default async function saveHotspotNetworks(
 
     if (!hotspot) {
       return { success: false, error: "Hotspot not found" };
-    }
-
-    // Update Location Name
-    if (newData.locationName && newData.locationName.trim() !== "") {
-      await Prisma.hotspot.update({
-        where: { id: hotspot.id },
-        data: { location_name: newData.locationName },
-      });
     }
 
     // Check for existing configs
