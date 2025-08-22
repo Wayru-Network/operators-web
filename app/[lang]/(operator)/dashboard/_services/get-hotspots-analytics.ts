@@ -17,7 +17,7 @@ export interface HotspotAnalytics {
 export interface HotspotsAnalyticsResponse {
   connectionsTotal: 0;
   trace: [];
-  dataTrafficTotal: 0;
+  dataTrafficTotal: number;
   dataTrafficTrace: [];
   unit: "KB";
 }
@@ -80,11 +80,27 @@ export async function getHotspotsAnalytics(
   const { connectionsTotal, trace, dataTrafficTotal, dataTrafficTrace, unit } =
     hotspots.data;
 
+  // format data traffic
+
   return {
     connectionsTotal,
     trace,
-    dataTrafficTotal,
+    dataTrafficTotal: bytesToReadableSize(dataTrafficTotal),
     dataTrafficTrace,
     unit,
   };
+}
+
+function bytesToReadableSize(bytes: number): number {
+  const GB = 1024 ** 3
+  const MB = 1024 ** 2
+  const KB = 1024
+
+  if (bytes >= GB) {
+    return Number((bytes / GB).toFixed(2))
+  } else if (bytes >= MB) {
+    return Number((bytes / MB).toFixed(2))
+  } else {
+    return Number((bytes / KB).toFixed(2))
+  }
 }
