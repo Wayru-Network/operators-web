@@ -1,7 +1,6 @@
 import React from "react";
 import { useBilling } from "@/app/[lang]/(operator)/settings/contexts/BillingContext";
 import { Steps } from "../../billing-tab";
-import { useCustomerSubscription } from "@/lib/contexts/customer-subscription-context";
 import CheckoutBillingDetails from "./checkout-billing-details";
 import { calculateDiscountSummary } from "@/lib/helpers/stripe-helper";
 import PaymentAndBillingMethod from "../payment-method/payment-and-billing-method";
@@ -24,17 +23,10 @@ export default function PlanCheckout({ setSelected }: CheckoutFormProps) {
   const productPriceDetails = product?.priceDetails[0];
   const productPriceFee = productPriceDetails?.price_with_fee ?? 0;
   const productPriceNotFee = productPriceDetails?.price_without_fee ?? 0;
-  const { subscription } = useCustomerSubscription();
-  const stripeSub = subscription?.stripe_subscription;
-  const currentHotspotsAmount = stripeSub?.products_amount ?? 0;
   const summaryWithFee = calculateDiscountSummary(
     hotspotsToAdd,
     productPriceFee
   );
-  const newHotspotsToAddAmount =
-    currentHotspotsAmount > 0 && hotspotsToAdd > currentHotspotsAmount
-      ? hotspotsToAdd - currentHotspotsAmount
-      : 0;
   const summaryNotFee = calculateDiscountSummary(
     hotspotsToAdd,
     productPriceNotFee
