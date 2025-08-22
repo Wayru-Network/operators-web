@@ -17,6 +17,8 @@ import { getCustomer } from "@/app/api/auth/callback/_services/customer-service"
 import { Prisma as generatedPrisma } from "../generated/prisma";
 import { calculateDiscountSummary } from "../helpers/stripe-helper";
 import { Prisma } from "../infra/prisma";
+const STRIPE_FIXED_FEE = 0.3;
+const STRIPE_PERCENT_FEE = 0.06;
 
 export async function getStripeCustomerSubscription(
     subscriptionId: string
@@ -32,7 +34,8 @@ export async function getStripeCustomerSubscription(
         });
 
         const product_id = sub.items.data[0].price?.product as unknown as string;
-        const products_amount = sub.items.data[0].quantity;
+        const isCanceledSub = sub?.status === "canceled";
+        const products_amount = isCanceledSub ? 0 : sub.items.data[0].quantity;
         const product = await stripeServer.products.retrieve(product_id);
 
         // Get payment method details
@@ -41,9 +44,9 @@ export async function getStripeCustomerSubscription(
         // Get billing details from price
         const price = sub.items.data[0].price as Stripe.Price;
         const today = moment();
-        const next_payment_date = moment(
-            sub.items.data[0].current_period_end * 1000
-        );
+        const next_payment_date = isCanceledSub
+            ? today.add(1, "month")
+            : moment(sub.items.data[0].current_period_end * 1000);
 
         const subscription: StripeSubscription = {
             subscription_id: sub.id,
@@ -86,9 +89,6 @@ export async function getStripeCustomerSubscription(
         return undefined;
     }
 }
-
-const STRIPE_FIXED_FEE = 0.3;
-const STRIPE_PERCENT_FEE = 0.06;
 
 function priceWithoutFee(stripePrice: number): number {
     const net = (stripePrice - STRIPE_FIXED_FEE) / (1 + STRIPE_PERCENT_FEE);
@@ -504,6 +504,11 @@ export const createTrialSubscription = async (
             },
             expand: ["latest_invoice.payment_intent"],
             discounts: discounts,
+            trial_settings: {
+                end_behavior: {
+                    missing_payment_method: "cancel",
+                },
+            },
         });
 
         // Update the subscription in database
@@ -755,7 +760,7 @@ export const createPaymentIntent = async ({
     payment_method_id?: string;
 }) => {
     try {
-        const customer = await getStripeCustomer()
+        const customer = await getStripeCustomer();
         if (!customer) {
             return {
                 error: true,

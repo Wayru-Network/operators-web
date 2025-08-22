@@ -62,7 +62,6 @@ export default function NonFormActionButtons({ setSelected }: Props) {
   const priceToPay = getProratedPrice({
     unitPrice: summaryNotFee?.unitPriceWithDiscount,
     daysUntilNextBilling,
-    newHotspotsToAddAmount,
   });
 
   const totalPayment = priceToPay + fee;
@@ -139,6 +138,13 @@ export default function NonFormActionButtons({ setSelected }: Props) {
     }
     setIsLoading(false);
   };
+
+  if (
+    customerContext?.action === "activating" ||
+    customerContext?.requiresPaymentMethod
+  ) {
+    return undefined;
+  }
 
   return (
     <div className="flex flex-row gap-4 mt-3">
