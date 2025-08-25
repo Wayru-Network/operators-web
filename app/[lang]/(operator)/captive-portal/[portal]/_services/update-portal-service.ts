@@ -13,6 +13,10 @@ export default async function updatePortal(
   success: boolean;
   error?: string;
 }> {
+  if (!updatedConfig.ad) {
+    return { success: false, error: "Watch ad access must be selected" };
+  }
+
   const updates = validateChanges(updatedConfig, originalConfig);
   const assetsUpdates = validateAssets(updatedConfig, originalConfig);
   const hotspotValidation = await validateHotspots(
