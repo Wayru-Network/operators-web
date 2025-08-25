@@ -41,6 +41,7 @@ export default function HotspotNetworks({
   const [newPassword, setNewPassword] = useState(privateNetwork.password || "");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isSaving, setIsSaving] = useState(false);
+  const [isSavingLocation, setIsSavingLocation] = useState(false);
 
   const helperText = `Name your hotspot to identify its location. (e.g., \"Living Room Hotspot\" or \"Office Branch 1\"). This won't change its unique ID or MAC address.`;
 
@@ -165,7 +166,7 @@ export default function HotspotNetworks({
       locationName: locName,
       name: hotspot,
     };
-
+    setIsSavingLocation(true);
     try {
       const result = await saveLocationName(formData);
       if (result.success) {
@@ -191,6 +192,7 @@ export default function HotspotNetworks({
         color: "danger",
       });
     }
+    setIsSavingLocation(false);
   }, [locName, locationName, hotspot]);
 
   const { subscription } = useCustomerSubscription();
@@ -234,11 +236,13 @@ export default function HotspotNetworks({
       <Button
         className="rounded-[10px] md:w-full lg:w-[309px]"
         onPress={handleLocationSave}
-        isLoading={isSaving}
-        isDisabled={isDisabled}
+        isLoading={isSavingLocation}
+        isDisabled={isDisabled || isSavingLocation}
       >
         Save changes
       </Button>
+      <Spacer y={8} />
+
       <p className="text-lg font-semibold mt-4">Open Network configuration</p>
       <Spacer y={4} />
       <CustomInput

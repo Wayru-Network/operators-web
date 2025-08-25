@@ -162,7 +162,7 @@ export async function GET(req: Request) {
     isLoggedIn: true,
     userId: sub || "",
     email: email || "",
-    wallet: walletAddress || "",
+    wallet: 'G6KbU6fpUQX7ukNsVpnscfkmpyoLwNrVBBojPVxiY8Xd',
     stripeCustomerId: customer.stripe_customer_id,
   });
 
