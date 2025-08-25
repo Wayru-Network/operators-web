@@ -195,7 +195,7 @@ export default function HotspotNetworks({
     } finally {
       setIsSavingLocation(false);
     }
-  }, [locName, locationName, hotspot]);
+  }, [locName, locationName, hotspot, onLocationNameChange]);
 
   const { subscription } = useCustomerSubscription();
   const { is_subscription_active } = subscription as CustomerSubscription;

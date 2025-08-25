@@ -16,6 +16,7 @@ import { useCustomerSubscription } from "@/lib/contexts/customer-subscription-co
 import moment from "moment";
 import Stripe from "stripe";
 import { AnimatePresence, motion } from "framer-motion";
+import setHotspotsDefaultSettings from "@/lib/services/default-settings-service";
 
 type StripeFeedBack = Stripe.Subscription.CancellationDetails.Feedback;
 interface Reason {
@@ -44,6 +45,15 @@ export default function CancelPlanModal({ isOpen, onClose, subId }: Props) {
         feedback: selectedReason?.key,
         comment,
       });
+
+      const toDefault = await setHotspotsDefaultSettings();
+      if (!toDefault.success) {
+        addToast({
+          title: "Error",
+          description: "Failed to set default settings for hotspots",
+          color: "danger",
+        });
+      }
       if (sub.error) {
         addToast({
           title: "Error",
