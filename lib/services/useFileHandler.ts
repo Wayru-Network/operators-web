@@ -8,6 +8,12 @@ const ACCEPTED_TYPES: Record<AssetType, string[]> = {
   ad: ["image/jpeg", "image/png", "image/gif", "video/mp4", "video/webm"],
 };
 
+const ACCEPTED_FILE_SIZES: Record<string, number> = {
+  static: 10, // 10MB for static images
+  gif: 10, // 10MB for GIFs
+  video: 40, // 40MB for videos
+};
+
 const MAX_FILE_SIZE_MB = 40;
 const MAX_VIDEO_DURATION = 60;
 
@@ -53,9 +59,22 @@ export function useFileHandler(label: AssetType) {
   const [isProcessing, setIsProcessing] = useState(false);
 
   const validateFile = useCallback(
-    async (file: File) => {
+    async (file: File, adType: string) => {
       const isValidType = ACCEPTED_TYPES[label].includes(file.type);
-      const isValidSize = file.size <= MAX_FILE_SIZE_MB * 1024 * 1024;
+      let isValidSize: boolean;
+      switch (adType) {
+        case "video":
+          isValidSize = file.size <= 40 * 1024 * 1024;
+          break;
+        case "gif":
+          isValidSize = file.size <= 10 * 1024 * 1024;
+          break;
+        case "static":
+          isValidSize = file.size <= 10 * 1024 * 1024;
+          break;
+        default:
+          isValidSize = file.size <= MAX_FILE_SIZE_MB * 1024 * 1024;
+      }
 
       if (!isValidType) {
         return `Invalid file type. Allowed: ${ACCEPTED_TYPES[label]
@@ -64,7 +83,7 @@ export function useFileHandler(label: AssetType) {
       }
 
       if (!isValidSize) {
-        return `File too large. Max size is ${MAX_FILE_SIZE_MB}MB.`;
+        return `File too large. Max size is ${ACCEPTED_FILE_SIZES[adType]}MB.`;
       }
 
       if (file.type.startsWith("video")) {
@@ -88,13 +107,14 @@ export function useFileHandler(label: AssetType) {
   const processFile = useCallback(
     async (
       file: File,
-      onSuccess: (file: File, url: string) => void
+      onSuccess: (file: File, url: string) => void,
+      adType: string
     ): Promise<string | null> => {
       setIsProcessing(true);
       setError(null);
 
       try {
-        const validationError = await validateFile(file);
+        const validationError = await validateFile(file, adType);
         if (validationError) {
           setError(validationError);
           return validationError;

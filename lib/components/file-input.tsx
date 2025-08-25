@@ -31,11 +31,15 @@ export default function FileInput({
 
   const handleProcess = useCallback(
     async (file: File) => {
-      const err = await processFile(file, (processed, url) => {
-        setPreviewUrl(url);
-        setFileData(processed);
-        onSelect(processed, url);
-      });
+      const err = await processFile(
+        file,
+        (processed, url) => {
+          setPreviewUrl(url);
+          setFileData(processed);
+          onSelect(processed, url);
+        },
+        adType || "undefined"
+      );
 
       if (!err) {
         inputRef.current!.value = "";
