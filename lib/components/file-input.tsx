@@ -31,17 +31,21 @@ export default function FileInput({
 
   const handleProcess = useCallback(
     async (file: File) => {
-      const err = await processFile(file, (processed, url) => {
-        setPreviewUrl(url);
-        setFileData(processed);
-        onSelect(processed, url);
-      });
+      const err = await processFile(
+        file,
+        (processed, url) => {
+          setPreviewUrl(url);
+          setFileData(processed);
+          onSelect(processed, url);
+        },
+        adType || "undefined"
+      );
 
       if (!err) {
         inputRef.current!.value = "";
       }
     },
-    [processFile, onSelect]
+    [processFile, onSelect, adType]
   );
 
   const handleFileChange = useCallback(
@@ -73,20 +77,20 @@ export default function FileInput({
   }, [error, videoDuration]);
   const getHelperText = () => {
     if (adType === "video") {
-      return "MP4 or WEBM — up to 40MB";
+      return "MP4 or WEBM — up to 20MB";
     }
 
     if (adType === "static") {
-      return "JPG or PNG — up to 10MB";
+      return "JPG or PNG — up to 5MB";
     }
 
     if (adType === "gif") {
-      return "GIF — up to 10MB";
+      return "GIF — up to 5MB";
     }
 
     return label === "logo" || label === "banner"
       ? "Use JPG or PNG (transparent background preferred)"
-      : "Use JPG, PNG, GIF, MP4 or WEBM — up to 40MB";
+      : "Use JPG, PNG, GIF, MP4 or WEBM — up to 20MB";
   };
 
   const getDisplayLabel = () =>

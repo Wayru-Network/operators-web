@@ -47,6 +47,9 @@ export interface Environment {
   // STRIPE
   STRIPE_SECRET_KEY: string;
   NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: string;
+
+  // NetworkConfig
+  DEFAULT_PRIVATE_SSID_PW: string;
 }
 
 /**
@@ -76,6 +79,7 @@ export function loadEnvironment(): Environment {
     "FAS_API_KEY",
     "STRIPE_SECRET_KEY",
     "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY",
+    "DEFAULT_PRIVATE_SSID_PW",
   ];
 
   const missingVars: string[] = [];

@@ -36,7 +36,11 @@ export default function AccessFlows({
               Users watch an advertisement to gain access
             </p>
           </div>
-          <Switch isSelected={newConfig.ad} onValueChange={adHandler} />
+          <Switch
+            isSelected={newConfig.ad}
+            onValueChange={adHandler}
+            isDisabled
+          />
         </div>
         <Tooltip content="Coming soon" placement="right" closeDelay={0}>
           <div className="flex flex-row items-center">
