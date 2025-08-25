@@ -42,7 +42,6 @@ export default function HotspotNetworks({
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [isSavingLocation, setIsSavingLocation] = useState(false);
-
   const helperText = `Name your hotspot to identify its location. (e.g., \"Living Room Hotspot\" or \"Office Branch 1\"). This won't change its unique ID or MAC address.`;
 
   const { hotspot } = useParams<{ hotspot: string }>();
@@ -166,7 +165,9 @@ export default function HotspotNetworks({
       locationName: locName,
       name: hotspot,
     };
+
     setIsSavingLocation(true);
+
     try {
       const result = await saveLocationName(formData);
       if (result.success) {
@@ -191,9 +192,10 @@ export default function HotspotNetworks({
           "An unexpected error occurred while updating location name",
         color: "danger",
       });
+    } finally {
+      setIsSavingLocation(false);
     }
-    setIsSavingLocation(false);
-  }, [locName, locationName, hotspot]);
+  }, [locName, locationName, hotspot, onLocationNameChange]);
 
   const { subscription } = useCustomerSubscription();
   const { is_subscription_active } = subscription as CustomerSubscription;
