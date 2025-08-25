@@ -239,10 +239,12 @@ export default function HotspotNetworks({
         className="rounded-[10px] md:w-full lg:w-[309px]"
         onPress={handleLocationSave}
         isLoading={isSavingLocation}
-        isDisabled={isDisabled}
+        isDisabled={isDisabled || isSavingLocation}
       >
         Save changes
       </Button>
+      <Spacer y={8} />
+
       <p className="text-lg font-semibold mt-4">Open Network configuration</p>
       <Spacer y={4} />
       <CustomInput

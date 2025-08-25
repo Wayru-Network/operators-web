@@ -7,6 +7,8 @@ import { industry_type } from "@/lib/generated/prisma";
 import { AccountInfo, AccountInfoUpdate, FormData } from "../_services/types";
 import { CustomInput } from "@/lib/components/custom-input";
 const SPACER_SECTION = 9;
+// delete account section
+const DISABLED_DELETE_ACCOUNT = true;
 
 const AccountTab = ({ accountInfo }: { accountInfo: AccountInfo }) => {
   const [mounted, setMounted] = useState(false);
@@ -330,18 +332,19 @@ const AccountTab = ({ accountInfo }: { accountInfo: AccountInfo }) => {
           )}
         </div>
       </Form>
-
-      <div className="flex flex-col items-start md:w-full lg:w-1/3 justify-self-end">
-        {/* Other section */}
-        <div className="flex flex-col w-full">
-          <p className="text-base font-semibold w-full align-left">Other</p>
-          <div className="flex flex-col gap-3 md:mt-3 lg:mt-8 items-center w-full">
-            <Button className="w-full bg-[#751CF6] border-2 border-gray-200 dark:border-gray-700 text-white">
-              Delete Account
-            </Button>
+      {!DISABLED_DELETE_ACCOUNT && (
+        <div className="flex flex-col items-start md:w-full lg:w-1/3 justify-self-end">
+          {/* Other section */}
+          <div className="flex flex-col w-full">
+            <p className="text-base font-semibold w-full align-left">Other</p>
+            <div className="flex flex-col gap-3 md:mt-3 lg:mt-8 items-center w-full">
+              <Button className="w-full bg-[#751CF6] border-2 border-gray-200 dark:border-gray-700 text-white">
+                Delete Account
+              </Button>
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };
