@@ -9,12 +9,12 @@ const ACCEPTED_TYPES: Record<AssetType, string[]> = {
 };
 
 const ACCEPTED_FILE_SIZES: Record<string, number> = {
-  static: 10, // 10MB for static images
-  gif: 10, // 10MB for GIFs
-  video: 40, // 40MB for videos
+  static: 5, // 5MB for static images
+  gif: 5, // 5MB for GIFs
+  video: 20, // 20MB for videos
 };
 
-const MAX_FILE_SIZE_MB = 40;
+const MAX_FILE_SIZE_MB = 20;
 const MAX_VIDEO_DURATION = 60;
 
 const getVideoDuration = (file: File): Promise<number> => {
@@ -64,13 +64,13 @@ export function useFileHandler(label: AssetType) {
       let isValidSize: boolean;
       switch (adType) {
         case "video":
-          isValidSize = file.size <= 40 * 1024 * 1024;
+          isValidSize = file.size <= 20 * 1024 * 1024;
           break;
         case "gif":
-          isValidSize = file.size <= 10 * 1024 * 1024;
+          isValidSize = file.size <= 5 * 1024 * 1024;
           break;
         case "static":
-          isValidSize = file.size <= 10 * 1024 * 1024;
+          isValidSize = file.size <= 5 * 1024 * 1024;
           break;
         default:
           isValidSize = file.size <= MAX_FILE_SIZE_MB * 1024 * 1024;
