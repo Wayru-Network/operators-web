@@ -116,6 +116,8 @@ spec:
                 secretKeyRef:
                   name: {{ .Values.name }}
                   key: STRIPE_SECRET_KEY
+            - name: DEFAULT_PRIVATE_SSID_PW
+              value: {{.Values.defaultPrivateSsidPw | quote }}
           volumeMounts:
             - name: {{ .Values.name }}-csi-volume
               mountPath: /mnt/secrets
