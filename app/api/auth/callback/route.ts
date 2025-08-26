@@ -172,7 +172,9 @@ export async function GET(req: Request) {
   cookieStore.delete("pkce_verifier");
 
   if (!walletAddress) {
-    return NextResponse.redirect(new URL("/create-wallet", env.APP_URL));
+    return NextResponse.redirect(
+      new URL("/main-wallet-not-found", env.APP_URL)
+    );
   }
   return NextResponse.redirect(env.APP_URL + "/dashboard");
 }
