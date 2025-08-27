@@ -33,9 +33,18 @@ const BillingPlanHotspotsStep = ({ setSelected }: SelectAPlanProps) => {
     hotspotPriceWithFee
   );
   const isNewMonthlyCost = currentHotspotsAmount != hotspotsToAdd;
-  const isButtonDisabled = stripeSub?.cancel_at
-    ? false
-    : hotspotsToAdd === currentHotspotsAmount;
+  const isButtonDisabled = () => {
+    switch (true) {
+      case !!stripeSub?.cancel_at && stripeSub?.status != "canceled":
+        return false;
+      case currentHotspotsAmount > 0:
+        return hotspotsToAdd === currentHotspotsAmount;
+      case hotspotsToAdd <= 0:
+        return true;
+      default:
+        return false;
+    }
+  };
   const newHotspotsToAddAmount =
     currentHotspotsAmount > 0 && hotspotsToAdd > currentHotspotsAmount
       ? hotspotsToAdd - currentHotspotsAmount
@@ -85,7 +94,7 @@ const BillingPlanHotspotsStep = ({ setSelected }: SelectAPlanProps) => {
                   ${currentMonthlyCost.toFixed(2)}
                 </p>
               </div>
-              {stripeSub?.cancel_at && (
+              {stripeSub?.cancel_at && stripeSub?.status != "canceled" && (
                 <div className="flex flex-row">
                   <p className="text-xs font-semibold">Status:</p>
                   <p className="text-xs font-medium dark:text-gray-300 text-gray-700 ml-1">
@@ -220,7 +229,7 @@ const BillingPlanHotspotsStep = ({ setSelected }: SelectAPlanProps) => {
             Back
           </Button>
           <Button
-            disabled={isButtonDisabled}
+            disabled={isButtonDisabled()}
             className="w-full bg-[#000] dark:bg-[#fff] text-white dark:text-black mt-9 disabled:opacity-50 disabled:cursor-not-allowed w-1/2"
             onPress={() => setSelected("step4")}
           >

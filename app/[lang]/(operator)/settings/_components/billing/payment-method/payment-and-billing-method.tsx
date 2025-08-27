@@ -21,7 +21,10 @@ export default function PaymentAndBillingMethod({
 }: PlanActiveProps) {
   const { subscription, refreshSubscriptionState } = useCustomerSubscription();
   const hotspotSubscription = subscription?.stripe_subscription;
-  const isActivePlan = hotspotSubscription?.cancel_at ? false : true;
+  const isActivePlan =
+    hotspotSubscription?.cancel_at || hotspotSubscription?.status === "canceled"
+      ? false
+      : true;
   const paymentMethod = hotspotSubscription?.payment_method;
   const [isDeletingPaymentMethod, startTransition] = useTransition();
 

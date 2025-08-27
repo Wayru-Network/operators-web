@@ -12,8 +12,11 @@ import { useCustomerSubscription } from "@/lib/contexts/customer-subscription-co
 import { useState } from "react";
 import { CardBrand } from "@stripe/stripe-js";
 import {
+  confirmPaymentMethodSetupIntent,
   createCustomerSubscription,
   createPaymentIntent,
+  createPaymentMethodSetupIntent,
+  deleteAllCustomerPaymentMethods,
 } from "@/lib/services/stripe-service";
 import { PaymentIcon, PaymentType } from "react-svg-credit-card-payment-icons";
 import { Button } from "@heroui/react";
@@ -41,6 +44,7 @@ export default function CheckoutForm({
   } = useBilling();
   const { refreshSubscriptionState, subscription } = useCustomerSubscription();
   const stripeSub = subscription?.stripe_subscription;
+  const isTrialPeriodUsed = subscription?.is_trial_period_used;
   const [cardBrand, setCardBrand] = useState<CardBrand | undefined>("unknown");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -70,6 +74,8 @@ export default function CheckoutForm({
     summaryWithFee.totalPriceWithDiscount -
     summaryNotFee.unitPriceWithDiscount * newHotspotsToAddAmount;
   const proratedPayment = priceToPay + proratedFee;
+  const needToCreatePreviousPaymentMethod =
+    isTrialPeriodUsed && !stripeSub?.payment_method;
 
   // total payment var
   const totalToPay =
@@ -129,42 +135,79 @@ export default function CheckoutForm({
           setSelected("step1");
         }
       } else {
+        // if is trial period used and no payment method, create a setup intent
+        if (needToCreatePreviousPaymentMethod) {
+          const setupIntent = await createPaymentMethodSetupIntent();
+          if (setupIntent?.error) {
+            throw new Error(setupIntent.message);
+          }
+          // confirm the card setup for the setup intent
+          const { error: confirmError } = await stripe.confirmCardSetup(
+            setupIntent?.client_secret || "",
+            {
+              payment_method: {
+                card: elements.getElement(CardNumberElement)!,
+                billing_details: {
+                  // Add billing details if needed
+                },
+              },
+            }
+          );
+          if (confirmError) {
+            throw new Error(confirmError.message);
+          }
+          const result = await confirmPaymentMethodSetupIntent(
+            setupIntent?.setup_intent_id as string
+          );
+          if (!result?.payment_method) {
+            throw new Error("Payment method error");
+          }
+        }
         // Create subscription on backend
         const subscription = await createCustomerSubscription({
           price_id: productPriceDetails?.id || "",
           plan_id: product?.id || "",
           quantity: hotspotsToAdd,
           base_price_with_fee: productPriceFee,
+          trial_period_days: isTrialPeriodUsed ? 0 : 7,
         });
-
-        if (!subscription?.payment_intent_client_secret) {
-          throw new Error("No payment intent client secret received");
+        if (subscription?.error) {
+          // abort the process, and delete all payment methods that previous created
+          await deleteAllCustomerPaymentMethods();
+          throw new Error(
+            subscription?.message || "No payment intent client secret received"
+          );
         }
 
-        // Confirm the card setup for the subscription
-        const { error: confirmError } = await stripe.confirmCardSetup(
-          subscription.payment_intent_client_secret,
-          {
-            payment_method: {
-              card: elements.getElement(CardNumberElement)!,
-              billing_details: {
-                // Add billing details if needed
+        // Confirm the card setup for the subscription if not need to create a payment method
+        if (
+          !needToCreatePreviousPaymentMethod &&
+          subscription?.payment_intent_client_secret
+        ) {
+          const { error: confirmError } = await stripe.confirmCardSetup(
+            subscription.payment_intent_client_secret,
+            {
+              payment_method: {
+                card: elements.getElement(CardNumberElement)!,
+                billing_details: {
+                  // Add billing details if needed
+                },
               },
-            },
-          }
-        );
+            }
+          );
 
-        if (confirmError) {
-          setError(confirmError.message || "Payment failed");
-        } else {
-          // Payment successful
-          const sub = await refreshSubscriptionState();
-          if (!sub?.stripe_subscription?.payment_method) {
-            // if there is not payment method try to refresh again
-            await refreshSubscriptionState();
+          if (confirmError) {
+            throw new Error(confirmError.message || "Payment failed");
           }
-          setSelected("step1");
         }
+
+        // Payment successful
+        const sub = await refreshSubscriptionState();
+        if (!sub?.stripe_subscription?.payment_method) {
+          // if there is not payment method try to refresh again
+          await refreshSubscriptionState();
+        }
+        setSelected("step1");
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Payment failed");

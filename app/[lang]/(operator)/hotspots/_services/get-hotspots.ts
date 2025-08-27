@@ -101,7 +101,6 @@ export async function getHotspots(
     };
   }
 
-  console.log("hotspots", hotspots);
   const wayruDeviceIds = hotspots?.data
     ?.filter(
       (hotspot) =>
