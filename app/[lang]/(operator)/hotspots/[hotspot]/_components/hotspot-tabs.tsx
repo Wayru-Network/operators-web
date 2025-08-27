@@ -19,6 +19,18 @@ export default function HotspotTabs({ info, networks }: HotspotTabsProps) {
     info.basic.locationName || ""
   );
 
+  const [openSSID, setOpenSSID] = useState(networks.openNetwork.ssid || "");
+  const [privateSSID, setPrivateSSID] = useState(
+    networks.privateNetwork.ssid || ""
+  );
+  const [privatePassword, setPrivatePassword] = useState(
+    networks.privateNetwork.password || ""
+  );
+
+  networks.openNetwork.ssid = openSSID;
+  networks.privateNetwork.ssid = privateSSID;
+  networks.privateNetwork.password = privatePassword;
+
   return (
     <Tabs
       fullWidth
@@ -37,6 +49,11 @@ export default function HotspotTabs({ info, networks }: HotspotTabsProps) {
           <HotspotDeviceInfo
             {...info}
             basic={{ ...info.basic, locationName }}
+            network={{
+              ...info.network,
+              openNetwork: { ssid: openSSID },
+              privateNetwork: { ssid: privateSSID, password: privatePassword },
+            }}
           />
         </EaseInOutContent>
       </Tab>
@@ -46,6 +63,9 @@ export default function HotspotTabs({ info, networks }: HotspotTabsProps) {
             {...networks}
             locationName={locationName}
             onLocationNameChange={setLocationName}
+            onOpenSSIDChange={setOpenSSID}
+            onPrivateSSIDChange={setPrivateSSID}
+            onPrivatePasswordChange={setPrivatePassword}
           />
         </EaseInOutContent>
       </Tab>
