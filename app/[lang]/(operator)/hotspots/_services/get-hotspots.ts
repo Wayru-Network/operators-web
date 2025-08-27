@@ -18,6 +18,8 @@ export interface Hotspot {
   wayru_device_id: string;
   assigned_portal?: string;
   location_name?: string;
+  os_version?: string;
+  os_services_version?: string
 }
 export interface MinersByAddressResponse {
   data: Hotspot[];
@@ -99,6 +101,7 @@ export async function getHotspots(
     };
   }
 
+  console.log("hotspots", hotspots);
   const wayruDeviceIds = hotspots?.data
     ?.filter(
       (hotspot) =>

@@ -17,7 +17,7 @@ type PageProps = {
 
 export default async function Hotspots({ searchParams }: PageProps) {
   const page = Number((await searchParams)?.page ?? "1");
-  const limit = Number((await searchParams)?.limit ?? "6");
+  const limit = Number((await searchParams)?.limit ?? "10");
   const query = (await searchParams)?.q ?? "";
 
   const hotspots = query

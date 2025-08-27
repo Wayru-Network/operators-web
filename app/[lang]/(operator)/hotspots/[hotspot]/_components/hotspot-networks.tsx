@@ -19,6 +19,7 @@ import { Alert } from "@heroui/alert";
 import { useCustomerSubscription } from "@/lib/contexts/customer-subscription-context";
 import { CustomerSubscription } from "@/lib/interfaces/subscriptions";
 import saveLocationName from "../_services/save-location-name";
+import { isMinimumVersionMet } from "@/lib/helpers/operators";
 
 export interface HotspotNetworksProps {
   locationName?: string;
@@ -198,11 +199,7 @@ export default function HotspotNetworks({
   const { subscription } = useCustomerSubscription();
   const { is_subscription_active } = subscription as CustomerSubscription;
 
-  const minimumVersion = "2.4.0";
-  const isMinimumVersion = isMinimumVersionMet(
-    osServicesVersion || "0.0.0",
-    minimumVersion
-  );
+  const isMinimumVersion = isMinimumVersionMet(osServicesVersion || "0.0.0");
   const isDisabled = !isMinimumVersion || !is_subscription_active;
 
   const RenderBanner = () => {
@@ -295,7 +292,7 @@ export default function HotspotNetworks({
         className="rounded-[10px] md:w-full lg:w-[309px]"
         onPress={handleSave}
         isLoading={isSaving}
-        isDisabled={isDisabled}
+        isDisabled={!isMinimumVersion} //This button is available if the customer don't have a subscription active
       >
         Save changes
       </Button>
@@ -323,20 +320,4 @@ function PreviewFeatureBanner() {
 
 function SubscriptionInactiveBanner() {
   return <Alert color="warning" title={`Your subscription is not activated`} />;
-}
-
-// Check if the current version meets the minimum version requirement
-function isMinimumVersionMet(current: string, minimum: string): boolean {
-  const currentParts = current.split(".").map(Number);
-  const minimumParts = minimum.split(".").map(Number);
-
-  for (let i = 0; i < minimumParts.length; i++) {
-    if (currentParts[i] > minimumParts[i]) {
-      return true;
-    } else if (currentParts[i] < minimumParts[i]) {
-      return false;
-    }
-  }
-
-  return true;
 }

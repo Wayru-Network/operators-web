@@ -35,7 +35,11 @@ export default function PaymentAndBillingMethod({
           color: "danger",
         });
       } else {
-        await refreshSubscriptionState();
+        const subscription = await refreshSubscriptionState();
+        if (subscription?.stripe_subscription?.payment_method) {
+          // refresh again
+          await refreshSubscriptionState();
+        }
         addToast({
           title: "Success",
           description: response?.message,

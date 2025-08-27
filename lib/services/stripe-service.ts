@@ -378,6 +378,15 @@ export const getStripeCustomer = async () => {
                 customer_id: customer.customer_uuid || "",
             },
         } as Stripe.CustomerCreateParams);
+        // update customer into db
+        await Prisma.customers.update({
+            where: {
+                id: customer?.id,
+            },
+            data: {
+                stripe_customer_id: stripeCustomer?.id,
+            },
+        });
     }
 
     return { ...stripeCustomer, customer_database_id: customer?.id };
