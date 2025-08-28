@@ -229,7 +229,7 @@ export default function CheckoutForm({
         throw new Error(setupIntent.message);
       }
 
-      if (!stripe) {
+      if (!stripe || !elements) {
         throw new Error("Stripe not found");
       }
       // confirm the card setup for the setup intent
@@ -237,7 +237,7 @@ export default function CheckoutForm({
         setupIntent?.client_secret || "",
         {
           payment_method: {
-            card: elements?.getElement(CardNumberElement)!,
+            card: elements.getElement(CardNumberElement)!,
             billing_details: {
               // Add billing details if needed
             },
