@@ -7,6 +7,7 @@ import { calculateDiscountSummary } from "@/lib/helpers/stripe-helper";
 import { useState } from "react";
 import {
   createPaymentIntent,
+  reactivateSubscription,
   updateHotspotAmountSubscription,
 } from "@/lib/services/stripe-service";
 import { addToast } from "@heroui/toast";
@@ -19,7 +20,7 @@ interface Props {
 // available actions to render a pay label
 const ACTIONS_TO_PAYMENT_LABEL: CustomerContext["action"][] = [
   "update_adding",
-  "reactivating_not_checkout",
+  "reactivate_adding",
 ];
 const ACTIONS_TO_ACTIVATE_LABEL: CustomerContext["action"][] = [
   "reactivate_removing",
@@ -81,6 +82,27 @@ export default function NonFormActionButtons({ setSelected }: Props) {
 
   const updateSubscription = async () => {
     setIsLoading(true);
+    if (customerContext?.action === "reactivating_not_checkout") {
+      const result = await reactivateSubscription(
+        stripeSub?.subscription_id as string
+      );
+      if (result.error) {
+        addToast({
+          title: "Error reactivating subscription",
+          description: result.message,
+          color: "danger",
+        });
+      } else {
+        await refreshSubscriptionState();
+        addToast({
+          title: "Success",
+          description: result.message,
+          color: "success",
+        });
+        setSelected("step1");
+      }
+      return;
+    }
     // user can update his subscription without paying only if trialing
     if (stripeSub?.status === "trialing") {
       const result = await updateHotspotAmountSubscription({
@@ -98,7 +120,7 @@ export default function NonFormActionButtons({ setSelected }: Props) {
         addToast({
           title: "Success",
           description: result.message,
-          color: "default",
+          color: "success",
         });
         setSelected("step1");
       }
@@ -124,6 +146,7 @@ export default function NonFormActionButtons({ setSelected }: Props) {
           color: "danger",
         });
       } else {
+        console.log("paymentIntent done", paymentIntent);
         await updateHotspotAmountSubscription({
           quantity: hotspotsToAdd,
           basePrice: productPriceWithFee,
@@ -132,6 +155,7 @@ export default function NonFormActionButtons({ setSelected }: Props) {
         addToast({
           title: "Success",
           description: paymentIntent?.message ?? "Payment successfully",
+          color: "success",
         });
         setSelected("step1");
       }
@@ -141,6 +165,7 @@ export default function NonFormActionButtons({ setSelected }: Props) {
 
   if (
     customerContext?.action === "activating" ||
+    customerContext?.action === "reactivating_checkout" ||
     customerContext?.requiresPaymentMethod
   ) {
     return undefined;

@@ -26,7 +26,7 @@ export default function CheckoutBillingDetails({ setSelected }: Props) {
   const stripeSub = subscription?.stripe_subscription;
   // get next billing date
   const nextBillingDate = stripeSub?.cancel_at
-    ? formatMillisecondsToDate(stripeSub?.cancel_at)
+    ? formatMillisecondsToDate(moment().add(1, "month").unix())
     : stripeSub?.billing_details?.next_payment_date;
 
   // get next trial billing date

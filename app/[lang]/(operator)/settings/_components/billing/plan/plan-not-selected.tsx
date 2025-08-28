@@ -4,6 +4,7 @@ import React from "react";
 import { Button } from "@heroui/react";
 import { Steps } from "../../billing-tab";
 import PaymentAndBillingMethod from "../payment-method/payment-and-billing-method";
+import { useCustomerSubscription } from "@/lib/contexts/customer-subscription-context";
 
 interface PlanNotSelectedProps {
   setSelected: (key: Steps) => void;
@@ -12,6 +13,9 @@ interface PlanNotSelectedProps {
 const PlanNotSelected = ({ setSelected }: PlanNotSelectedProps) => {
   // implement the invoicing when create a service for making invoice
   const isDisabledInvoicing = true;
+  const { subscription } = useCustomerSubscription();
+  const hotspotSubscription = subscription?.stripe_subscription;
+  const paymentMethod = hotspotSubscription?.payment_method;
 
   return (
     <div className=" flex md:flex-col lg:flex-row gap-8 w-full ">
@@ -59,7 +63,10 @@ const PlanNotSelected = ({ setSelected }: PlanNotSelectedProps) => {
 
           {/* Payment & billing section */}
           <div className="flex flex-col w-full">
-            <PaymentAndBillingMethod setSelected={setSelected} hideButton />
+            <PaymentAndBillingMethod
+              setSelected={setSelected}
+              hideButton={paymentMethod ? false : true}
+            />
           </div>
         </div>
       </div>

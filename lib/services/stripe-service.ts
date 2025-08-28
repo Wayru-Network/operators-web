@@ -41,6 +41,26 @@ export async function getStripeCustomerSubscription(
         // Get payment method details
         const paymentMethod = sub.default_payment_method as Stripe.PaymentMethod;
 
+        // Verify payment method is attached to customer
+        let paymentMethodAttached = false;
+        if (paymentMethod) {
+            try {
+                // Verify the payment method belongs to this customer
+                paymentMethodAttached = paymentMethod.customer === sub.customer;
+
+                // Additional verification: retrieve the payment method to ensure it's still valid
+                if (paymentMethodAttached) {
+                    const retrievedPaymentMethod =
+                        await stripeServer.paymentMethods.retrieve(paymentMethod.id);
+                    paymentMethodAttached =
+                        retrievedPaymentMethod.customer === sub.customer;
+                }
+            } catch (error) {
+                console.warn("Could not verify payment method attachment:", error);
+                paymentMethodAttached = false;
+            }
+        }
+
         // Get billing details from price
         const price = sub.items.data[0].price as Stripe.Price;
         const today = moment();
@@ -63,7 +83,7 @@ export async function getStripeCustomerSubscription(
                     : null,
             cancel_at: sub.cancel_at,
             cancellation_reason: sub?.cancellation_details?.reason,
-            payment_method: paymentMethod
+            payment_method: paymentMethodAttached
                 ? {
                     id: paymentMethod.id,
                     type: paymentMethod.type,
@@ -149,6 +169,12 @@ export const createStripeSubscription = async (
         const stripeCustomer = await getStripeCustomer();
         if (!stripeCustomer) return;
 
+        // get the trialing subscriptions
+        const trialingSubscriptions = await stripeServer.subscriptions.list({
+            customer: stripeCustomer.id,
+            status: "trialing",
+        });
+
         // if the subscription have more than 1 hotspot add a coupon
         let coupon: Stripe.Response<Stripe.Coupon> | null = null;
         if (input.quantity > 1) {
@@ -173,23 +199,52 @@ export const createStripeSubscription = async (
             : null;
 
         // create subscription
-        const trial_period_days = 7;
-        const subscription = await stripeServer.subscriptions.create({
+        const trial_period_days = input?.trial_period_days === 0 ? 0 : 7;
+
+        // Base subscription params
+        const subscriptionParams: Stripe.SubscriptionCreateParams = {
             customer: stripeCustomer.id,
             items: [{ price: input.price_id, quantity: input.quantity }],
             metadata: {
                 customer_id: customer.customer_uuid || "",
                 plan_id: input.plan_id,
             },
-            trial_period_days: trial_period_days,
-            payment_behavior: "default_incomplete",
             payment_settings: { save_default_payment_method: "on_subscription" },
-            expand: ["pending_setup_intent", "latest_invoice", "customer"],
             discounts: discounts,
-        } as Stripe.SubscriptionCreateParams);
+        };
 
-        const setupIntent = subscription.pending_setup_intent as Stripe.SetupIntent;
+        // Configuration if trial period is greater than 0
+        if (trial_period_days > 0) {
+            subscriptionParams.trial_period_days = trial_period_days;
+            subscriptionParams.payment_behavior = "default_incomplete";
+            subscriptionParams.expand = [
+                "pending_setup_intent",
+                "latest_invoice",
+                "customer",
+            ];
+        } else {
+            console.log("creating subscription without trial period");
+            // If trial period is 0, charge immediately
+            subscriptionParams.collection_method = "charge_automatically";
+            subscriptionParams.proration_behavior = "create_prorations";
+            subscriptionParams.expand = ["latest_invoice", "customer"];
+        }
+
+        const subscription = await stripeServer.subscriptions.create(
+            subscriptionParams
+        );
+
+        // Handle conditional setupIntent
+        const setupIntent =
+            trial_period_days > 0
+                ? (subscription.pending_setup_intent as Stripe.SetupIntent)
+                : undefined;
         const latestInvoice = subscription.latest_invoice as Stripe.Invoice;
+
+        // delete the trialing subscriptions because the new one is created
+        for (const sub of trialingSubscriptions.data) {
+            await stripeServer.subscriptions.cancel(sub.id);
+        }
 
         return {
             subscription_id: subscription.id,
@@ -351,9 +406,114 @@ export const confirmChangePaymentMethod = async (setup_intent_id: string) => {
     }
 };
 
-export const getStripeCustomer = async () => {
-    const { isLoggedIn, userId } = await getSession();
-    if (!isLoggedIn || !userId) {
+export const createPaymentMethodSetupIntent = async () => {
+    try {
+        // get stripe customer
+        const customer = await getStripeCustomer();
+        if (!customer) {
+            return {
+                error: true,
+                message: "Customer not found",
+            };
+        }
+        console.log("stripe customer id", customer.id);
+
+        const setupIntent = await stripeServer.setupIntents.create({
+            customer: customer?.id,
+            payment_method_types: ["card"],
+            usage: "off_session",
+            metadata: {
+                purpose: "save_payment_method",
+            },
+        });
+
+        return {
+            setup_intent_id: setupIntent.id,
+            client_secret: setupIntent.client_secret,
+        };
+    } catch (error) {
+        console.error("create setup intent error", error);
+        return null;
+    }
+};
+
+export const confirmPaymentMethodSetupIntent = async (setup_intent_id: string) => {
+    try {
+        const setupIntent = await stripeServer.setupIntents.retrieve(setup_intent_id);
+
+        // Check if setup intent was successful
+        if (setupIntent.status !== 'succeeded') {
+            throw new Error(`Setup intent status is ${setupIntent.status}, expected succeeded`);
+        }
+
+        // Get the customer
+        const { isLoggedIn, userId } = await getSession();
+        if (!isLoggedIn || !userId) {
+            throw new Error("User not logged in");
+        }
+
+        const customer = await getCustomer(userId);
+        if (!customer || !customer?.stripe_customer_id) {
+            throw new Error("Customer not found");
+        }
+
+        // Set the payment method as the default payment method for the customer
+        await stripeServer.customers.update(customer.stripe_customer_id, {
+            invoice_settings: {
+                default_payment_method: setupIntent.payment_method as string,
+            },
+        });
+
+        console.log("Payment method set as default for customer");
+
+        return {
+            setup_intent_id: setupIntent.id,
+            payment_method: setupIntent.payment_method,
+        }
+    } catch (error) {
+        console.error("confirm payment method setup intent error", error);
+        return null;
+    }
+};
+
+export const getCustomerPaymentMethods = async () => {
+    try {
+        const { isLoggedIn, userId } = await getSession();
+        if (!isLoggedIn || !userId) {
+            return null;
+        }
+
+        const customer = await getCustomer(userId);
+        if (!customer || !customer?.stripe_customer_id) {
+            return {
+                error: true,
+                message: "Customer not found",
+                payment_methods: null,
+            };
+        }
+
+        const paymentMethods = await stripeServer.paymentMethods.list({
+            customer: customer?.stripe_customer_id as string,
+            type: "card",
+        });
+
+        return {
+            error: false,
+            message: "Payment methods retrieved successfully",
+            payment_methods: paymentMethods,
+        };
+    } catch (error) {
+        console.error("get customer payment methods error", error);
+        return {
+            error: true,
+            message: "Failed to get customer payment methods",
+        };
+    }
+};
+
+export const getStripeCustomer = async (userIdProps?: string) => {
+    const userId = userIdProps || (await getSession()).userId;
+    if (!userId) {
         return null;
     }
 
@@ -378,6 +538,15 @@ export const getStripeCustomer = async () => {
                 customer_id: customer.customer_uuid || "",
             },
         } as Stripe.CustomerCreateParams);
+        // update customer into db
+        await Prisma.customers.update({
+            where: {
+                id: customer?.id,
+            },
+            data: {
+                stripe_customer_id: stripeCustomer?.id,
+            },
+        });
     }
 
     return { ...stripeCustomer, customer_database_id: customer?.id };
@@ -716,6 +885,72 @@ export const cancelSubscription = async ({
     }
 };
 
+export const reactivateSubscription = async (subId: string) => {
+    try {
+        const stripeCustomer = await getStripeCustomer();
+        if (!stripeCustomer) {
+            return {
+                error: true,
+                message: "Customer not found",
+            };
+        }
+        const subscription = await stripeServer.subscriptions.retrieve(subId);
+        if (!subscription) {
+            return {
+                error: true,
+                message: "Subscription not found",
+            };
+        }
+        // check if the subscription is trialing
+        if (subscription.status === "trialing") {
+            return {
+                error: true,
+                message: "Subscription is already active",
+            };
+        }
+
+        // check if the subscription has a cancel_at date and is not active
+        if (subscription.status !== "active" && subscription.cancel_at) {
+            return {
+                error: true,
+                message: "Subscription was expired",
+            };
+        }
+
+        // get payment method of the customer
+        const paymentMethods = await stripeServer.paymentMethods.list({
+            customer: stripeCustomer.id,
+            type: "card",
+            limit: 1,
+        });
+
+        if (paymentMethods.data.length === 0) {
+            return {
+                error: true,
+                message: "No payment method found",
+            };
+        }
+        const paymentMethod = paymentMethods.data[0];
+
+        // update the subscription removing the cancel_at date
+        await stripeServer.subscriptions.update(subId, {
+            cancel_at: null,
+            default_payment_method: paymentMethod.id,
+        });
+
+        return {
+            error: false,
+            message: "Subscription reactivated",
+        };
+    } catch (e) {
+        console.log("Error reactivateSubscription", e);
+        return {
+            error: true,
+            message: "Error reactivating subscription",
+        };
+    }
+}
+
 export const deleteCustomerPaymentMethod = async () => {
     try {
         const customer = await getStripeCustomer();
@@ -817,6 +1052,52 @@ export const createPaymentIntent = async ({
                 error instanceof Error ? error.message : "Unknown confirmation error",
             payment_intent_id: null,
             client_secret: null,
+        };
+    }
+};
+
+// Optional: Function to delete all payment methods for a customer
+export const deleteAllCustomerPaymentMethods = async () => {
+    try {
+        const { isLoggedIn, userId } = await getSession();
+        if (!isLoggedIn || !userId) {
+            return {
+                error: true,
+                message: "User not logged in",
+            };
+        }
+
+        const customer = await getCustomer(userId);
+        if (!customer || !customer?.stripe_customer_id) {
+            return {
+                error: true,
+                message: "Customer not found",
+            };
+        }
+
+        // Get all payment methods for the customer
+        const paymentMethods = await stripeServer.paymentMethods.list({
+            customer: customer.stripe_customer_id,
+            type: "card",
+        });
+
+        // Detach all payment methods
+        const deletePromises = paymentMethods.data.map(paymentMethod =>
+            stripeServer.paymentMethods.detach(paymentMethod.id)
+        );
+
+        await Promise.all(deletePromises);
+
+        return {
+            error: false,
+            message: `Deleted ${paymentMethods.data.length} payment methods successfully`,
+            deleted_count: paymentMethods.data.length,
+        };
+    } catch (error) {
+        console.error("delete all customer payment methods error", error);
+        return {
+            error: true,
+            message: "Failed to delete payment methods",
         };
     }
 };
