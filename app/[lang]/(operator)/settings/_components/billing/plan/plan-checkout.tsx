@@ -36,6 +36,7 @@ export default function PlanCheckout({ setSelected }: CheckoutFormProps) {
     summaryNotFee.unitPriceWithDiscount * hotspotsToAdd;
 
   const RenderPaymentBilling = () => {
+    console.log("customerContext", customerContext);
     if (!customerContext?.requiresPaymentMethod) {
       return (
         <PaymentAndBillingMethod

@@ -21,6 +21,10 @@ const PlanDetails = ({ setSelected }: PlanActiveProps) => {
   const { onOpen, isOpen, onClose } = useDisclosure();
   // TODO: enable this when we have a invoicing method
   const latestInvoice = false;
+  const hideButton =
+    !hotspotSubscription?.payment_method &&
+    hotspotSubscription?.cancel_at &&
+    subscription?.is_trialing;
 
   return (
     <div className="flex md:flex-col lg:flex-row gap-8 w-full">
@@ -71,7 +75,10 @@ const PlanDetails = ({ setSelected }: PlanActiveProps) => {
           </div>
 
           {/* Payment & billing methods section */}
-          <PaymentAndBillingMethod setSelected={setSelected} />
+          <PaymentAndBillingMethod
+            setSelected={setSelected}
+            hideButton={!!hideButton}
+          />
         </div>
       </div>
 

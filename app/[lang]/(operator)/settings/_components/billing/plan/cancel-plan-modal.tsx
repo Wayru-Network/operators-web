@@ -65,6 +65,7 @@ export default function CancelPlanModal({ isOpen, onClose, subId }: Props) {
         addToast({
           title: "Success",
           description: sub.message,
+          color: "success",
         });
         onClose();
       }

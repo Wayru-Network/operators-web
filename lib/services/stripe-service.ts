@@ -169,6 +169,12 @@ export const createStripeSubscription = async (
         const stripeCustomer = await getStripeCustomer();
         if (!stripeCustomer) return;
 
+        // get the trialing subscriptions
+        const trialingSubscriptions = await stripeServer.subscriptions.list({
+            customer: stripeCustomer.id,
+            status: "trialing",
+        });
+
         // if the subscription have more than 1 hotspot add a coupon
         let coupon: Stripe.Response<Stripe.Coupon> | null = null;
         if (input.quantity > 1) {
@@ -234,6 +240,11 @@ export const createStripeSubscription = async (
                 ? (subscription.pending_setup_intent as Stripe.SetupIntent)
                 : undefined;
         const latestInvoice = subscription.latest_invoice as Stripe.Invoice;
+
+        // delete the trialing subscriptions because the new one is created
+        for (const sub of trialingSubscriptions.data) {
+            await stripeServer.subscriptions.cancel(sub.id);
+        }
 
         return {
             subscription_id: subscription.id,
@@ -429,7 +440,6 @@ export const createPaymentMethodSetupIntent = async () => {
 export const confirmPaymentMethodSetupIntent = async (setup_intent_id: string) => {
     try {
         const setupIntent = await stripeServer.setupIntents.retrieve(setup_intent_id);
-        console.log("setupIntent", setupIntent);
 
         // Check if setup intent was successful
         if (setupIntent.status !== 'succeeded') {
@@ -501,9 +511,9 @@ export const getCustomerPaymentMethods = async () => {
     }
 };
 
-export const getStripeCustomer = async () => {
-    const { isLoggedIn, userId } = await getSession();
-    if (!isLoggedIn || !userId) {
+export const getStripeCustomer = async (userIdProps?: string) => {
+    const userId = userIdProps || (await getSession()).userId;
+    if (!userId) {
         return null;
     }
 
@@ -874,6 +884,72 @@ export const cancelSubscription = async ({
         };
     }
 };
+
+export const reactivateSubscription = async (subId: string) => {
+    try {
+        const stripeCustomer = await getStripeCustomer();
+        if (!stripeCustomer) {
+            return {
+                error: true,
+                message: "Customer not found",
+            };
+        }
+        const subscription = await stripeServer.subscriptions.retrieve(subId);
+        if (!subscription) {
+            return {
+                error: true,
+                message: "Subscription not found",
+            };
+        }
+        // check if the subscription is trialing
+        if (subscription.status === "trialing") {
+            return {
+                error: true,
+                message: "Subscription is already active",
+            };
+        }
+
+        // check if the subscription has a cancel_at date and is not active
+        if (subscription.status !== "active" && subscription.cancel_at) {
+            return {
+                error: true,
+                message: "Subscription was expired",
+            };
+        }
+
+        // get payment method of the customer
+        const paymentMethods = await stripeServer.paymentMethods.list({
+            customer: stripeCustomer.id,
+            type: "card",
+            limit: 1,
+        });
+
+        if (paymentMethods.data.length === 0) {
+            return {
+                error: true,
+                message: "No payment method found",
+            };
+        }
+        const paymentMethod = paymentMethods.data[0];
+
+        // update the subscription removing the cancel_at date
+        await stripeServer.subscriptions.update(subId, {
+            cancel_at: null,
+            default_payment_method: paymentMethod.id,
+        });
+
+        return {
+            error: false,
+            message: "Subscription reactivated",
+        };
+    } catch (e) {
+        console.log("Error reactivateSubscription", e);
+        return {
+            error: true,
+            message: "Error reactivating subscription",
+        };
+    }
+}
 
 export const deleteCustomerPaymentMethod = async () => {
     try {

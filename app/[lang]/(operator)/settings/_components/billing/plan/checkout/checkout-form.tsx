@@ -17,6 +17,7 @@ import {
   createPaymentIntent,
   createPaymentMethodSetupIntent,
   deleteAllCustomerPaymentMethods,
+  reactivateSubscription,
 } from "@/lib/services/stripe-service";
 import { PaymentIcon, PaymentType } from "react-svg-credit-card-payment-icons";
 import { Button } from "@heroui/react";
@@ -103,8 +104,32 @@ export default function CheckoutForm({
     setError(null);
 
     try {
-      // create a unique payment
-      if (isUniquePayment) {
+      // user is reactivating a subscription that is going to cancel in the next billing cycle
+      // and this do not have a payment method, so save the payment method
+      if (customerContext?.action === "reactivating_not_checkout") {
+        if (!stripeSub?.payment_method) {
+          const result = await addPaymentMethod();
+          if (!result) {
+            throw new Error("Payment method error");
+          }
+        }
+        // now reactivate the subscription
+        const resultReactivate = await reactivateSubscription(
+          stripeSub?.subscription_id as string
+        );
+        if (resultReactivate.error) {
+          throw new Error(resultReactivate.message);
+        }
+        // refresh the subscription state
+        await refreshSubscriptionState();
+        addToast({
+          title: "Success",
+          description: "Subscription reactivated",
+          color: "success",
+        });
+        setSelected("step1");
+        return;
+      } else if (isUniquePayment) {
         const paymentIntent = await createPaymentIntent({
           amount_usd: Number(totalToPay),
           metadata: {
@@ -130,36 +155,16 @@ export default function CheckoutForm({
           await refreshSubscriptionState();
           addToast({
             title: "Success",
-            description: "",
+            description: "Payment successful",
+            color: "success",
           });
           setSelected("step1");
         }
       } else {
         // if is trial period used and no payment method, create a setup intent
         if (needToCreatePreviousPaymentMethod) {
-          const setupIntent = await createPaymentMethodSetupIntent();
-          if (setupIntent?.error) {
-            throw new Error(setupIntent.message);
-          }
-          // confirm the card setup for the setup intent
-          const { error: confirmError } = await stripe.confirmCardSetup(
-            setupIntent?.client_secret || "",
-            {
-              payment_method: {
-                card: elements.getElement(CardNumberElement)!,
-                billing_details: {
-                  // Add billing details if needed
-                },
-              },
-            }
-          );
-          if (confirmError) {
-            throw new Error(confirmError.message);
-          }
-          const result = await confirmPaymentMethodSetupIntent(
-            setupIntent?.setup_intent_id as string
-          );
-          if (!result?.payment_method) {
+          const result = await addPaymentMethod();
+          if (!result) {
             throw new Error("Payment method error");
           }
         }
@@ -213,6 +218,53 @@ export default function CheckoutForm({
       setError(err instanceof Error ? err.message : "Payment failed");
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const addPaymentMethod = async () => {
+    try {
+      // We need to use this function in the client because we need to have access to the elements
+      const setupIntent = await createPaymentMethodSetupIntent();
+      if (setupIntent?.error) {
+        throw new Error(setupIntent.message);
+      }
+
+      if (!stripe) {
+        throw new Error("Stripe not found");
+      }
+      // confirm the card setup for the setup intent
+      const { error: confirmError } = await stripe?.confirmCardSetup(
+        setupIntent?.client_secret || "",
+        {
+          payment_method: {
+            card: elements?.getElement(CardNumberElement)!,
+            billing_details: {
+              // Add billing details if needed
+            },
+          },
+        }
+      );
+      if (confirmError) {
+        throw new Error(confirmError.message);
+      }
+      const result = await confirmPaymentMethodSetupIntent(
+        setupIntent?.setup_intent_id as string
+      );
+      if (!result?.payment_method) {
+        throw new Error("Payment method error");
+      }
+      return {
+        error: false,
+        message: "Payment method added",
+        paymentMethodId: result?.payment_method,
+      };
+    } catch (error) {
+      console.log("error", error);
+      return {
+        error: true,
+        message: "Payment method error",
+        paymentMethodId: null,
+      };
     }
   };
 
@@ -322,6 +374,8 @@ export default function CheckoutForm({
         >
           {isLoading
             ? "Processing..."
+            : customerContext?.action === "reactivating_not_checkout"
+            ? "Reactivate subscription"
             : `Pay $${Number(totalToPay).toFixed(2)}`}
         </Button>
       </div>
