@@ -11,6 +11,7 @@ export function middleware(request: NextRequest) {
     "/api/hotspots",
     "/api/subscriptions",
     "/api/hotspots/subscription",
+    "/api/captive-portals",
   ];
 
   if (availablePathnames.includes(pathname)) {
