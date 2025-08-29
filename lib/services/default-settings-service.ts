@@ -3,6 +3,7 @@ import saveHotspotNetworks from "@/app/[lang]/(operator)/hotspots/[hotspot]/_ser
 import { HotspotNetworksFormData } from "@/app/[lang]/(operator)/hotspots/[hotspot]/_types/hotspot-networks";
 import { Prisma } from "@/lib/infra/prisma";
 import { getHotspotBySubscription } from "@/app/api/hotspots/_services/hotspots-service";
+import { env } from "@/lib/infra/env";
 
 interface setDefaultProps {
   hotspot_name: string;
@@ -22,7 +23,7 @@ const defaultSettings: HotspotNetworksFormData = {
   },
   privateNetwork: {
     ssid: "Wayru Operator",
-    password: "default-password",
+    password: env.DEFAULT_PRIVATE_SSID_PW || "admin",
   },
 };
 

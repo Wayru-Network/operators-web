@@ -25,6 +25,9 @@ export interface HotspotNetworksProps {
   openNetwork: HotspotOpenNetwork;
   privateNetwork: HotspotPrivateNetwork;
   onLocationNameChange?: (name: string) => void;
+  onOpenSSIDChange?: (ssid: string) => void;
+  onPrivateSSIDChange?: (ssid: string) => void;
+  onPrivatePasswordChange?: (password: string) => void;
 }
 
 export default function HotspotNetworks({
@@ -33,11 +36,16 @@ export default function HotspotNetworks({
   openNetwork,
   privateNetwork,
   onLocationNameChange,
+  onOpenSSIDChange,
+  onPrivateSSIDChange,
+  onPrivatePasswordChange,
 }: HotspotNetworksProps) {
   const [locName, setLocName] = useState(locationName || "");
   const [openSSID, setOpenSSID] = useState(openNetwork.ssid || "");
+  const [newOpenSSID, setNewOpenSSID] = useState<string>("");
   const [privateSSID, setPrivateSSID] = useState(privateNetwork.ssid || "");
-  const [newPassword, setNewPassword] = useState(privateNetwork.password || "");
+  const [newPrivateSSID, setNewPrivateSSID] = useState<string>("");
+  const [newPassword, setNewPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [isSavingLocation, setIsSavingLocation] = useState(false);
@@ -47,7 +55,16 @@ export default function HotspotNetworks({
 
   const handleSave = useCallback(async () => {
     // Form validation
-    if (privateSSID && newPassword !== confirmPassword) {
+    if (newPrivateSSID === privateSSID) {
+      addToast({
+        title: "Warning",
+        description: "Private network SSID is unchanged",
+        color: "warning",
+      });
+      return;
+    }
+
+    if (newPrivateSSID.trim() && newPassword !== confirmPassword) {
       addToast({
         title: "Error",
         description: "Password confirmation does not match",
@@ -56,7 +73,7 @@ export default function HotspotNetworks({
       return;
     }
 
-    if (privateSSID && newPassword.length < 8) {
+    if (newPrivateSSID.trim() && newPassword.length < 8) {
       addToast({
         title: "Error",
         description: "Password must be at least 8 characters long",
@@ -65,7 +82,7 @@ export default function HotspotNetworks({
       return;
     }
 
-    if (openSSID.length > 34) {
+    if (newOpenSSID.length > 34) {
       addToast({
         title: "Error",
         description: "Open network SSID must be 34 characters or less",
@@ -74,7 +91,16 @@ export default function HotspotNetworks({
       return;
     }
 
-    if (privateSSID.length > 34) {
+    if (newOpenSSID === openSSID) {
+      addToast({
+        title: "Warning",
+        description: "Open network SSID is unchanged",
+        color: "warning",
+      });
+      return;
+    }
+
+    if (newPrivateSSID.length > 34) {
       addToast({
         title: "Error",
         description: "Private network SSID must be 34 characters or less",
@@ -83,7 +109,7 @@ export default function HotspotNetworks({
       return;
     }
 
-    if (!openSSID.trim() && !privateSSID.trim()) {
+    if (!newOpenSSID.trim() && !newPrivateSSID.trim()) {
       addToast({
         title: "Error",
         description: "At least one network must be configured",
@@ -96,10 +122,10 @@ export default function HotspotNetworks({
       const formData: HotspotNetworksFormData = {
         locationName: locName === locationName ? "" : locName,
         openNetwork: {
-          ssid: openSSID,
+          ssid: newOpenSSID,
         },
         privateNetwork: {
-          ssid: privateSSID,
+          ssid: newPrivateSSID,
           password: newPassword,
         },
         name: hotspot,
@@ -114,6 +140,19 @@ export default function HotspotNetworks({
           color: "success",
         });
         setConfirmPassword(""); // Clear confirm password on success
+        if (newOpenSSID.trim()) {
+          setOpenSSID(newOpenSSID);
+          onOpenSSIDChange?.(newOpenSSID);
+          setNewOpenSSID("");
+        }
+
+        if (newPrivateSSID.trim()) {
+          setPrivateSSID(newPrivateSSID);
+          onPrivateSSIDChange?.(newPrivateSSID);
+          onPrivatePasswordChange?.(newPassword);
+          setNewPrivateSSID("");
+          setNewPassword("");
+        }
       } else {
         addToast({
           title: "Error",
@@ -135,10 +174,15 @@ export default function HotspotNetworks({
     locName,
     locationName,
     openSSID,
+    newOpenSSID,
     privateSSID,
+    newPrivateSSID,
     newPassword,
     confirmPassword,
     hotspot,
+    onOpenSSIDChange,
+    onPrivateSSIDChange,
+    onPrivatePasswordChange,
   ]);
 
   const handleLocationSave = useCallback(async () => {
@@ -239,10 +283,10 @@ export default function HotspotNetworks({
       <Spacer y={4} />
       <CustomInput
         label="SSID open network"
-        placeholder="Open WiFi"
+        placeholder={openSSID}
         helper="Up to 34 characters"
-        onChange={(e) => setOpenSSID(e.target.value)}
-        value={openSSID}
+        onChange={(e) => setNewOpenSSID(e.target.value)}
+        value={newOpenSSID}
         type="text"
         wrapperClass="max-w-[210px]"
         disabled={isDisabled}
@@ -254,10 +298,10 @@ export default function HotspotNetworks({
       <div className="flex md:flex-col lg:flex-row space-x-8 md:space-y-8 lg:space-y-0">
         <CustomInput
           label="SSID private network"
-          placeholder="Private WiFi"
+          placeholder={privateSSID}
           helper="Up to 34 characters"
-          onChange={(e) => setPrivateSSID(e.target.value)}
-          value={privateSSID}
+          onChange={(e) => setNewPrivateSSID(e.target.value)}
+          value={newPrivateSSID}
           type="text"
           wrapperClass="lg:max-w-[210px] md:w-full"
           disabled={isDisabled}

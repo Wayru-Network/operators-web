@@ -10,5 +10,6 @@ export function validatePortalConfigInput(
     return "No banner set";
   if (config.adAsset?.file?.name === "undefined" || !config.adAsset?.file)
     return "No Ad set";
+  if (!config.ad) return "Watch ad access must be selected";
   return null;
 }
