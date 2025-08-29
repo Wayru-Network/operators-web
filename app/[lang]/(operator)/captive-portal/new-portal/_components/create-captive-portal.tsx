@@ -48,9 +48,8 @@ export default function CreateCaptivePortal({
 }: {
   hotspots: Hotspot[];
 }) {
-  const [selected, setSelected] = useState("step1");
-
   // Step 1 - Branding states
+  const [selected, setSelected] = useState("step1");
   const [colors, setColors] = useState(initial);
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
   const [logoFile, setLogoFile] = useState<File | null>(null);

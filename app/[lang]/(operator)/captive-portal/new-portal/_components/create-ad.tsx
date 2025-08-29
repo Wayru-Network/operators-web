@@ -46,11 +46,13 @@ export default function CreateAd({
         label="ad"
         existingUrl={newConfig.adAsset?.url || ""}
         adType={newConfig.adFormat}
+        validSubscription={hasValidSubscription}
       />
       <p className="font-semibold text-lg">Minimum interaction time</p>
       <InteractionTime
         selected={newConfig.interactionTime}
         setSelected={interactionTimeHandler}
+        validSubscription={hasValidSubscription}
       />
       <p className="font-semibold text-lg">Portal Text Content</p>
       <CustomInput
