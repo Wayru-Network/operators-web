@@ -74,9 +74,13 @@ export const BillingProvider = ({
     }
 
     const requiresPaymentMethod =
-      // customer is in trialing period, don't need a payment method
-      stripeSubscription?.status === "trialing"
-        ? false
+      // If user is reactivating a cancelled subscription, always require payment method
+      (action === "reactivating_checkout" ||
+        action === "reactivate_adding" ||
+        action === "reactivate_removing" ||
+        action === "reactivating_not_checkout") &&
+      !hasPaymentMethod
+        ? true
         : // Checkout is required unless removing with active subscription
           !(subscriptionStatus === "active" && isRemoving) && !hasPaymentMethod;
 

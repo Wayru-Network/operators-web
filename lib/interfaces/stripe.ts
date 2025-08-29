@@ -23,6 +23,7 @@ export interface CreateSubscriptionInput {
     price_id: string;
     quantity: number;
     base_price_with_fee: number
+    trial_period_days?: number;
 }
 
 export interface CreateSubscriptionInputWithCustomer

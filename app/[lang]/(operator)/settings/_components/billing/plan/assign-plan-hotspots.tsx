@@ -15,6 +15,7 @@ import {
   removeHotspotToSubscription,
 } from "@/app/[lang]/(operator)/settings/_services/hotspots-service";
 import { useSubscriptionHotspots } from "@/lib/hooks/use-hotspots";
+import { isMinimumVersionMet } from "@/lib/helpers/operators";
 
 export default function AssignPlanHotspots() {
   const { hotspots, addHotspot } = useBilling();
@@ -36,15 +37,18 @@ export default function AssignPlanHotspots() {
   const isInputDisabled =
     hotspotLimitReached || isUpdatingSubscription || isSearching;
 
-  const removeDuplicatedHotspots = (items: Hotspot[]) => {
+  const filterHotspotsList = (items: Hotspot[]) => {
     const seenIds = new Set<number>();
-    return items.filter((item) => {
+    const hotspotsNotDuplicates = items.filter((item) => {
       if (seenIds.has(item.id)) {
         return false; // Remove duplicate
       }
       seenIds.add(item.id);
       return true; // Keep first occurrence
     });
+    return hotspotsNotDuplicates.filter((item) =>
+      isMinimumVersionMet(item.os_services_version ?? "")
+    );
   };
 
   // Hook for API search
@@ -61,7 +65,7 @@ export default function AssignPlanHotspots() {
 
     if (localResults.length > 0 && existingLocalResults.length === 0) {
       // Only set local results if they don't already exist in filtered list
-      setFilteredHotspots(removeDuplicatedHotspots(localResults));
+      setFilteredHotspots(filterHotspotsList(localResults));
     } else {
       const url = `/api/hotspots?page=${1}&limit=${50}&q=${query}`;
       let response: Response | undefined;
@@ -79,7 +83,7 @@ export default function AssignPlanHotspots() {
         return;
       }
       const { data } = (await response.json()) as { data: Hotspot[] };
-      const deletedDuplicates = removeDuplicatedHotspots([
+      const deletedDuplicates = filterHotspotsList([
         ...data,
         ...filteredHotspots,
       ]);
@@ -135,14 +139,17 @@ export default function AssignPlanHotspots() {
   };
 
   return (
-    <div className="flex flex-col md:w-full lg:max-w-96 md:mt-1">
+    <div className="flex flex-col md:w-full lg:w-1/2 md:mt-1">
       <p className="text-base font-semibold w-full">Assign plan to hotspots</p>
+      <p className="text-xs mt-0.5">
+        Only hotspots with the minimum required version will be displayed
+      </p>
       <Tooltip
         isDisabled={!hotspotLimitReached}
         content={"Update your plan if you want to add more hotspots"}
       >
         <div
-          className={`flex flex-row w-full justify-start mt-3 ${
+          className={`flex flex-row w-full justify-start mt-4 ${
             hotspotLimitReached || isUpdatingSubscription
               ? "cursor-not-allowed"
               : ""
@@ -153,7 +160,7 @@ export default function AssignPlanHotspots() {
             size="sm"
             placeholder={`Search Hotspot`}
             id="search-hotspots-input"
-            className="md:w-full lg:w-[300px]"
+            className="md:w-full lg:w-[400px]"
             startContent={<Search size={16} />}
             endContent={isSearching && <Spinner size="sm" />}
             selectorIcon={
@@ -179,7 +186,7 @@ export default function AssignPlanHotspots() {
                 : "No hotspots found",
             }}
           >
-            {removeDuplicatedHotspots(filteredHotspots).map((hotspot) => (
+            {filterHotspotsList(filteredHotspots).map((hotspot) => (
               <AutocompleteItem
                 key={hotspot.id}
                 startContent={<Router size={12} />}

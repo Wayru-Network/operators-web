@@ -21,7 +21,10 @@ export default function PaymentAndBillingMethod({
 }: PlanActiveProps) {
   const { subscription, refreshSubscriptionState } = useCustomerSubscription();
   const hotspotSubscription = subscription?.stripe_subscription;
-  const isActivePlan = hotspotSubscription?.cancel_at ? false : true;
+  const isActivePlan =
+    hotspotSubscription?.cancel_at || hotspotSubscription?.status === "canceled"
+      ? false
+      : true;
   const paymentMethod = hotspotSubscription?.payment_method;
   const [isDeletingPaymentMethod, startTransition] = useTransition();
 
@@ -35,7 +38,11 @@ export default function PaymentAndBillingMethod({
           color: "danger",
         });
       } else {
-        await refreshSubscriptionState();
+        const subscription = await refreshSubscriptionState();
+        if (subscription?.stripe_subscription?.payment_method) {
+          // refresh again
+          await refreshSubscriptionState();
+        }
         addToast({
           title: "Success",
           description: response?.message,

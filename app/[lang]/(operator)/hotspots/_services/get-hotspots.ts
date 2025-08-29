@@ -18,6 +18,8 @@ export interface Hotspot {
   wayru_device_id: string;
   assigned_portal?: string;
   location_name?: string;
+  os_version?: string;
+  os_services_version?: string
 }
 export interface MinersByAddressResponse {
   data: Hotspot[];
