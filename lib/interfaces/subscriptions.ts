@@ -8,4 +8,5 @@ export interface CustomerSubscription extends Prisma.SubscriptionsMaxAggregateOu
     is_subscription_active: boolean
     is_trial_period_used: boolean
     is_trialing: boolean
+    has_valid_subscription: boolean
 }

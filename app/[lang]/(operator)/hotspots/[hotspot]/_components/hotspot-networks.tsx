@@ -16,8 +16,6 @@ import {
   HotspotPrivateNetwork,
 } from "../_services/parse-hotspot-config";
 import { Alert } from "@heroui/alert";
-import { useCustomerSubscription } from "@/lib/contexts/customer-subscription-context";
-import { CustomerSubscription } from "@/lib/interfaces/subscriptions";
 import saveLocationName from "../_services/save-location-name";
 import { isMinimumVersionMet } from "@/lib/helpers/operators";
 
@@ -198,16 +196,11 @@ export default function HotspotNetworks({
     }
   }, [locName, locationName, hotspot, onLocationNameChange]);
 
-  const { subscription } = useCustomerSubscription();
-  const { is_subscription_active } = subscription as CustomerSubscription;
-
   const isMinimumVersion = isMinimumVersionMet(osServicesVersion || "0.0.0");
-  const isDisabled = !isMinimumVersion || !is_subscription_active;
+  const isDisabled = !isMinimumVersion;
 
   const RenderBanner = () => {
     switch (true) {
-      case !is_subscription_active:
-        return <SubscriptionInactiveBanner />;
       case !isMinimumVersion:
         return <MinimumVersionBanner />;
       default:
@@ -318,8 +311,4 @@ function PreviewFeatureBanner() {
       title={`This is a preview feature. Issues may occur.`}
     />
   );
-}
-
-function SubscriptionInactiveBanner() {
-  return <Alert color="warning" title={`Your subscription is not activated`} />;
 }

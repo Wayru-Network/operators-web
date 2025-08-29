@@ -117,7 +117,7 @@ export default function PortalsTable({ rows }: { rows: rowCaptivePortal[] }) {
           }}
           startContent={<Search className="pl-2" />}
         />
-        <NewPortal />
+        <NewPortal currentPortals={rows.length} />
       </div>
 
       <div className="bg-[#ffffff] dark:bg-[#191c1d] rounded-[30px] pb-8">

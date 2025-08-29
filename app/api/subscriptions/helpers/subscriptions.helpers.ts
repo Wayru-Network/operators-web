@@ -25,10 +25,12 @@ export const getSubscriptionStatusDetails = (sub?: StripeSubscription) => {
     // Check subscription status
     const is_subscription_active = ACTIVATED_STATUSES.includes(sub.status);
     const is_trialing = sub.status === 'trialing';
+    const has_valid_subscription = is_subscription_active || is_trialing;
 
     return {
         is_subscription_active,
         is_trial_period_used,
-        is_trialing
+        is_trialing,
+        has_valid_subscription
     };
 };

@@ -5,6 +5,7 @@ import AdFormat from "@/lib/components/adformat-dropdown";
 import { CustomInput } from "@/lib/components/custom-input";
 import { Button } from "@heroui/button";
 import { PortalConfig } from "../../[portal]/_components/customize-captive-portal";
+import { useCustomerSubscription } from "@/lib/contexts/customer-subscription-context";
 
 interface CreateAdProps {
   newConfig: NewPortalConfig | PortalConfig;
@@ -27,11 +28,18 @@ export default function CreateAd({
   selectedHandler,
   fileHandler,
 }: CreateAdProps) {
+  const { subscription } = useCustomerSubscription();
+  const hasValidSubscription = subscription?.has_valid_subscription;
+
   return (
     <div className="h-full flex flex-col justify-start bg-[#ffffff] dark:bg-[#191c1d] rounded-[30px] p-8 space-y-4">
       <p className="font-bold text-lg">Step 3: Create an Ad</p>
       <p className="font-semibold text-lg">Ad format</p>
-      <AdFormat selected={newConfig.adFormat} setSelected={adFormatHandler} />
+      <AdFormat
+        hasValidSubscription={hasValidSubscription}
+        selected={newConfig.adFormat}
+        setSelected={adFormatHandler}
+      />
       <p className="font-bold text-lg">Upload Media</p>
       <FileInput
         onSelect={(file, url) => fileHandler(file, url, "ad")}
