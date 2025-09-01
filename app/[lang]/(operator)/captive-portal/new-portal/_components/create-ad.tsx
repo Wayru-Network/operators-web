@@ -28,15 +28,12 @@ export default function CreateAd({
   selectedHandler,
   fileHandler,
 }: CreateAdProps) {
-  const { subscription } = useCustomerSubscription();
-  const hasValidSubscription = subscription?.has_valid_subscription;
-
   return (
     <div className="h-full flex flex-col justify-start bg-[#ffffff] dark:bg-[#191c1d] rounded-[30px] p-8 space-y-4">
       <p className="font-bold text-lg">Step 3: Create an Ad</p>
       <p className="font-semibold text-lg">Ad format</p>
       <AdFormat
-        hasValidSubscription={hasValidSubscription}
+        hasValidSubscription={newConfig.validSub}
         selected={newConfig.adFormat}
         setSelected={adFormatHandler}
       />
@@ -46,13 +43,13 @@ export default function CreateAd({
         label="ad"
         existingUrl={newConfig.adAsset?.url || ""}
         adType={newConfig.adFormat}
-        validSubscription={hasValidSubscription}
+        validSubscription={newConfig.validSub}
       />
       <p className="font-semibold text-lg">Minimum interaction time</p>
       <InteractionTime
         selected={newConfig.interactionTime}
         setSelected={interactionTimeHandler}
-        validSubscription={hasValidSubscription}
+        validSubscription={newConfig.validSub}
       />
       <p className="font-semibold text-lg">Portal Text Content</p>
       <CustomInput

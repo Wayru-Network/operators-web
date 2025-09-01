@@ -48,7 +48,11 @@ export default async function uploadConfig(
       );
       if (!portal.success || !portal.portal) return portal;
 
-      if (portalConfig.ad && portalConfig.adAsset?.file) {
+      if (
+        portalConfig.ad &&
+        portalConfig.adAsset?.file &&
+        portalConfig.validSub
+      ) {
         const adCreation = await insertAdConfig(
           portalConfig,
           portal.portal.id,
