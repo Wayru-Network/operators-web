@@ -35,8 +35,13 @@ export default function PortalSettings({
         <div className="flex flex-row items-center">
           <Check size={25} />
           <p className="pt-1">
-            {config.adFormat.charAt(0).toUpperCase() + config.adFormat.slice(1)}{" "}
-            ad: &quot;{config.adAsset?.file?.name}&quot;
+            ad:{" "}
+            {!config.ad
+              ? "Wayru default"
+              : `${
+                  config.adFormat.charAt(0).toUpperCase() +
+                  config.adFormat.slice(1)
+                } ad: "${config.adAsset?.file?.name || "No asset selected"}"`}
           </p>
         </div>
         <p className="font-bold pt-4">Duration</p>
