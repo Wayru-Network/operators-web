@@ -55,6 +55,7 @@ export interface PortalConfig {
   redirectUrl: string;
   portalName: string;
   assignedHotspot: Hotspot[];
+  validSub?: boolean;
 }
 
 export default function CustomizeCaptivePortal({
