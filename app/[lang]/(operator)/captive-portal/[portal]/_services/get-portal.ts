@@ -43,15 +43,31 @@ export default async function getPortal(portalId: number) {
 
   const blobLogo = await getBlobImage(portal.logo.asset_url);
   const blobBanner = await getBlobImage(portal.banner.asset_url);
-  const blobAd = portal.ads[0].asset
-    ? await getBlobImage(portal.ads[0].asset.asset_url)
-    : null;
+  let blobAd = null;
+  if (portal.ads.length > 0 && portal.ads[0].asset) {
+    blobAd = await getBlobImage(portal.ads[0].asset.asset_url);
+  }
 
   if (!blobLogo.success) {
     blobLogo.url = "";
   }
   if (!blobBanner.success) {
     blobBanner.url = "";
+  }
+
+  let adFormat = null;
+  if (portal.ads.length > 0) {
+    adFormat = portal.ads[0].format;
+  }
+
+  let adInteractionTime = "15";
+  if (portal.ads.length > 0) {
+    adInteractionTime = portal.ads[0].interaction_time.toString();
+  }
+
+  let adName = null;
+  if (portal.ads.length > 0) {
+    adName = portal.ads[0].asset?.asset_url;
   }
 
   const Config: PortalConfig = {
@@ -91,13 +107,13 @@ export default async function getPortal(portalId: number) {
       nfnode_type: "",
       status: "unknown",
     })),
-    adFormat: portal.ads[0].format || "video",
+    adFormat: adFormat || "video",
     adAsset: {
       url: blobAd?.url || null,
       file: null,
-      name: portal.ads[0].asset?.asset_url || null,
+      name: adName || null,
     },
-    interactionTime: portal.ads[0].interaction_time.toString() || "15",
+    interactionTime: adInteractionTime || "15",
   };
 
   return Config;

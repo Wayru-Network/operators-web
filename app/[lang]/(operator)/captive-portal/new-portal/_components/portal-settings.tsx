@@ -36,7 +36,7 @@ export default function PortalSettings({
           <Check size={25} />
           <p className="pt-1">
             ad:{" "}
-            {!config.ad
+            {!config.validSub
               ? "Wayru default"
               : `${
                   config.adFormat.charAt(0).toUpperCase() +

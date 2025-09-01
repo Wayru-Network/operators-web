@@ -11,6 +11,7 @@ import UpdatePortal from "./update-portal";
 import { adFormat } from "@/lib/generated/prisma";
 import { addToast } from "@heroui/react";
 import { redirect } from "next/navigation";
+import { useCustomerSubscription } from "@/lib/contexts/customer-subscription-context";
 
 interface Ad {
   id: number;
@@ -65,6 +66,9 @@ export default function CustomizeCaptivePortal({
   hotspots: Hotspot[];
   config: PortalConfig;
 }) {
+  const { subscription } = useCustomerSubscription();
+  const hasValidSubscription = subscription?.has_valid_subscription;
+
   const [selected, setSelected] = useState("step1");
 
   if (!config) {
@@ -162,6 +166,7 @@ export default function CustomizeCaptivePortal({
     redirectUrl: redirectUrl || "",
     portalName: portalName,
     assignedHotspot: assignedHotspot,
+    validSub: hasValidSubscription || false,
   };
 
   return (
