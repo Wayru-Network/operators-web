@@ -137,7 +137,8 @@ const AccountTab = ({ accountInfo }: { accountInfo: AccountInfo }) => {
   };
 
   // Fc to save changes
-  const handleSaveChanges = async () => {
+  const handleSaveChanges = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault(); // do not reload the page
     if (validateForm()) {
       // Create an object with only the changed fields
       const changedData: Partial<AccountInfoUpdate> = {};
