@@ -112,6 +112,8 @@ enum industry_type {
   telecom
   finance
   technology
+  healthcare
+  education
 }
 
 model subscriptions {
