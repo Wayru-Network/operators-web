@@ -1,17 +1,11 @@
 "use client";
 
 import { Button } from "@heroui/button";
-import { Tooltip } from "@heroui/tooltip";
 import { useCallback } from "react";
 import { redirect } from "next/navigation";
 import { Plus } from "lucide-react";
 import { useCustomerSubscription } from "@/lib/contexts/customer-subscription-context";
-import Stripe from "stripe";
 import RequestAValidSubTooltip from "@/lib/components/request-a-valid-sub-tooltip";
-const AVAILABLE_STATUS: Array<Stripe.Subscription.Status> = [
-  "active",
-  "trialing",
-];
 
 interface NewPortalProps {
   currentPortals: number;

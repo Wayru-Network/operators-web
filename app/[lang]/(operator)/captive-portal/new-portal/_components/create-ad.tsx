@@ -5,7 +5,6 @@ import AdFormat from "@/lib/components/adformat-dropdown";
 import { CustomInput } from "@/lib/components/custom-input";
 import { Button } from "@heroui/button";
 import { PortalConfig } from "../../[portal]/_components/customize-captive-portal";
-import { useCustomerSubscription } from "@/lib/contexts/customer-subscription-context";
 
 interface CreateAdProps {
   newConfig: NewPortalConfig | PortalConfig;
