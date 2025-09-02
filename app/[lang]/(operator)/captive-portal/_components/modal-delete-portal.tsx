@@ -8,7 +8,7 @@ import {
   ModalFooter,
   Button,
 } from "@heroui/react";
-import deletePortal from "../[portal]/_services/delete-porta-service";
+import deletePortal from "../[portal]/_services/delete-portal-service";
 import { useTransition } from "react";
 import { useCaptivePortals } from "@/lib/hooks/use-captive-portals";
 
