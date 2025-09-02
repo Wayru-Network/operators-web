@@ -49,7 +49,7 @@ export default function HotspotsTable({
     direction: "ascending",
   });
 
-  const PAGE_SIZE = 6; // row limit per page
+  const PAGE_SIZE = 10; // row limit per page
   const [page, setPage] = useState(Number(searchParams.get("page") ?? "1"));
 
   const { hotspots, meta, isLoading } = useHotspots(
