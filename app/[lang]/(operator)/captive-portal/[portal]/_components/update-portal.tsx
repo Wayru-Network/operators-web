@@ -7,7 +7,7 @@ import UpdateAssignedHotspot from "./customize-hotspot-dropdown";
 import updatePortal from "../_services/update-portal-service";
 import { redirect } from "next/navigation";
 import { useState } from "react";
-import cleanPortalCache from "../_services/clean_portal_cache";
+import cleanPortalCache from "../_services/clean-portal-cache";
 
 interface PublishProps {
   selectedHandler: (step: string) => void;
