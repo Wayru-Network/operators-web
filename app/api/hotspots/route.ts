@@ -14,7 +14,7 @@ export async function GET(req: NextRequest) {
 
   const { searchParams } = new URL(req.url);
   const page = Number(searchParams.get("page") ?? "1");
-  const limit = Number(searchParams.get("limit") ?? "6");
+  const limit = Number(searchParams.get("limit") ?? "10");
   const query = searchParams.get("q")?.trim();
 
   if (query && query.length > 0) {
