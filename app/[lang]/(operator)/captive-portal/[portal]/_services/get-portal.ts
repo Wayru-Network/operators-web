@@ -2,7 +2,7 @@
 import { Prisma } from "@/lib/infra/prisma";
 import { getSession } from "@/lib/session/session";
 import { PortalConfig } from "../_components/customize-captive-portal";
-import { getBlobImage } from "./get-blob-image";
+import { getBlobImage } from "@/lib/blob_storage/get-blob-image";
 
 export default async function getPortal(portalId: number) {
   const { userId } = await getSession();

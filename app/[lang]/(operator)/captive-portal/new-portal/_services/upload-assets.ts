@@ -1,6 +1,6 @@
 import { Prisma } from "@/lib/infra/prisma";
 import { PrismaClient } from "@prisma/client/extension";
-import { uploadImageToBlobStorage } from "../_actions/upload-blob";
+import { uploadImageToBlobStorage } from "@/lib/blob_storage/upload-blob";
 
 export async function uploadAsset(
   file: File,
