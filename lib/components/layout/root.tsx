@@ -4,9 +4,9 @@ import { LayoutProps } from "@/lib/interfaces/page";
 import { GeistMono, GeistSans } from "@/lib/ui/font";
 import CheckSupportedDeviceLayout from "./supported-device-layout";
 
-export default function RootLayout({ children }: LayoutProps) {
+export default async function RootLayout({ children, params }: LayoutProps) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang={(await params)?.lang??'en'} suppressHydrationWarning>
       <body
         className={`${GeistSans.variable} ${GeistMono.variable} antialiased`}
       >

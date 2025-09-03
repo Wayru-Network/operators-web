@@ -14,8 +14,10 @@ import {
 import { Input } from "@heroui/input";
 import { Pagination } from "@heroui/pagination";
 import NewPortal from "./new-portal";
-import { Settings, Search } from "lucide-react";
-import { rowCaptivePortal } from "../_services/get-captive-portals";
+import { Search } from "lucide-react";
+import PortalActions from "./portal-actions";
+import { useCaptivePortals } from "@/lib/hooks/use-captive-portals";
+import { Spinner } from "@heroui/react";
 
 interface PortalsColumns {
   key: string;
@@ -34,7 +36,8 @@ interface PortalsRows {
   conversion_rate?: string; // Optional, as it may not be present in all rows
 }
 
-export default function PortalsTable({ rows }: { rows: rowCaptivePortal[] }) {
+export default function PortalsTable() {
+  const { captivePortals: rows, isLoading } = useCaptivePortals();
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState<SortDescriptor>({
     column: "name",
@@ -117,7 +120,7 @@ export default function PortalsTable({ rows }: { rows: rowCaptivePortal[] }) {
           }}
           startContent={<Search className="pl-2" />}
         />
-        <NewPortal />
+        <NewPortal currentPortals={rows.length} />
       </div>
 
       <div className="bg-[#ffffff] dark:bg-[#191c1d] rounded-[30px] pb-8">
@@ -126,7 +129,7 @@ export default function PortalsTable({ rows }: { rows: rowCaptivePortal[] }) {
           isVirtualized
           isHeaderSticky
           rowHeight={40}
-          maxTableHeight={500}
+          maxTableHeight={rows.length > PAGE_SIZE ? 500 : 400} // when the rows are more than page size, we need to set the maxTableHeight to 500 to generate a smooth scroll, otherwise the table will be fixed height
           sortDescriptor={sort}
           onSortChange={setSort}
           classNames={{
@@ -147,7 +150,20 @@ export default function PortalsTable({ rows }: { rows: rowCaptivePortal[] }) {
             )}
           </TableHeader>
 
-          <TableBody items={paged} emptyContent="No portals found">
+          <TableBody
+            items={paged}
+            emptyContent={
+              isLoading ? (
+                <div className="flex justify-center items-center h-full">
+                  <Spinner />
+                </div>
+              ) : (
+                <div className="flex justify-center items-center h-full">
+                  <p>No portals found</p>
+                </div>
+              )
+            }
+          >
             {(item: PortalsRows) => (
               <TableRow
                 key={item.id}
@@ -156,12 +172,7 @@ export default function PortalsTable({ rows }: { rows: rowCaptivePortal[] }) {
                 {(columnKey) => (
                   <TableCell className="text-center">
                     {columnKey === "actions" ? (
-                      <a
-                        href={`/captive-portal/${item.id}`}
-                        className="flex items-center justify-center hover:underline"
-                      >
-                        <Settings className="" />
-                      </a>
+                      <PortalActions portalId={item.id} />
                     ) : columnKey === "assigned-hotspots" ? (
                       <>{item._count.hotspots}</>
                     ) : columnKey === "conversion-rate" ? (

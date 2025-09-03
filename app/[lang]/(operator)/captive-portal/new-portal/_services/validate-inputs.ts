@@ -8,8 +8,9 @@ export function validatePortalConfigInput(
     return "No logo set";
   if (config.banner?.file?.name === "undefined" || !config.banner?.file)
     return "No banner set";
-  if (config.adAsset?.file?.name === "undefined" || !config.adAsset?.file)
-    return "No Ad set";
-  if (!config.ad) return "Watch ad access must be selected";
+  if (config.ad && config.validSub) {
+    if (config.adAsset?.file?.name === "undefined" || !config.adAsset?.file)
+      return "No Ad set";
+  }
   return null;
 }

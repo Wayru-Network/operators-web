@@ -10,6 +10,7 @@ import Publish from "./publish";
 import PortalSettings from "./portal-settings";
 import Link from "next/link";
 import { Hotspot } from "@/app/[lang]/(operator)/hotspots/_services/get-hotspots";
+import { useCustomerSubscription } from "@/lib/contexts/customer-subscription-context";
 
 const initial = {
   background: "#ffffff",
@@ -41,6 +42,7 @@ export interface NewPortalConfig {
   redirectUrl?: string;
   portalName: string;
   assignedHotspot: string[];
+  validSub: boolean;
 }
 
 export default function CreateCaptivePortal({
@@ -48,9 +50,8 @@ export default function CreateCaptivePortal({
 }: {
   hotspots: Hotspot[];
 }) {
-  const [selected, setSelected] = useState("step1");
-
   // Step 1 - Branding states
+  const [selected, setSelected] = useState("step1");
   const [colors, setColors] = useState(initial);
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
   const [logoFile, setLogoFile] = useState<File | null>(null);
@@ -96,6 +97,8 @@ export default function CreateCaptivePortal({
     }
   };
 
+  const { subscription } = useCustomerSubscription();
+  const hasValidSubscription = subscription?.has_valid_subscription;
   const newConfig: NewPortalConfig = {
     colors,
     logo: {
@@ -119,6 +122,7 @@ export default function CreateCaptivePortal({
     redirectUrl: redirectUrl || undefined,
     portalName: portalName,
     assignedHotspot: assignedHotspot,
+    validSub: hasValidSubscription || false,
   };
 
   return (

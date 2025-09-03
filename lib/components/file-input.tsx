@@ -12,6 +12,7 @@ type Props = {
   label: AssetType;
   existingUrl?: string;
   adType?: string;
+  validSubscription?: boolean;
 };
 
 export default function FileInput({
@@ -19,6 +20,7 @@ export default function FileInput({
   label,
   existingUrl,
   adType,
+  validSubscription = true,
 }: Props) {
   const [isOver, setIsOver] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(
@@ -95,6 +97,16 @@ export default function FileInput({
 
   const getDisplayLabel = () =>
     `Drag and drop your ${label} here or browse files`;
+
+  if (!validSubscription) {
+    return (
+      <div className="flex flex-col items-center justify-center w-full h-48 rounded-[10px] bg-white dark:bg-[#222222]">
+        <p className="text-xs">
+          You need a premium subscription to upload your own Ads.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col items-center justify-center w-full">

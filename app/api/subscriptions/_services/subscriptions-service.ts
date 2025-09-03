@@ -45,6 +45,7 @@ export async function getCustomerSubscription(): Promise<CustomerSubscription | 
             is_subscription_active: false,
             is_trial_period_used: false,
             is_trialing: false,
+            has_valid_subscription: false,
         };
 
         // if sub has a stripe subscription id return this too
@@ -59,6 +60,7 @@ export async function getCustomerSubscription(): Promise<CustomerSubscription | 
                 is_subscription_active: statusDetails.is_subscription_active,
                 is_trial_period_used: statusDetails.is_trial_period_used,
                 is_trialing: statusDetails.is_trialing,
+                has_valid_subscription: statusDetails.has_valid_subscription || false,
             };
         }
 

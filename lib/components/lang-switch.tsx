@@ -11,10 +11,12 @@ import type { SharedSelection } from "@heroui/system";
 import { SupportedLanguages } from "../language/language";
 import { useMemo, useState } from "react";
 import { Globe } from "lucide-react";
+import { redirect, usePathname } from "next/navigation";
 
 export default function LangSwitch() {
+  const pathname = usePathname();
   const [selectedKeys, setSelectedKeys] = useState<SharedSelection>(
-    new Set(["en"]),
+    new Set([pathname.split('/')[1]]),
   );
 
   const selectedValue = useMemo(
@@ -43,7 +45,14 @@ export default function LangSwitch() {
         aria-label="Language options"
         selectedKeys={selectedKeys}
         selectionMode="single"
-        onSelectionChange={setSelectedKeys}
+        onSelectionChange={(value)=>{
+          setSelectedKeys(value)
+          const route = pathname.split('/');
+          route.splice(1, 1, value.anchorKey??'en');
+          
+          redirect(route.join('/'));
+        }
+        }
         classNames={{
           base: "min-w-[80px] w-auto",
           list: "min-w-[80px] w-auto",

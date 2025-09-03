@@ -31,18 +31,24 @@ export default function CreateAd({
     <div className="h-full flex flex-col justify-start bg-[#ffffff] dark:bg-[#191c1d] rounded-[30px] p-8 space-y-4">
       <p className="font-bold text-lg">Step 3: Create an Ad</p>
       <p className="font-semibold text-lg">Ad format</p>
-      <AdFormat selected={newConfig.adFormat} setSelected={adFormatHandler} />
+      <AdFormat
+        hasValidSubscription={newConfig.validSub}
+        selected={newConfig.adFormat}
+        setSelected={adFormatHandler}
+      />
       <p className="font-bold text-lg">Upload Media</p>
       <FileInput
         onSelect={(file, url) => fileHandler(file, url, "ad")}
         label="ad"
         existingUrl={newConfig.adAsset?.url || ""}
         adType={newConfig.adFormat}
+        validSubscription={newConfig.validSub}
       />
       <p className="font-semibold text-lg">Minimum interaction time</p>
       <InteractionTime
         selected={newConfig.interactionTime}
         setSelected={interactionTimeHandler}
+        validSubscription={newConfig.validSub}
       />
       <p className="font-semibold text-lg">Portal Text Content</p>
       <CustomInput
@@ -52,6 +58,7 @@ export default function CreateAd({
         onChange={(e) => redirectUrlHandler(e.target.value)}
         value={newConfig.redirectUrl || ""}
         type="url"
+        disabled={!newConfig.validSub}
       />
       <div className="flex gap-2 mt-auto">
         <Button
