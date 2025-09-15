@@ -63,6 +63,7 @@ export default function Publish({
         placeholder="Enter portal name"
         value={portalConfig.portalName}
         onChange={(e) => nameHandler(e.target.value)}
+        validSubscription={true}
       />
       <p className="font-semibold text-lg">Assign a Hotspot</p>
       <AssignHotspot

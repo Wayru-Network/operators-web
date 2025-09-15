@@ -83,6 +83,7 @@ export default function AccessFlows({
           helper="Max 50 characters"
           onChange={(e) => welcomeMessageHandler(e.target.value)}
           value={newConfig.welcomeMessage}
+          validSubscription={true}
         />
       </div>
       <div className="flex gap-2 mt-auto">
