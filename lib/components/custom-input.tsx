@@ -1,6 +1,6 @@
 import { Tooltip } from "@heroui/tooltip";
 
-interface CustomInputProps {
+interface CustomInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label: string;
   helper?: string;
   placeholder?: string;
@@ -11,9 +11,7 @@ interface CustomInputProps {
   validSubscription?: boolean;
 }
 
-export function CustomInput(
-  props: CustomInputProps & React.InputHTMLAttributes<HTMLInputElement>
-) {
+export function CustomInput(props: CustomInputProps) {
   const {
     label,
     helper,
@@ -22,13 +20,14 @@ export function CustomInput(
     wrapperClass = "",
     labelClass = "",
     helperClass = "",
+    validSubscription = true,
     ...rest
   } = props;
   return (
     <Tooltip
       content="You need to have a premium plan to set a redirect URL."
       placement="top"
-      isDisabled={props.validSubscription}
+      isDisabled={validSubscription}
       className="w-full"
       color="warning"
     >
@@ -40,10 +39,11 @@ export function CustomInput(
           bg-transparent px-4 pt-4 pb-4 text-lg outline-none peer
           focus:border-[#751CF6] disabled:text-neutral-600 disabled:border-neutral-600 ${inputClass}`}
           maxLength={50}
-          disabled={!props.validSubscription}
+          disabled={!validSubscription}
         />
         <label
-          className={`absolute bg-[#ffffff] dark:bg-[#191c1d] px-2 w-fit left-3 -top-3 peer-focus:text-[#363438] ${labelClass}`}
+          className={`absolute bg-[#ffffff] dark:bg-[#191c1d] px-2 w-fit left-3 -top-3
+          peer-focus:text-[#751CF6] peer-disabled:text-neutral-600 ${labelClass}`}
         >
           {label}
         </label>
