@@ -60,6 +60,8 @@ model ad {
   format           adFormat
   asset            asset?         @relation(fields: [ad_asset_id], references: [id])
   portal_config    portal_config? @relation(fields: [portal_config_id], references: [id])
+  customer_uuid    String?
+  customer         customers?     @relation(fields: [customer_uuid], references: [customer_uuid])
 }
 
 model asset {
@@ -95,6 +97,7 @@ model customers {
   companies          companies[]
   stripe_customer_id String?        @db.VarChar(100)
   subscriptions      subscriptions?
+  ads                ad[]
 }
 
 enum adFormat {
