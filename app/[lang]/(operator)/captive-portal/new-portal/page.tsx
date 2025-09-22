@@ -1,6 +1,5 @@
 import CreateCaptivePortal from "./_components/create-captive-portal";
 import { getHotspotsToAssignCaptivePortal } from "../../hotspots/_services/get-hotspots";
-import { getCustomerSubscription } from "@/app/api/subscriptions/_services/subscriptions-service";
 import { canCreatePortal } from "./_services/can-create-portal";
 import { redirect } from "next/navigation";
 
