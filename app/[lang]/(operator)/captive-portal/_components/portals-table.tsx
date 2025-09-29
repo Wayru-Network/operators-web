@@ -36,7 +36,7 @@ interface PortalsRows {
   conversion_rate?: string; // Optional, as it may not be present in all rows
 }
 
-export default function PortalsTable() {
+export default function PortalsTable({ canCreate }: { canCreate: boolean }) {
   const { captivePortals: rows, isLoading } = useCaptivePortals();
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState<SortDescriptor>({
@@ -120,7 +120,7 @@ export default function PortalsTable() {
           }}
           startContent={<Search className="pl-2" />}
         />
-        <NewPortal currentPortals={rows.length} />
+        <NewPortal canCreate={canCreate} />
       </div>
 
       <div className="bg-[#ffffff] dark:bg-[#191c1d] rounded-[30px] pb-8">
