@@ -4,6 +4,7 @@ import {
   pauseSubscription,
   revokeSubscription,
 } from "@/lib/services/default-settings-service";
+import { env } from "@/lib/infra/env";
 
 export async function POST(req: NextRequest) {
   const sig = req.headers.get("stripe-signature");
@@ -21,7 +22,7 @@ export async function POST(req: NextRequest) {
     event = stripe.webhooks.constructEvent(
       rawBody,
       sig,
-      process.env.STRIPE_WEBHOOK_SECRET!
+      env.STRIPE_WEBHOOK_SECRET
     );
   } catch (err: unknown) {
     console.error(
