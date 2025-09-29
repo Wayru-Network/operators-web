@@ -85,3 +85,97 @@ async function setDefaultSettings({
 
   return { success: true, message: "Default settings applied successfully" };
 }
+
+interface revokeSubscriptionResponse {
+  success: boolean;
+  error?: string;
+}
+
+export async function revokeSubscription(
+  sub_id: string
+): Promise<revokeSubscriptionResponse> {
+  try {
+    const subscription = await Prisma.subscriptions.findUnique({
+      where: { stripe_subscription_id: sub_id },
+    });
+    if (subscription) {
+      await Prisma.subscriptions.delete({
+        where: { id: subscription.id },
+      });
+      const customer = await Prisma.customers.findUnique({
+        where: { id: subscription.customer_id },
+        select: { customer_uuid: true },
+      });
+
+      if (!customer?.customer_uuid) {
+        return { success: false, error: "Not found" };
+      }
+
+      const portals = await Prisma.portal_config.findMany({
+        where: { user_id: customer?.customer_uuid },
+        select: { id: true },
+      });
+
+      for (const portal of portals) {
+        await Prisma.ad.updateMany({
+          where: { portal_config_id: portal.id },
+          data: { portal_config_id: null },
+        });
+      }
+      return { success: true };
+    } else {
+      console.warn(`Subscription with id ${sub_id} not found.`);
+      return {
+        success: false,
+        error: `Sub not found`,
+      };
+    }
+  } catch (error) {
+    console.error("Error revoking subscription:", error);
+    throw new Error(`Failed to revoke subscription: ${error}`);
+  }
+}
+
+interface pauseSubscriptionResponse {
+  success: boolean;
+  error?: string;
+}
+
+export async function pauseSubscription(
+  sub_id: string
+): Promise<pauseSubscriptionResponse> {
+  try {
+    const subscription = await Prisma.subscriptions.findUnique({
+      where: { stripe_subscription_id: sub_id },
+    });
+    if (subscription) {
+      const customer = await Prisma.customers.findUnique({
+        where: { id: subscription.customer_id },
+        select: { customer_uuid: true },
+      });
+
+      if (!customer?.customer_uuid) {
+        return { success: false, error: "Not found" };
+      }
+
+      const portals = await Prisma.portal_config.findMany({
+        where: { user_id: customer?.customer_uuid },
+        select: { id: true },
+      });
+
+      for (const portal of portals) {
+        await Prisma.ad.updateMany({
+          where: { portal_config_id: portal.id },
+          data: { portal_config_id: null },
+        });
+      }
+
+      return { success: true };
+    } else {
+      return { success: false, error: "Not found" };
+    }
+  } catch (error) {
+    console.error("Error pausing subscription:", error);
+    throw new Error(`Failed to pause subscription: ${error}`);
+  }
+}
