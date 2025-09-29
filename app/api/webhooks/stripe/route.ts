@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import stripe from "stripe";
+import {
+  pauseSubscription,
+  revokeSubscription,
+} from "@/lib/services/default-settings-service";
 
 export async function POST(req: NextRequest) {
   const sig = req.headers.get("stripe-signature");
@@ -32,13 +36,23 @@ export async function POST(req: NextRequest) {
     switch (event.type) {
       case "customer.subscription.paused": {
         const subscription = event.data.object as stripe.Subscription;
-        console.log("Subscription paused: ", subscription.id);
+        const result = await pauseSubscription(subscription.id);
+        if (result.error === "Not found") {
+          return NextResponse.json({ error: "Not found" }, { status: 404 });
+        }
         break;
       }
 
       case "customer.subscription.deleted": {
         const subscription = event.data.object as stripe.Subscription;
         console.log("Subscription canceled:", subscription.id);
+        const result = await revokeSubscription(subscription.id);
+        if (result.error === "Sub not found") {
+          return NextResponse.json(
+            { error: "Subscription not found" },
+            { status: 404 }
+          );
+        }
         break;
       }
     }
