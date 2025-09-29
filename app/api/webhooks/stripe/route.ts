@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
     );
   } catch (err: unknown) {
     console.error(
-      `⚠️  Error verifying Stripe signature: ${
+      `Error verifying Stripe signature: ${
         err instanceof Error ? err.message : String(err)
       }`
     );
@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
 
       case "customer.subscription.deleted": {
         const subscription = event.data.object as stripe.Subscription;
-        console.log("❌ Subscription canceled:", subscription.id);
+        console.log("Subscription canceled:", subscription.id);
         break;
       }
     }
@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
     // Stripe needs a 2xx response to consider the webhook received successfully
     return NextResponse.json({ received: true }, { status: 200 });
   } catch (err: unknown) {
-    console.error("⚠️ Error processing event:", err);
+    console.error("Error processing event:", err);
     return NextResponse.json({ error: "Processing error" }, { status: 500 });
   }
 }
