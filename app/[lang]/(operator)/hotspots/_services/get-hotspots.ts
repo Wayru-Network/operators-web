@@ -19,7 +19,8 @@ export interface Hotspot {
   assigned_portal?: string;
   location_name?: string;
   os_version?: string;
-  os_services_version?: string
+  os_services_version?: string;
+  subbed?: boolean;
 }
 export interface MinersByAddressResponse {
   data: Hotspot[];
@@ -161,4 +162,19 @@ export async function getHotspotsToAssignCaptivePortal(): Promise<Hotspot[]> {
   const hotspots = await getHotspotBySubscription();
   console.log("Fetched hotspots:", hotspots?.length);
   return hotspots as unknown as Hotspot[];
+}
+
+export async function getAllHotspots(): Promise<Hotspot[]> {
+  const { data: allHotspots } = await getHotspots(1, 150);
+  const subbedHotspots = await getHotspotBySubscription();
+  if (!subbedHotspots) {
+    return allHotspots;
+  }
+  const subbedNames = new Set(subbedHotspots.map((h) => h.name));
+  const combined = allHotspots.map((h) => ({
+    ...h,
+    subbed: subbedNames.has(h.name),
+  }));
+
+  return combined;
 }
