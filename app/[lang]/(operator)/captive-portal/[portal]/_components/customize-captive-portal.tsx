@@ -173,11 +173,14 @@ export default function CustomizeCaptivePortal({
   // If the captive portal has an ad, it can ONLY be assigned to hotspots with a valid subscription.
   // If the captive portal has no ad, it can be assigned to any hotspot.
   const filteredHotspots = useMemo(() => {
-    if (Config.adAsset?.url === null || Config.adAsset?.url === "") {
+    if (
+      (Config.adAsset?.url === null || Config.adAsset?.url === "") &&
+      Config.redirectUrl === ""
+    ) {
       return hotspots;
     }
     return hotspots.filter((hotspot) => hotspot.subbed === true);
-  }, [hotspots, Config.adAsset?.url]);
+  }, [hotspots, Config.adAsset?.url, Config.redirectUrl]);
 
   return (
     <div className="flex flex-col space-y-2">
