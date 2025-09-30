@@ -2,7 +2,7 @@ import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import getPortal from "./_services/get-portal";
 import CustomizeCaptivePortal from "./_components/customize-captive-portal";
-import { getHotspotsToAssignCaptivePortal } from "../../hotspots/_services/get-hotspots";
+import { getAllHotspots } from "../../hotspots/_services/get-hotspots";
 
 export default async function HotspotPage({
   params,
@@ -11,7 +11,8 @@ export default async function HotspotPage({
 }) {
   const { portal: portalId } = await params;
   const portal = await getPortal(Number(portalId));
-  const hotspots = await getHotspotsToAssignCaptivePortal();
+  const hotspots = await getAllHotspots();
+  // const hotspots = await getHotspotsToAssignCaptivePortal();
   if (!portal) {
     return (
       <div className="flex flex-col items-center justify-center h-screen">
