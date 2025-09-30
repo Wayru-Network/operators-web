@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { ArrowLeft } from "lucide-react";
 import Preview from "./preview";
 import { Tab, Tabs } from "@heroui/tabs";
@@ -125,6 +125,16 @@ export default function CreateCaptivePortal({
     validSub: hasValidSubscription || false,
   };
 
+  // Hotspot list to assign captive portal dynamic depending on subscription status.
+  // If the captive portal has an ad, it can ONLY be assigned to hotspots with a valid subscription.
+  // If the captive portal has no ad, it can be assigned to any hotspot.
+  const filteredHotspots = useMemo(() => {
+    if (newConfig.adAsset?.url === null || newConfig.adAsset?.url === "") {
+      return hotspots;
+    }
+    return hotspots.filter((hotspot) => hotspot.subbed === true);
+  }, [hotspots, newConfig.adAsset?.url]);
+
   return (
     <div className="flex flex-col space-y-2">
       <Link className="rounded-full bg-secondary w-fit" href="/captive-portal">
@@ -175,7 +185,7 @@ export default function CreateCaptivePortal({
                 portalConfig={newConfig}
                 nameHandler={setPortalName}
                 assignedHotspotHandler={setAssignedHotspot}
-                hotspots={hotspots}
+                hotspots={filteredHotspots}
               />
             </Tab>
           </Tabs>
@@ -186,6 +196,11 @@ export default function CreateCaptivePortal({
           <PortalSettings config={newConfig} />
         )}
       </div>
+      {/* <div className="mt-4">
+        <pre className=" p-2 rounded text-xs overflow-x-auto">
+          {JSON.stringify(newConfig, null, 2)}
+        </pre>
+      </div> */}
     </div>
   );
 }
