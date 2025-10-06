@@ -116,6 +116,11 @@ spec:
                 secretKeyRef:
                   name: {{ .Values.name }}
                   key: STRIPE_SECRET_KEY
+            - name: STRIPE_WEBHOOK_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.name }}
+                  key: STRIPE_WEBHOOK_SECRET
             - name: DEFAULT_PRIVATE_SSID_PW
               value: {{.Values.defaultPrivateSsidPw | quote }}
           volumeMounts:
