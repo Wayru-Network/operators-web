@@ -13,7 +13,7 @@ resources:
   - repo: self
 
 variables:
-  dockerRegistryServiceConnection: "wayrudev-registry"
+  dockerRegistryServiceConnection: "wayrudev-registry-2"
   imageRepository: "wayru/operators-web"
   containerRegistry: "wayrudev.azurecr.io"
   dockerfilePath: "Dockerfile"

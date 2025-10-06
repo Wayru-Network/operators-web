@@ -12,9 +12,9 @@ model hotspot {
   id               Int              @id @default(autoincrement())
   wayru_device_id  String           @unique @db.Uuid
   name             String?          @unique
-  location_name    String?
   portal_config_id Int?
   subscription_id  Int?
+  location_name    String?
   portal_config    portal_config?   @relation(fields: [portal_config_id], references: [id])
   subscription     subscriptions?   @relation(fields: [subscription_id], references: [id])
   network_configs  network_config[]
@@ -60,6 +60,8 @@ model ad {
   format           adFormat
   asset            asset?         @relation(fields: [ad_asset_id], references: [id])
   portal_config    portal_config? @relation(fields: [portal_config_id], references: [id])
+  customer_uuid    String?        @db.Uuid
+  customer         customers?     @relation(fields: [customer_uuid], references: [customer_uuid])
 }
 
 model asset {
@@ -92,9 +94,21 @@ model customers {
   created_at         DateTime?      @default(now()) @db.Timestamp(6)
   updated_at         DateTime?      @default(now()) @db.Timestamp(6)
   email              String?        @db.VarChar(150)
-  companies          companies[]
   stripe_customer_id String?        @db.VarChar(100)
+  companies          companies[]
   subscriptions      subscriptions?
+  ads                ad[]
+}
+
+model subscriptions {
+  id                     Int       @id @default(autoincrement())
+  customer_id            Int       @unique
+  stripe_subscription_id String?   @unique @db.VarChar(100)
+  created_at             DateTime  @default(now()) @db.Timestamp(6)
+  updated_at             DateTime  @updatedAt @db.Timestamp(6)
+  hotspot_limit          Int
+  hotspots               hotspot[]
+  customer               customers @relation(fields: [customer_id], references: [id], onDelete: Cascade)
 }
 
 enum adFormat {
@@ -114,16 +128,4 @@ enum industry_type {
   technology
   healthcare
   education
-}
-
-model subscriptions {
-  id                     Int      @id @default(autoincrement())
-  customer_id            Int      @unique
-  hotspot_limit          Int
-  stripe_subscription_id String?  @unique @db.VarChar(100)
-  created_at             DateTime @default(now()) @db.Timestamp(6)
-  updated_at             DateTime @updatedAt @db.Timestamp(6)
-
-  customer customers @relation(fields: [customer_id], references: [id], onDelete: Cascade)
-  hotspots hotspot[]
 }

@@ -13,8 +13,8 @@ export default function MainWalletNeeded() {
           <h3>Oops!</h3>
           <p>Seems like we could not find your Main Wallet</p>
           <p>
-            Please select the wallet of your miners in the Wayru Wifi App as the{" "}
-            <span className="font-bold">Main Wallet</span>
+            Please select the wallet of your miners in the Wayru Operators App
+            as the <span className="font-bold">Main Wallet</span>
           </p>
           <p>Once you have selected your main wallet please login again</p>
           <LogoutButton />

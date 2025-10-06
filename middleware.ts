@@ -12,6 +12,7 @@ export function middleware(request: NextRequest) {
     "/api/subscriptions",
     "/api/hotspots/subscription",
     "/api/captive-portals",
+    "/api/webhooks/stripe",
   ];
 
   if (availablePathnames.includes(pathname)) {

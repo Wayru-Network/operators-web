@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Tab, Tabs } from "@heroui/tabs";
 import Branding from "./customize-branding";
 import AccessFlows from "@/app/[lang]/(operator)/captive-portal/new-portal/_components/access-flows";
@@ -169,6 +169,19 @@ export default function CustomizeCaptivePortal({
     validSub: hasValidSubscription || false,
   };
 
+  // Hotspot list to assign captive portal dynamic depending on subscription status.
+  // If the captive portal has an ad, it can ONLY be assigned to hotspots with a valid subscription.
+  // If the captive portal has no ad, it can be assigned to any hotspot.
+  const filteredHotspots = useMemo(() => {
+    if (
+      (Config.adAsset?.url === null || Config.adAsset?.url === "") &&
+      Config.redirectUrl === ""
+    ) {
+      return hotspots;
+    }
+    return hotspots.filter((hotspot) => hotspot.subbed === true);
+  }, [hotspots, Config.adAsset?.url, Config.redirectUrl]);
+
   return (
     <div className="flex flex-col space-y-2">
       <div className="flex flex-row">
@@ -215,7 +228,7 @@ export default function CustomizeCaptivePortal({
                 portalConfig={Config}
                 nameHandler={setPortalName}
                 assignedHotspotHandler={setAssignedHotspot}
-                hotspots={hotspots}
+                hotspots={filteredHotspots}
                 originalConfig={originalConfig}
               />
             </Tab>

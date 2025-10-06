@@ -58,7 +58,7 @@ export default function CreateAd({
         onChange={(e) => redirectUrlHandler(e.target.value)}
         value={newConfig.redirectUrl || ""}
         type="url"
-        disabled={!newConfig.validSub}
+        validSubscription={newConfig.validSub}
       />
       <div className="flex gap-2 mt-auto">
         <Button

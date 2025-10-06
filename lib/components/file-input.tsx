@@ -79,20 +79,20 @@ export default function FileInput({
   }, [error, videoDuration]);
   const getHelperText = () => {
     if (adType === "video") {
-      return "MP4 or WEBM — up to 20MB";
+      return "MP4 or WEBM — up to 1MB";
     }
 
     if (adType === "static") {
-      return "JPG or PNG — up to 5MB";
+      return "JPG or PNG — up to 1MB";
     }
 
     if (adType === "gif") {
-      return "GIF — up to 5MB";
+      return "GIF — up to 1MB";
     }
 
     return label === "logo" || label === "banner"
       ? "Use JPG or PNG (transparent background preferred)"
-      : "Use JPG, PNG, GIF, MP4 or WEBM — up to 20MB";
+      : "Use JPG, PNG, GIF, MP4 or WEBM — up to 1MB";
   };
 
   const getDisplayLabel = () =>

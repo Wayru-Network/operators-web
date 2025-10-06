@@ -1,33 +1,39 @@
 "use client";
 
 import { Button } from "@heroui/button";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { redirect } from "next/navigation";
 import { Plus } from "lucide-react";
-import { useCustomerSubscription } from "@/lib/contexts/customer-subscription-context";
-import RequestAValidSubTooltip from "@/lib/components/request-a-valid-sub-tooltip";
+import { Tooltip } from "@heroui/tooltip";
+import { CanCreatePortalResponse } from "../new-portal/_services/can-create-portal";
 
 interface NewPortalProps {
-  currentPortals: number;
+  canCreate: CanCreatePortalResponse;
+  portalsCount: number;
 }
-export default function NewPortal({ currentPortals }: NewPortalProps) {
-  const { subscription } = useCustomerSubscription();
-  const hasValidSubscription = subscription?.has_valid_subscription;
-  const requiredSubscription = !hasValidSubscription && currentPortals >= 1;
-
+export default function NewPortal({ canCreate, portalsCount }: NewPortalProps) {
   const handleClick = useCallback(() => {
     redirect("/captive-portal/new-portal");
   }, []);
 
+  const create = useMemo(
+    () => canCreate.maxPortals >= portalsCount,
+    [canCreate, portalsCount]
+  );
+
   return (
-    <RequestAValidSubTooltip
-      isDisabled={requiredSubscription ? false : true}
-      content="You need to have an active subscription to create more than 1 portal"
+    <Tooltip
+      placement="top"
+      color="warning"
+      isDisabled={create}
+      content="You have reached the maximum number of portals."
     >
-      <Button isDisabled={requiredSubscription} onPress={handleClick}>
-        <Plus />
-        Create new portal
-      </Button>
-    </RequestAValidSubTooltip>
+      <div>
+        <Button isDisabled={!create} onPress={handleClick}>
+          <Plus />
+          Create new portal
+        </Button>
+      </div>
+    </Tooltip>
   );
 }

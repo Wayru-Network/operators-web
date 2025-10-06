@@ -58,6 +58,10 @@ spec:
           objectName: stripe-secret-key
           objectType: secret
           objectVersion: ""
+        - |
+          objectName: stripe-webhook-secret
+          objectType: secret
+          objectVersion: ""
   secretObjects:
     - secretName: {{ .Values.name }}
       type: Opaque
@@ -82,3 +86,5 @@ spec:
           key: FAS_API_KEY
         - objectName: stripe-secret-key
           key: STRIPE_SECRET_KEY
+        - objectName: stripe-webhook-secret
+          key: STRIPE_WEBHOOK_SECRET
