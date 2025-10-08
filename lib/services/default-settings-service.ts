@@ -145,35 +145,12 @@ export async function pauseSubscription(
   sub_id: string
 ): Promise<pauseSubscriptionResponse> {
   try {
-    const subscription = await Prisma.subscriptions.findUnique({
+    await Prisma.subscriptions.update({
       where: { stripe_subscription_id: sub_id },
+      data: { is_valid: false },
     });
-    if (subscription) {
-      const customer = await Prisma.customers.findUnique({
-        where: { id: subscription.customer_id },
-        select: { customer_uuid: true },
-      });
 
-      if (!customer?.customer_uuid) {
-        return { success: false, error: "Not found" };
-      }
-
-      const portals = await Prisma.portal_config.findMany({
-        where: { user_id: customer?.customer_uuid },
-        select: { id: true },
-      });
-
-      for (const portal of portals) {
-        await Prisma.ad.updateMany({
-          where: { portal_config_id: portal.id },
-          data: { portal_config_id: null },
-        });
-      }
-
-      return { success: true };
-    } else {
-      return { success: false, error: "Not found" };
-    }
+    return { success: true };
   } catch (error) {
     console.error("Error pausing subscription:", error);
     throw new Error(`Failed to pause subscription: ${error}`);
