@@ -15,6 +15,16 @@ interface setDefaultResponse {
   error?: string;
 }
 
+interface pauseSubscriptionResponse {
+  success: boolean;
+  error?: string;
+}
+
+interface resumeSubscriptionResponse {
+  success: boolean;
+  error?: string;
+}
+
 // const defaultSettings: HotspotNetworksFormData = {
 //   locationName: "Unknown",
 //   name: "Default Hotspot",
@@ -136,17 +146,19 @@ export async function revokeSubscription(
   }
 }
 
-interface pauseSubscriptionResponse {
-  success: boolean;
-  error?: string;
-}
-
 export async function pauseSubscription(
   sub_id: string
 ): Promise<pauseSubscriptionResponse> {
   try {
-    await Prisma.subscriptions.update({
+    const subscription = await Prisma.subscriptions.findUnique({
       where: { stripe_subscription_id: sub_id },
+    });
+    if (!subscription) {
+      return { success: false, error: "Not found" };
+    }
+
+    await Prisma.subscriptions.update({
+      where: { id: subscription.id },
       data: { is_valid: false },
     });
 
@@ -154,5 +166,27 @@ export async function pauseSubscription(
   } catch (error) {
     console.error("Error pausing subscription:", error);
     throw new Error(`Failed to pause subscription: ${error}`);
+  }
+}
+
+export async function resumeSubscription(
+  sub_id: string
+): Promise<resumeSubscriptionResponse> {
+  try {
+    const subscription = await Prisma.subscriptions.findUnique({
+      where: { stripe_subscription_id: sub_id },
+    });
+    if (!subscription) {
+      return { success: false, error: "Not found" };
+    }
+    await Prisma.subscriptions.update({
+      where: { id: subscription.id },
+      data: { is_valid: true },
+    });
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error resuming subscription:", error);
+    throw new Error(`Failed to resume subscription: ${error}`);
   }
 }
