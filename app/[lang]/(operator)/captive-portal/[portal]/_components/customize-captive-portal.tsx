@@ -1,5 +1,5 @@
 "use client";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { Tab, Tabs } from "@heroui/tabs";
 import Branding from "./customize-branding";
 import AccessFlows from "@/app/[lang]/(operator)/captive-portal/new-portal/_components/access-flows";
