@@ -7,7 +7,7 @@ import {
 } from "@heroui/dropdown";
 import { Button } from "@heroui/button";
 import React, { useEffect, useMemo, useState } from "react";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Star } from "lucide-react";
 import type { Selection } from "@heroui/react";
 import { Hotspot } from "../../../hotspots/_services/get-hotspots";
 
@@ -90,7 +90,14 @@ export default function UpdateAssignedHotspot({
             key={hotspot.wayru_device_id}
             value={hotspot.wayru_device_id}
           >
-            {hotspot.name}
+            {hotspot.subbed ? (
+              <div className="flex items-center">
+                <Star size={18} color="white" className="mr-2" />
+                {hotspot.name}
+              </div>
+            ) : (
+              <>{hotspot.name}</>
+            )}
           </DropdownItem>
         ))}
       </DropdownMenu>
