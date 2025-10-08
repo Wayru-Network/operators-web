@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import stripe from "stripe";
 import {
   pauseSubscription,
+  resumeSubscription,
   revokeSubscription,
 } from "@/lib/services/default-settings-service";
 import { env } from "@/lib/infra/env";
@@ -35,6 +36,16 @@ export async function POST(req: NextRequest) {
 
   try {
     switch (event.type) {
+      case "customer.subscription.resumed": {
+        const subscription = event.data.object as stripe.Subscription;
+        console.log("Subscription resumed:", subscription.id);
+        const result = await resumeSubscription(subscription.id);
+        if (result.error === "Not found") {
+          return NextResponse.json({ error: "Not found" }, { status: 404 });
+        }
+        break;
+      }
+
       case "customer.subscription.paused": {
         const subscription = event.data.object as stripe.Subscription;
         const result = await pauseSubscription(subscription.id);
