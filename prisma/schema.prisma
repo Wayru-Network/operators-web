@@ -109,6 +109,7 @@ model subscriptions {
   hotspot_limit          Int
   hotspots               hotspot[]
   customer               customers @relation(fields: [customer_id], references: [id], onDelete: Cascade)
+  is_valid               Boolean   @default(false)
 }
 
 enum adFormat {

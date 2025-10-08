@@ -15,6 +15,16 @@ interface setDefaultResponse {
   error?: string;
 }
 
+interface pauseSubscriptionResponse {
+  success: boolean;
+  error?: string;
+}
+
+interface resumeSubscriptionResponse {
+  success: boolean;
+  error?: string;
+}
+
 // const defaultSettings: HotspotNetworksFormData = {
 //   locationName: "Unknown",
 //   name: "Default Hotspot",
@@ -136,11 +146,6 @@ export async function revokeSubscription(
   }
 }
 
-interface pauseSubscriptionResponse {
-  success: boolean;
-  error?: string;
-}
-
 export async function pauseSubscription(
   sub_id: string
 ): Promise<pauseSubscriptionResponse> {
@@ -148,34 +153,40 @@ export async function pauseSubscription(
     const subscription = await Prisma.subscriptions.findUnique({
       where: { stripe_subscription_id: sub_id },
     });
-    if (subscription) {
-      const customer = await Prisma.customers.findUnique({
-        where: { id: subscription.customer_id },
-        select: { customer_uuid: true },
-      });
-
-      if (!customer?.customer_uuid) {
-        return { success: false, error: "Not found" };
-      }
-
-      const portals = await Prisma.portal_config.findMany({
-        where: { user_id: customer?.customer_uuid },
-        select: { id: true },
-      });
-
-      for (const portal of portals) {
-        await Prisma.ad.updateMany({
-          where: { portal_config_id: portal.id },
-          data: { portal_config_id: null },
-        });
-      }
-
-      return { success: true };
-    } else {
+    if (!subscription) {
       return { success: false, error: "Not found" };
     }
+
+    await Prisma.subscriptions.update({
+      where: { id: subscription.id },
+      data: { is_valid: false },
+    });
+
+    return { success: true };
   } catch (error) {
     console.error("Error pausing subscription:", error);
     throw new Error(`Failed to pause subscription: ${error}`);
+  }
+}
+
+export async function resumeSubscription(
+  sub_id: string
+): Promise<resumeSubscriptionResponse> {
+  try {
+    const subscription = await Prisma.subscriptions.findUnique({
+      where: { stripe_subscription_id: sub_id },
+    });
+    if (!subscription) {
+      return { success: false, error: "Not found" };
+    }
+    await Prisma.subscriptions.update({
+      where: { id: subscription.id },
+      data: { is_valid: true },
+    });
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error resuming subscription:", error);
+    throw new Error(`Failed to resume subscription: ${error}`);
   }
 }
