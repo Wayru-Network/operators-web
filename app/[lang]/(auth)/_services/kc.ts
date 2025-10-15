@@ -16,7 +16,13 @@ const kc = {
   redirectUri: env.APP_URL + "/api/auth/callback",
 };
 
-const ALLOWED_PROVIDERS = ["facebook", "google", "apple"] as const;
+const ALLOWED_PROVIDERS = [
+  "facebook",
+  "google",
+  "apple",
+  "twitter",
+  "discord",
+] as const;
 export type Provider = (typeof ALLOWED_PROVIDERS)[number];
 
 export async function socialLogin(provider: Provider) {
