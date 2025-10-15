@@ -14,6 +14,8 @@ interface AuthProps {
     facebook: string;
     google: string;
     apple: string;
+    twitter: string;
+    discord: string;
     already: string;
     alt: string;
   };
@@ -77,6 +79,30 @@ export default function Auth({ type, dict }: AuthProps) {
               className="dark:invert"
             />
             <p className="text-lg">{dict.apple}</p>
+          </Button>
+          <Button
+            onPress={() => socialLogin("twitter")}
+            className="w-[345px] h-[54px] bg-[#1DA1F2] text-lg text-white rounded-[10px]"
+          >
+            <Image
+              src="/assets/twitter.png"
+              alt="Twitter logo"
+              width={24}
+              height={24}
+            />
+            <p>{dict.twitter}</p>
+          </Button>
+          <Button
+            onPress={() => socialLogin("discord")}
+            className="w-[345px] h-[54px] bg-[#5865F2] text-lg text-white rounded-[10px]"
+          >
+            <Image
+              src="/assets/discord.webp"
+              alt="Discord logo"
+              width={24}
+              height={24}
+            />
+            <p>{dict.discord}</p>
           </Button>
         </div>
       </CardBody>
