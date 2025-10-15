@@ -5,6 +5,8 @@
     "facebook": "Entrar com Facebook",
     "google": "Entrar com Google",
     "apple": "Entrar com Apple",
+    "twitter": "Entrar com Twitter",
+    "discord": "Entrar com Discord",
     "already": "Já tem uma conta?",
     "alt": "Entrar"
   },
@@ -14,6 +16,8 @@
     "facebook": "Entrar com Facebook",
     "google": "Entrar com Google",
     "apple": "Entrar com Apple",
+    "twitter": "Entrar com Twitter",
+    "discord": "Entrar com Discord",
     "already": "Não tem uma conta?",
     "alt": "Registrar"
   }

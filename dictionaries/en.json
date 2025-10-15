@@ -5,6 +5,8 @@
     "facebook": "Sign In with Facebook",
     "google": "Sign In with Google",
     "apple": "Sign In with Apple",
+    "twitter": "Sign In with Twitter",
+    "discord": "Sign In with Discord",
     "already": "Already have an account?",
     "alt": "Log in"
   },
@@ -14,6 +16,8 @@
     "facebook": "Log In with Facebook",
     "google": "Log In with Google",
     "apple": "Log In with Apple",
+    "twitter": "Log In with Twitter",
+    "discord": "Log In with Discord",
     "already": "Don't have an account?",
     "alt": "Sign Up"
   }
