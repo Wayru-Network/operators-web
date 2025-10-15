@@ -147,7 +147,7 @@ export default function HotspotsTable({
               <TableColumn
                 key={col.key}
                 allowsSorting={col.allowsSorting}
-                className="font-semibold"
+                className="font-semibold text-center"
               >
                 {col.label}
               </TableColumn>
@@ -165,7 +165,7 @@ export default function HotspotsTable({
                 className="hover:bg-gray-100 dark:hover:bg-gray-500"
               >
                 {(columnKey) => (
-                  <TableCell>
+                  <TableCell className="text-center">
                     {columnKey === "status" ? (
                       <StatusPill
                         status={
@@ -176,7 +176,10 @@ export default function HotspotsTable({
                         }
                       />
                     ) : columnKey === "actions" ? (
-                      <a href={`/hotspots/${item.name}`} className="block">
+                      <a
+                        href={`/hotspots/${item.name}`}
+                        className="flex items-center justify-center"
+                      >
                         <Settings />
                       </a>
                     ) : columnKey === "name" ? (

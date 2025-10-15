@@ -13,7 +13,7 @@ export default function statusPill({
 
   return (
     <span
-      className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium capitalize ${
+      className={`flex justify-center items-center py-1 rounded-full text-sm font-medium capitalize ${
         statusClasses[status] || "bg-gray-200 text-gray-700"
       }`}
     >
