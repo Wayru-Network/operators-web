@@ -4,7 +4,7 @@ import { authVerifySession } from "@/lib/dal/dal";
 import { LayoutProps } from "@/lib/interfaces/page";
 import { Metadata } from "next";
 export async function generateStaticParams() {
-  return [{ lang: 'en' }, { lang: 'es' }, { lang: 'pt' }]
+  return [{ lang: "en" }, { lang: "es" }, { lang: "pt" }];
 }
 export const metadata: Metadata = {
   title: "Auth - Wayru",
@@ -12,11 +12,11 @@ export const metadata: Metadata = {
     "Manage and monitor your fleet of WiFi routers. Configure, deploy, and maintain.",
 };
 
-export default async function AuthLayout({ children,params }: LayoutProps) {
+export default async function AuthLayout({ children, params }: LayoutProps) {
   await authVerifySession();
   return (
     <RootLayout params={params}>
-      <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
+      <div className="grid items-center justify-items-center min-h-screen p-8 pb-20 sm:p-10 font-[family-name:var(--font-geist-sans)]">
         <div className="absolute top-0 right-0 p-11">
           <LangSwitch />
         </div>

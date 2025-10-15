@@ -26,7 +26,7 @@ export default function Auth({ type, dict }: AuthProps) {
 
   return (
     <Card className="rounded-[20px] shadow-large ring-1 ring-gray-200 dark:ring-0">
-      <CardHeader className="pt-14 pb-10 justify-center">
+      <CardHeader className="pt-10 justify-center">
         <Image
           className="dark:invert"
           src="/assets/logo.webp"
