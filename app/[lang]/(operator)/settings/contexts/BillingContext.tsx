@@ -11,7 +11,6 @@ import {
   HotspotChange,
   SubscriptionStatus,
 } from "../_components/interfaces/billing-context";
-import { useCustomerSubscription } from "@/lib/contexts/customer-subscription-context";
 
 const BillingContext = createContext<BillingContextType | null>(null);
 
