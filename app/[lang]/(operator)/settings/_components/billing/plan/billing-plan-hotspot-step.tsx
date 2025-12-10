@@ -3,7 +3,6 @@
 import { Button, Tooltip } from "@heroui/react";
 import { Minus, Plus } from "lucide-react";
 import { useBilling } from "../../../contexts/BillingContext";
-import PlanNotFound from "./plan-not-found";
 import { Steps } from "../../billing-tab";
 import { useSubscriptionHotspots } from "@/lib/hooks/use-hotspots";
 import { calculateDiscountSummary } from "@/lib/helpers/stripe-helper";

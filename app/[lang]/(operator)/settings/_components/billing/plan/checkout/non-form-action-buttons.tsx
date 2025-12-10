@@ -6,7 +6,6 @@ import { calculateDiscountSummary } from "@/lib/helpers/stripe-helper";
 import { useState } from "react";
 import {
   createPaymentIntent,
-  reactivateSubscription,
   updateHotspotAmountSubscription,
 } from "@/lib/services/stripe-service";
 import { addToast } from "@heroui/toast";

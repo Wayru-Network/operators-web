@@ -4,7 +4,6 @@ import moment from "moment";
 import { Steps } from "../../billing-tab";
 import AssignPlanHotspots from "./assign-plan-hotspots";
 import PaymentAndBillingMethod from "../payment-method/payment-and-billing-method";
-import CancelPlanModal from "./cancel-plan-modal";
 import PlanActiveDetails from "./activation-details/plan-active-details";
 import PlanCancelledDetails from "./activation-details/plan-cancelled-details";
 
@@ -16,7 +15,7 @@ const PlanDetails = ({ setSelected }: PlanActiveProps) => {
   // STRIPE REMOVAL
   const currentMonth = moment().format("MMMM");
   const currentYear = moment().format("YYYY");
-  const { onOpen, isOpen, onClose } = useDisclosure();
+  const { onOpen } = useDisclosure();
   // TODO: enable this when we have a invoicing method
   const latestInvoice = false;
   const hideButton = false;

@@ -1,9 +1,7 @@
 import { useBilling } from "../../../../contexts/BillingContext";
 import { calculateDiscountSummary } from "@/lib/helpers/stripe-helper";
-import Stripe from "stripe";
 import { Button } from "@heroui/button";
 import { Steps } from "../../../billing-tab";
-import { formatMillisecondsToDate } from "@/lib/helpers/dates";
 
 interface Props {
   setSelected: (key: Steps) => void;

@@ -182,7 +182,7 @@ function ChangePaymentForm({ setSelected }: CheckoutFormProps) {
       <div className="flex flex-row gap-4">
         <Button
           type="button"
-          className="w-full mt-4 w-1/2"
+          className="mt-4 w-1/2"
           onPress={() => setSelected("step1")}
           disabled={isLoading}
         >
@@ -190,7 +190,7 @@ function ChangePaymentForm({ setSelected }: CheckoutFormProps) {
         </Button>
         <Button
           type="submit"
-          className={`w-full mt-4 w-1/2 ${
+          className={`mt-4 w-1/2 ${
             isLoading || isLoadingInputs
               ? "cursor-not-allowed"
               : "cursor-pointer"

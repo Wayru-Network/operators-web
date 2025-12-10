@@ -1,7 +1,6 @@
 import { Button } from "@heroui/react";
 import { Tooltip } from "@heroui/tooltip";
 import { Trash2 } from "lucide-react";
-import moment from "moment";
 import { PaymentIcon, PaymentType } from "react-svg-credit-card-payment-icons";
 import { Steps } from "../../billing-tab";
 import { useTransition } from "react";
