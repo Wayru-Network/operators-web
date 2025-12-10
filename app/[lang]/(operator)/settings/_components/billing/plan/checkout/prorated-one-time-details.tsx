@@ -1,22 +1,15 @@
-import { useCustomerSubscription } from "@/lib/contexts/customer-subscription-context";
 import { useBilling } from "../../../../contexts/BillingContext";
 import { calculateDiscountSummary } from "@/lib/helpers/stripe-helper";
 
 export default function ProratedOneTimeDetails() {
   const { hotspotsToAdd, products, getProratedPrice } = useBilling();
-  const { subscription } = useCustomerSubscription();
+  // STRIPE REMOVAL
   const product = products.find((product) => product.type === "hotspots");
   const productPriceDetails = product?.priceDetails[0];
-  const stripeSub = subscription?.stripe_subscription;
   const productPriceNotFee = productPriceDetails?.price_without_fee ?? 0;
   const productPriceWithFee = productPriceDetails?.price_with_fee ?? 0;
-  const currentHotspotsAmount = stripeSub?.products_amount ?? 0;
-  const newHotspotsToAddAmount =
-    currentHotspotsAmount > 0 && hotspotsToAdd > currentHotspotsAmount
-      ? hotspotsToAdd - currentHotspotsAmount
-      : 0;
-  const daysUntilNextBilling =
-    stripeSub?.billing_details?.days_until_next_billing ?? 0;
+  const newHotspotsToAddAmount = hotspotsToAdd;
+  const daysUntilNextBilling = 0;
   const summaryNotFee = calculateDiscountSummary(
     newHotspotsToAddAmount,
     productPriceNotFee
@@ -37,7 +30,7 @@ export default function ProratedOneTimeDetails() {
 
   if (
     newHotspotsToAddAmount === 0 ||
-    stripeSub?.status === "trialing" ||
+    // stripeSub?.status === "trialing" ||
     daysUntilNextBilling <= 0
   )
     return undefined;
@@ -48,8 +41,8 @@ export default function ProratedOneTimeDetails() {
       <p className="text-xs font-medium ml-1 dark:text-gray-300 text-gray-700 mt-1">
         You are adding <strong>{newHotspotsToAddAmount}</strong> hotspot
         {newHotspotsToAddAmount > 1 ? "s" : ""}. Since your next billing date is{" "}
-        <strong>{stripeSub?.billing_details?.next_payment_date}</strong>, you
-        will be charged a one-time prorated fee for the remaining{" "}
+        <strong>{/* stripeSub?.billing_details?.next_payment_date */}</strong>,
+        you will be charged a one-time prorated fee for the remaining{" "}
         <strong>{daysUntilNextBilling} days</strong> of this cycle.
       </p>
       <p className="text-xs font-medium ml-1 dark:text-gray-300 text-gray-700 mt-1">

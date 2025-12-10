@@ -1,7 +1,6 @@
 import moment from "moment";
 import { useBilling } from "../../../contexts/BillingContext";
 import { Switch, Spinner } from "@heroui/react";
-import { useCustomerSubscription } from "@/lib/contexts/customer-subscription-context";
 import { CustomerSubscription } from "@/lib/interfaces/subscriptions";
 import { useTransition } from "react";
 import { Steps } from "../../billing-tab";
@@ -20,14 +19,14 @@ export default function CheckoutBillingDetails({ setSelected }: Props) {
   const product = products.find((product) => product.type === "hotspots");
   const productPriceDetails = product?.priceDetails[0];
   const recurring = productPriceDetails?.recurring;
-  const { subscription, refreshSubscriptionState } = useCustomerSubscription();
+  // STRIPE REMOVAL
   const { hotspotsToAdd } = useBilling();
-  const { is_trial_period_used } = subscription as CustomerSubscription;
-  const stripeSub = subscription?.stripe_subscription;
+  //const { is_trial_period_used } = subscription as CustomerSubscription;
+  const is_trial_period_used = true;
   // get next billing date
-  const nextBillingDate = stripeSub?.cancel_at
-    ? formatMillisecondsToDate(moment().add(1, "month").unix())
-    : stripeSub?.billing_details?.next_payment_date;
+  // const nextBillingDate = stripeSub?.cancel_at
+  //   ? formatMillisecondsToDate(moment().add(1, "month").unix())
+  //   : stripeSub?.billing_details?.next_payment_date;
 
   // get next trial billing date
   const nextTrialBillingDate = moment().add(7, "days").format(formatDate);
@@ -54,7 +53,7 @@ export default function CheckoutBillingDetails({ setSelected }: Props) {
         description: response.message,
         color: "default",
       });
-      await refreshSubscriptionState();
+      // await refreshSubscriptionState();
       setSelected("step1");
     });
   };
@@ -83,7 +82,7 @@ export default function CheckoutBillingDetails({ setSelected }: Props) {
         <div className="flex flex-row">
           <p className="text-xs font-semibold">Next billing date:</p>
           <p className="text-xs font-medium dark:text-gray-300 text-gray-700 ml-1">
-            {nextBillingDate}
+            {/* {nextBillingDate} */}
           </p>
         </div>
       </div>

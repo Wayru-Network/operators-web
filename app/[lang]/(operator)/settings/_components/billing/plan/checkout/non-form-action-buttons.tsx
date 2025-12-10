@@ -2,7 +2,6 @@ import { Button } from "@heroui/react";
 import { Steps } from "../../../billing-tab";
 import { useBilling } from "../../../../contexts/BillingContext";
 import { CustomerContext } from "../../../interfaces/billing-context";
-import { useCustomerSubscription } from "@/lib/contexts/customer-subscription-context";
 import { calculateDiscountSummary } from "@/lib/helpers/stripe-helper";
 import { useState } from "react";
 import {
@@ -34,21 +33,18 @@ const ACTIONS_TO_ACTIVATE_LABEL: CustomerContext["action"][] = [
 export default function NonFormActionButtons({ setSelected }: Props) {
   const { customerContext, products, hotspotsToAdd, getProratedPrice } =
     useBilling();
-  const { subscription, refreshSubscriptionState } = useCustomerSubscription();
+  // STRIPE REMOVAL
   const product = products.find((product) => product.type === "hotspots");
   const productPriceDetails = product?.priceDetails[0];
-  const stripeSub = subscription?.stripe_subscription;
   const productPriceNotFee = productPriceDetails?.price_without_fee ?? 0;
   const productPriceWithFee = productPriceDetails?.price_with_fee ?? 0;
-  const paymentMethod = stripeSub?.payment_method;
-  const currentHotspotsAmount = stripeSub?.products_amount ?? 0;
+  const currentHotspotsAmount = 0;
   const [isLoading, setIsLoading] = useState(false);
   const newHotspotsToAddAmount =
     currentHotspotsAmount > 0 && hotspotsToAdd > currentHotspotsAmount
       ? hotspotsToAdd - currentHotspotsAmount
       : 0;
-  const daysUntilNextBilling =
-    stripeSub?.billing_details?.days_until_next_billing ?? 0;
+  const daysUntilNextBilling = 0;
   const summaryNotFee = calculateDiscountSummary(
     newHotspotsToAddAmount,
     productPriceNotFee
@@ -69,8 +65,8 @@ export default function NonFormActionButtons({ setSelected }: Props) {
 
   const getConfirmButtonText = () => {
     if (
-      ACTIONS_TO_PAYMENT_LABEL.includes(customerContext?.action) &&
-      stripeSub?.status != "trialing"
+      ACTIONS_TO_PAYMENT_LABEL.includes(customerContext?.action)
+      //stripeSub?.status != "trialing"
     ) {
       return "Pay " + totalPayment?.toFixed(2);
     } else if (ACTIONS_TO_ACTIVATE_LABEL.includes(customerContext?.action)) {
@@ -83,20 +79,18 @@ export default function NonFormActionButtons({ setSelected }: Props) {
   const updateSubscription = async () => {
     setIsLoading(true);
     if (customerContext?.action === "reactivating_not_checkout") {
-      const result = await reactivateSubscription(
-        stripeSub?.subscription_id as string
-      );
-      if (result.error) {
+      const result = true;
+      if (!result) {
         addToast({
           title: "Error reactivating subscription",
-          description: result.message,
+          description: "result.message",
           color: "danger",
         });
       } else {
-        await refreshSubscriptionState();
+        //await refreshSubscriptionState();
         addToast({
           title: "Success",
-          description: result.message,
+          description: "refreshed subscription state",
           color: "success",
         });
         setSelected("step1");
@@ -104,7 +98,8 @@ export default function NonFormActionButtons({ setSelected }: Props) {
       return;
     }
     // user can update his subscription without paying only if trialing
-    if (stripeSub?.status === "trialing") {
+    //if (stripeSub?.status === "trialing") {
+    if (false) {
       const result = await updateHotspotAmountSubscription({
         quantity: hotspotsToAdd,
         basePrice: productPriceWithFee,
@@ -116,7 +111,7 @@ export default function NonFormActionButtons({ setSelected }: Props) {
           color: "danger",
         });
       } else {
-        await refreshSubscriptionState();
+        //await refreshSubscriptionState();
         addToast({
           title: "Success",
           description: result.message,
@@ -134,9 +129,9 @@ export default function NonFormActionButtons({ setSelected }: Props) {
             " new hotspots" +
             moment().format("MMM DD, YYYY"),
           "New total hotspots": hotspotsToAdd,
-          "Subscription id": stripeSub?.subscription_id ?? "",
+          "Subscription id": "",
         },
-        payment_method_id: paymentMethod?.id,
+        payment_method_id: "",
       });
 
       if (paymentIntent?.error) {
@@ -151,7 +146,7 @@ export default function NonFormActionButtons({ setSelected }: Props) {
           quantity: hotspotsToAdd,
           basePrice: productPriceWithFee,
         });
-        await refreshSubscriptionState();
+        //await refreshSubscriptionState();
         addToast({
           title: "Success",
           description: paymentIntent?.message ?? "Payment successfully",

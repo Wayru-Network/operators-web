@@ -5,7 +5,6 @@ import { Minus, Plus } from "lucide-react";
 import { useBilling } from "../../../contexts/BillingContext";
 import PlanNotFound from "./plan-not-found";
 import { Steps } from "../../billing-tab";
-import { useCustomerSubscription } from "@/lib/contexts/customer-subscription-context";
 import { useSubscriptionHotspots } from "@/lib/hooks/use-hotspots";
 import { calculateDiscountSummary } from "@/lib/helpers/stripe-helper";
 import { AnimatePresence, motion } from "framer-motion";
@@ -19,40 +18,35 @@ const BillingPlanHotspotsStep = ({ setSelected }: SelectAPlanProps) => {
   const hotspotProduct = products.find(
     (product) => product.type === "hotspots"
   );
-  const { subscription } = useCustomerSubscription();
-  const stripeSub = subscription?.stripe_subscription;
-  const currentHotspotsAmount = stripeSub?.products_amount ?? 0;
+  // STRIPE REMOVAL
   const hotspotPriceWithFee =
     hotspotProduct?.priceDetails[0].price_with_fee ?? 0;
-  const { totalPriceWithDiscount: currentMonthlyCost } =
-    calculateDiscountSummary(currentHotspotsAmount, hotspotPriceWithFee);
+  // const { totalPriceWithDiscount: currentMonthlyCost } =
+  //   calculateDiscountSummary(currentHotspotsAmount, hotspotPriceWithFee);
   const { hotspots: assignedHotspots } = useSubscriptionHotspots();
   const assignedHotspotsAmount = assignedHotspots?.length;
   const { totalPriceWithDiscount } = calculateDiscountSummary(
     hotspotsToAdd,
     hotspotPriceWithFee
   );
-  const isNewMonthlyCost = currentHotspotsAmount != hotspotsToAdd;
+  const isNewMonthlyCost = 0 != hotspotsToAdd;
   const isButtonDisabled = () => {
-    switch (true) {
-      case !!stripeSub?.cancel_at && stripeSub?.status != "canceled":
-        return false;
-      case currentHotspotsAmount > 0:
-        return hotspotsToAdd === currentHotspotsAmount;
-      case hotspotsToAdd <= 0:
-        return true;
-      default:
-        return false;
-    }
+    // switch (true) {
+    //   case !!stripeSub?.cancel_at && stripeSub?.status != "canceled":
+    //     return false;
+    //   case currentHotspotsAmount > 0:
+    //     return hotspotsToAdd === currentHotspotsAmount;
+    //   case hotspotsToAdd <= 0:
+    //     return true;
+    //   default:
+    //     return false;
+    // }
+    return false;
   };
   const newHotspotsToAddAmount =
-    currentHotspotsAmount > 0 && hotspotsToAdd > currentHotspotsAmount
-      ? hotspotsToAdd - currentHotspotsAmount
-      : 0;
+    0 > 0 && hotspotsToAdd > 0 ? hotspotsToAdd - 0 : 0;
   const hotspotsToRemoveAmount =
-    currentHotspotsAmount > 0 && hotspotsToAdd < currentHotspotsAmount
-      ? currentHotspotsAmount - hotspotsToAdd
-      : 0;
+    0 > 0 && hotspotsToAdd < 0 ? 0 - hotspotsToAdd : 0;
 
   const handleHotspotsCountChange = (type: "add" | "remove") => {
     const hotspotsToRemove = hotspotsToAdd - 1;
@@ -68,9 +62,10 @@ const BillingPlanHotspotsStep = ({ setSelected }: SelectAPlanProps) => {
     }
   };
 
-  if (!hotspotProduct) {
-    return <PlanNotFound />;
-  }
+  // STRIPE REMOVAL
+  // if (!hotspotProduct) {
+  //   return <PlanNotFound />;
+  // }
 
   return (
     <div className=" flex flex-row gap-8 w-full">
@@ -85,16 +80,16 @@ const BillingPlanHotspotsStep = ({ setSelected }: SelectAPlanProps) => {
               <div className="flex flex-row">
                 <p className="text-xs font-semibold">Active hotspots:</p>
                 <p className="text-xs font-medium dark:text-gray-300 text-gray-700 ml-1">
-                  {currentHotspotsAmount}
+                  {0}
                 </p>
               </div>
               <div className="flex flex-row">
                 <p className="text-xs font-semibold">Monthly cost:</p>
                 <p className="text-xs font-medium dark:text-gray-300 text-gray-700 ml-1">
-                  ${currentMonthlyCost.toFixed(2)}
+                  ${0}
                 </p>
               </div>
-              {stripeSub?.cancel_at && stripeSub?.status != "canceled" && (
+              {true && (
                 <div className="flex flex-row">
                   <p className="text-xs font-semibold">Status:</p>
                   <p className="text-xs font-medium dark:text-gray-300 text-gray-700 ml-1">
@@ -147,8 +142,7 @@ const BillingPlanHotspotsStep = ({ setSelected }: SelectAPlanProps) => {
             <div className="flex flex-row w-full">
               <div className="flex flex-col w-full ml-4 gap-1">
                 <AnimatePresence>
-                  {currentHotspotsAmount > 0 &&
-                  currentHotspotsAmount != hotspotsToAdd ? (
+                  {false ? (
                     <motion.div
                       key="reason-details"
                       initial={{ height: 0, opacity: 0 }}
@@ -164,7 +158,7 @@ const BillingPlanHotspotsStep = ({ setSelected }: SelectAPlanProps) => {
                             Current Activate hotspot:
                           </p>
                           <p className="text-xs  font-medium ml-1 dark:text-gray-300 text-gray-700">
-                            {currentHotspotsAmount}{" "}
+                            {0}{" "}
                           </p>
                         </div>
                         <div className="flex flex-row">
@@ -183,11 +177,9 @@ const BillingPlanHotspotsStep = ({ setSelected }: SelectAPlanProps) => {
                             Total hotspots:
                           </p>
                           <p className="text-xs  font-medium ml-1 dark:text-gray-300 text-gray-700">
-                            {hotspotsToAdd > currentHotspotsAmount
-                              ? currentHotspotsAmount +
-                                (hotspotsToAdd - currentHotspotsAmount)
-                              : currentHotspotsAmount -
-                                (currentHotspotsAmount - hotspotsToAdd)}
+                            {hotspotsToAdd > 0
+                              ? 0 + (hotspotsToAdd - 0)
+                              : 0 - (0 - hotspotsToAdd)}
                           </p>
                         </div>
                         <div className="flex flex-row">
@@ -223,14 +215,14 @@ const BillingPlanHotspotsStep = ({ setSelected }: SelectAPlanProps) => {
         </div>
         <div className="flex flex-row gap-4">
           <Button
-            className="w-full bg-[#000] dark:bg-[#fff] text-white dark:text-black mt-9 disabled:opacity-50 disabled:cursor-not-allowed w-1/2"
+            className="bg-[#000] dark:bg-[#fff] text-white dark:text-black mt-9 disabled:opacity-50 disabled:cursor-not-allowed w-1/2"
             onPress={() => setSelected("step1")}
           >
             Back
           </Button>
           <Button
             disabled={isButtonDisabled()}
-            className="w-full bg-[#000] dark:bg-[#fff] text-white dark:text-black mt-9 disabled:opacity-50 disabled:cursor-not-allowed w-1/2"
+            className="bg-[#000] dark:bg-[#fff] text-white dark:text-black mt-9 disabled:opacity-50 disabled:cursor-not-allowed w-1/2"
             onPress={() => setSelected("step4")}
           >
             Proceed to checkout
