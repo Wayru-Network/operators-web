@@ -15,6 +15,7 @@ export async function getHotspotBySubscription() {
       return null;
     }
 
+    // @TODO: Update this valid sub logic due to STRIPE REMOVAL
     const sub = await Prisma.subscriptions.findFirst({
       where: {
         customer_id: customer?.id,

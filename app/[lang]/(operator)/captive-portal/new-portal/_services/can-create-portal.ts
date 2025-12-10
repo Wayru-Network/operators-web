@@ -1,6 +1,5 @@
 "use server";
 
-//import { getCustomerSubscription } from "@/app/api/subscriptions/_services/subscriptions-service";
 import { Prisma } from "@/lib/infra/prisma";
 import { getSession } from "@/lib/session/session";
 import { getHotspots } from "../../../hotspots/_services/get-hotspots";
@@ -27,23 +26,9 @@ export async function canCreatePortal(): Promise<CanCreatePortalResponse> {
     },
   });
 
-  console.log("portals", portals);
-  console.log("hotspots", hotspots.meta.total);
-
   if (portals >= hotspots.meta.total) {
     return { able: false, maxPortals: 0 };
   }
 
-  // const subscription = await getCustomerSubscription();
-  // if (!subscription?.has_valid_subscription) {
-  //   const portals = await Prisma.portal_config.count({
-  //     where: {
-  //       user_id: session.userId,
-  //     },
-  //   });
-  //   if (portals >= 1) {
-  //     return false;
-  //   }
-  // }
   return { able: true, maxPortals: hotspots.meta.total };
 }

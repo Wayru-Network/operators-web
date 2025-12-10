@@ -15,7 +15,7 @@ import { SidebarProvider } from "@/lib/contexts/sidebar-context";
 import SidebarLogo from "@/lib/components/sidebar-logo";
 import SidebarWrapper from "@/lib/components/sidebar-wrapper";
 import ToggleSidebar from "@/lib/components/toggle-sidebar";
-import { CustomerSubscriptionProvider } from "@/lib/contexts/customer-subscription-context";
+//import { CustomerSubscriptionProvider } from "@/lib/contexts/customer-subscription-context";
 
 export const metadata: Metadata = {
   title: "Operators - Wayru",
@@ -56,9 +56,9 @@ export default async function OperatorLayout({ children }: LayoutProps) {
               <LogoutButton />
             </StickyHeader>
             {/* Page Content */}
-            <CustomerSubscriptionProvider>
-              {children}
-            </CustomerSubscriptionProvider>
+            {/* <CustomerSubscriptionProvider> Uncomment this provider if stripe is used again... */}
+            {children}
+            {/* </CustomerSubscriptionProvider> */}
           </ScrollContainer>
         </div>
       </SidebarProvider>

@@ -10,7 +10,6 @@ import Publish from "./publish";
 import PortalSettings from "./portal-settings";
 import Link from "next/link";
 import { Hotspot } from "@/app/[lang]/(operator)/hotspots/_services/get-hotspots";
-import { useCustomerSubscription } from "@/lib/contexts/customer-subscription-context";
 
 const initial = {
   background: "#ffffff",
@@ -97,8 +96,9 @@ export default function CreateCaptivePortal({
     }
   };
 
-  const { subscription } = useCustomerSubscription();
-  const hasValidSubscription = subscription?.has_valid_subscription;
+  // @TODO: Update hasValidSubscription logic when subscription context is ready
+  // Due to STRIPE REMOVAL
+  const hasValidSubscription = false;
   const newConfig: NewPortalConfig = {
     colors,
     logo: {

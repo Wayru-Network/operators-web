@@ -22,13 +22,12 @@ export const BillingProvider = ({
 }: BillingProviderProps) => {
   const [hotspotsToAdd, setHotspotsToAdd] = useState(0);
   const [hotspots, setHotspots] = useState(hotspotsProps);
-  const { subscription } = useCustomerSubscription();
-  const stripeSubscription = subscription?.stripe_subscription;
-  const currentHotspotsAmount = stripeSubscription?.products_amount ?? 0;
+  // STRIPE REMOVAL
+  // const { subscription } = useCustomerSubscription();
+  // const stripeSubscription = subscription?.stripe_subscription;
+  //const currentHotspotsAmount = stripeSubscription?.products_amount ?? 0;
   const newHotspotsToAddAmount =
-    currentHotspotsAmount > 0 && hotspotsToAdd > currentHotspotsAmount
-      ? hotspotsToAdd - currentHotspotsAmount
-      : 0;
+    1 > 0 && hotspotsToAdd > 1 ? hotspotsToAdd - 1 : 0;
 
   const handleHotspotsToAdd = (hotspots: number) => {
     setHotspotsToAdd(hotspots);
@@ -41,16 +40,16 @@ export const BillingProvider = ({
   }, []);
 
   const getCustomerContext = (): CustomerContext => {
-    const currentHotspotsAmount = stripeSubscription?.products_amount ?? 0;
+    const currentHotspotsAmount = 0;
     const hasHotspots = currentHotspotsAmount > 0;
     const isSame = hotspotsToAdd === currentHotspotsAmount;
     const isAdding = hotspotsToAdd > currentHotspotsAmount;
     const isRemoving = hotspotsToAdd < currentHotspotsAmount;
-    const status = stripeSubscription?.status;
+    const status = "active";
 
-    const isCanceling = !!stripeSubscription?.cancel_at;
+    const isCanceling = false;
     const isExpired = isCanceling && status !== "active";
-    const hasPaymentMethod = !!stripeSubscription?.payment_method;
+    const hasPaymentMethod = true;
 
     let subscriptionStatus: SubscriptionStatus = "active";
     if (isCanceling) subscriptionStatus = isExpired ? "expired" : "canceling";
@@ -96,7 +95,7 @@ export const BillingProvider = ({
     unitPrice,
     daysUntilNextBilling,
   }: GetProratedPrice) => {
-    return (unitPrice / 30) * daysUntilNextBilling * newHotspotsToAddAmount;
+    return (unitPrice / 30) * daysUntilNextBilling * 1;
   };
 
   return (

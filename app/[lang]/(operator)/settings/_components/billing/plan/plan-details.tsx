@@ -3,7 +3,6 @@ import { ArrowDownToLine } from "lucide-react";
 import moment from "moment";
 import { Steps } from "../../billing-tab";
 import AssignPlanHotspots from "./assign-plan-hotspots";
-import { useCustomerSubscription } from "@/lib/contexts/customer-subscription-context";
 import PaymentAndBillingMethod from "../payment-method/payment-and-billing-method";
 import CancelPlanModal from "./cancel-plan-modal";
 import PlanActiveDetails from "./activation-details/plan-active-details";
@@ -14,30 +13,26 @@ interface PlanActiveProps {
 }
 
 const PlanDetails = ({ setSelected }: PlanActiveProps) => {
-  const { subscription } = useCustomerSubscription();
-  const hotspotSubscription = subscription?.stripe_subscription;
+  // STRIPE REMOVAL
   const currentMonth = moment().format("MMMM");
   const currentYear = moment().format("YYYY");
   const { onOpen, isOpen, onClose } = useDisclosure();
   // TODO: enable this when we have a invoicing method
   const latestInvoice = false;
-  const hideButton =
-    !hotspotSubscription?.payment_method &&
-    hotspotSubscription?.cancel_at &&
-    subscription?.is_trialing;
+  const hideButton = false;
 
   return (
     <div className="flex md:flex-col lg:flex-row gap-8 w-full">
-      <CancelPlanModal
+      {/* <CancelPlanModal
         subId={hotspotSubscription?.subscription_id ?? ""}
         isOpen={isOpen}
         onClose={onClose}
-      />
+      /> */}
       {/* Left side */}
       <div className="flex flex-col gap-3 lg:w-1/2 md:w-full">
         <div className="flex flex-col items-center w-full lg:max-w-96 ">
           {/* Subscription for your hotspots section */}
-          {hotspotSubscription?.cancel_at ? (
+          {false ? (
             <PlanCancelledDetails setSelected={setSelected} />
           ) : (
             <PlanActiveDetails
@@ -54,8 +49,7 @@ const PlanDetails = ({ setSelected }: PlanActiveProps) => {
               <div className="flex flex-row w-full items-center gap-4 ml-4 mt-2 justify-between">
                 <div>
                   <p className="text-xs  font-small">
-                    {hotspotSubscription?.products_amount} hotspots - Monthly
-                    Plan
+                    {0} hotspots - Monthly Plan
                   </p>
                   <p className="text-lg  font-medium">
                     {currentMonth} {currentYear}

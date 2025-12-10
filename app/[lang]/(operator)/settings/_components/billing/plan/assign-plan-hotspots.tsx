@@ -9,7 +9,6 @@ import React, { useState, useRef, useTransition } from "react";
 import { useBilling } from "../../../contexts/BillingContext";
 import { Hotspot } from "@/app/[lang]/(operator)/hotspots/_services/get-hotspots";
 import AssignedHotspotsList from "./assigned-hotspots-list";
-import { useCustomerSubscription } from "@/lib/contexts/customer-subscription-context";
 import {
   addHotspotToSubscription,
   removeHotspotToSubscription,
@@ -18,8 +17,8 @@ import { useSubscriptionHotspots } from "@/lib/hooks/use-hotspots";
 import { isMinimumVersionMet } from "@/lib/helpers/operators";
 
 export default function AssignPlanHotspots() {
+  // STRIPE REMOVAL
   const { hotspots, addHotspot } = useBilling();
-  const { subscription } = useCustomerSubscription();
   const [filteredHotspots, setFilteredHotspots] = useState(hotspots);
   const [isSearching, setIsSearching] = useState(false);
   const [isSearchInProgress, setIsSearchInProgress] = useState(false);
@@ -29,8 +28,7 @@ export default function AssignPlanHotspots() {
     refresh: refreshHotspotsAssigned,
     isLoading: isGettingHotspotAssigned,
   } = useSubscriptionHotspots();
-  const stripeSub = subscription?.stripe_subscription;
-  const hotspotLimitToAdd = stripeSub?.products_amount ?? 0;
+  const hotspotLimitToAdd = 1;
   const hotspotLimitReached = hotspotLimitToAdd <= assignedHotspots?.length;
   const [isUpdatingSubscription, startUpdatingSubscription] = useTransition();
   const [inputValue, setInputValue] = useState("");
@@ -122,7 +120,7 @@ export default function AssignPlanHotspots() {
       if (hotspotsFiltered) {
         await addHotspotToSubscription(
           hotspotsFiltered?.wayru_device_id,
-          subscription?.id as number
+          8 as number
         );
         await refreshHotspotsAssigned();
         const newFiltered = filteredHotspots.filter?.((i) => i.id !== id);

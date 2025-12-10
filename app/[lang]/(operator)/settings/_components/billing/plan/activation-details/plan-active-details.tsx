@@ -1,4 +1,3 @@
-import { useCustomerSubscription } from "@/lib/contexts/customer-subscription-context";
 import { useBilling } from "../../../../contexts/BillingContext";
 import { calculateDiscountSummary } from "@/lib/helpers/stripe-helper";
 import Stripe from "stripe";
@@ -14,34 +13,17 @@ export default function PlanActiveDetails({
   setSelected,
   openCancelModal,
 }: Props) {
-  const { subscription } = useCustomerSubscription();
-  const hotspotSubscription = subscription?.stripe_subscription;
-  const products_amount = hotspotSubscription?.products_amount ?? 0;
+  // STRIPE REMOVAL
   const { handleHotspotsToAdd, products } = useBilling();
   const product = products.find((product) => product.type === "hotspots");
   const productPriceDetails = product?.priceDetails[0];
   const productPriceFee = productPriceDetails?.price_with_fee ?? 0;
   const productPriceNotFee = productPriceDetails?.price_without_fee ?? 0;
-  const summaryWithFee = calculateDiscountSummary(
-    products_amount,
-    productPriceFee
-  );
-  const summaryNotFee = calculateDiscountSummary(
-    products_amount,
-    productPriceNotFee
-  );
+  const summaryWithFee = calculateDiscountSummary(0, productPriceFee);
+  const summaryNotFee = calculateDiscountSummary(0, productPriceNotFee);
   const fee =
     summaryWithFee.totalPriceWithDiscount -
-    summaryNotFee.unitPriceWithDiscount * products_amount;
-
-  const billingCycle = (interval: Stripe.Price.Recurring.Interval) => {
-    if (interval === "month") {
-      return "Monthly";
-    } else if (interval === "year") {
-      return "Yearly";
-    }
-    return "Monthly";
-  };
+    summaryNotFee.unitPriceWithDiscount * 0;
 
   return (
     <div className="flex flex-col w-full">
@@ -52,7 +34,7 @@ export default function PlanActiveDetails({
         <div className="flex flex-row">
           <p className="text-xs font-semibold">Number of hotspots:</p>
           <p className="text-xs font-medium dark:text-gray-300 text-gray-700 ml-1">
-            {products_amount}
+            {0}
           </p>
         </div>
         <div className="flex flex-row">
@@ -64,8 +46,7 @@ export default function PlanActiveDetails({
         <div className="flex flex-row">
           <p className="text-xs font-semibold">Sub total:</p>
           <p className="text-xs font-medium dark:text-gray-300 text-gray-700 ml-1">
-            $
-            {(products_amount * summaryNotFee.unitPriceWithDiscount).toFixed(2)}
+            ${(0 * summaryNotFee.unitPriceWithDiscount).toFixed(2)}
           </p>
         </div>
         <div className="flex flex-row">
@@ -83,37 +64,30 @@ export default function PlanActiveDetails({
         <div className="flex flex-row">
           <p className="text-xs font-semibold">Billing cycle:</p>
           <p className="text-xs font-medium dark:text-gray-300 text-gray-700 ml-1">
-            {billingCycle(
-              hotspotSubscription?.billing_details
-                ?.interval as Stripe.Price.Recurring.Interval
-            )}
+            Billing cycle goes here...
           </p>
         </div>
-        {subscription?.is_trialing && (
+        {false && (
           <div className="flex flex-row">
             <p className="text-xs font-semibold">Trial period:</p>
             <p className="text-xs font-medium dark:text-gray-300 text-gray-700 ml-1">
-              {formatMillisecondsToDate(
-                hotspotSubscription?.trial_period_start ?? 0
-              )}
+              {0}
               {" - "}
-              {formatMillisecondsToDate(
-                hotspotSubscription?.trial_period_end ?? 0
-              )}
+              {0}
             </p>
           </div>
         )}
         <div className="flex flex-row">
           <p className="text-xs font-semibold">Next billing date:</p>
           <p className="text-xs font-medium dark:text-gray-300 text-gray-700 ml-1">
-            {hotspotSubscription?.billing_details?.next_payment_date || "N/A"}
+            {"N/A"}
           </p>
         </div>
       </div>
       <div className="flex flex-row w-full justify-start mt-3">
         <Button
           onPress={() => {
-            handleHotspotsToAdd(products_amount ?? 0);
+            handleHotspotsToAdd(0);
             setSelected("step2");
           }}
           className="w-1/2 bg-[#000] dark:bg-[#fff] text-white dark:text-black"

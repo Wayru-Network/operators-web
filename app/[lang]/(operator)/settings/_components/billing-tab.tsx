@@ -9,11 +9,17 @@ import ChangePaymentMethod from "./billing/payment-method/change-payment-method"
 import { Tab, Tabs } from "@heroui/tabs";
 import EaseInOutContent from "@/lib/components/ease-in-out-content";
 import { Spinner } from "@heroui/react";
-import { useCustomerSubscription } from "@/lib/contexts/customer-subscription-context";
+// import { useCustomerSubscription } from "@/lib/contexts/customer-subscription-context";
 
 export type Steps = "step1" | "step2" | "step3" | "step4";
 const BillingTab = () => {
-  const { subscription, isGettingSubscription } = useCustomerSubscription();
+  // STRIPE REMOVAL
+  const { subscription, isGettingSubscription } = {
+    subscription: {
+      stripe_subscription: { status: "active" },
+    },
+    isGettingSubscription: false,
+  }; // useCustomerSubscription();
   const [selected, setSelected] = useState<Steps>("step1");
   const stripeSubscription =
     subscription?.stripe_subscription &&

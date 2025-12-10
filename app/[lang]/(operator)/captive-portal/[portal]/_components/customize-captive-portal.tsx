@@ -11,7 +11,6 @@ import UpdatePortal from "./update-portal";
 import { adFormat } from "@/lib/generated/prisma";
 import { addToast } from "@heroui/react";
 import { redirect } from "next/navigation";
-import { useCustomerSubscription } from "@/lib/contexts/customer-subscription-context";
 
 interface Ad {
   id: number;
@@ -66,8 +65,9 @@ export default function CustomizeCaptivePortal({
   hotspots: Hotspot[];
   config: PortalConfig;
 }) {
-  const { subscription } = useCustomerSubscription();
-  const hasValidSubscription = subscription?.has_valid_subscription;
+  // @TODO: Update this when subscription logic is ready
+  // Due to STRIPE REMOVAL
+  const hasValidSubscription = false;
 
   const [selected, setSelected] = useState("step1");
 

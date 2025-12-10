@@ -1,4 +1,3 @@
-import { useCustomerSubscription } from "@/lib/contexts/customer-subscription-context";
 import { Button } from "@heroui/react";
 import { Tooltip } from "@heroui/tooltip";
 import { Trash2 } from "lucide-react";
@@ -19,13 +18,9 @@ export default function PaymentAndBillingMethod({
   hideDeleteIcon,
   hideButton,
 }: PlanActiveProps) {
-  const { subscription, refreshSubscriptionState } = useCustomerSubscription();
-  const hotspotSubscription = subscription?.stripe_subscription;
-  const isActivePlan =
-    hotspotSubscription?.cancel_at || hotspotSubscription?.status === "canceled"
-      ? false
-      : true;
-  const paymentMethod = hotspotSubscription?.payment_method;
+  // STRIPE REMOVAL
+  const isActivePlan = true;
+  const paymentMethod = null;
   const [isDeletingPaymentMethod, startTransition] = useTransition();
 
   const deletePayment = async () => {
@@ -38,11 +33,6 @@ export default function PaymentAndBillingMethod({
           color: "danger",
         });
       } else {
-        const subscription = await refreshSubscriptionState();
-        if (subscription?.stripe_subscription?.payment_method) {
-          // refresh again
-          await refreshSubscriptionState();
-        }
         addToast({
           title: "Success",
           description: response?.message,
@@ -62,24 +52,17 @@ export default function PaymentAndBillingMethod({
           <div className="flex flex-row w-full mt-2">
             <div className="flex flex-row w-full ml-4 items-center">
               <PaymentIcon
-                type={paymentMethod?.brand as PaymentType}
+                type={"Visa" as PaymentType}
                 format="logo"
                 className="mr-2"
               />
               <div>
                 <p className="text-sm  font-medium">
-                  {paymentMethod?.brand
-                    ?.toLowerCase()
-                    .replace(/^\w/, (c: string) => c.toUpperCase())}{" "}
-                  **** {paymentMethod?.last4}
+                  {"Visa"}
+                  {"**** **** **** "}
                 </p>
 
-                <p className="text-xs  font-normal">
-                  Expires{" "}
-                  {moment(Number(paymentMethod?.exp_month) * 1000).format(
-                    "MMM DD, YYYY"
-                  )}
-                </p>
+                <p className="text-xs  font-normal">Expires </p>
               </div>
             </div>
             {!hideDeleteIcon && (
