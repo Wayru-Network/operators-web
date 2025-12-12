@@ -18,7 +18,6 @@ import { Search } from "lucide-react";
 import PortalActions from "./portal-actions";
 import { useCaptivePortals } from "@/lib/hooks/use-captive-portals";
 import { Spinner } from "@heroui/react";
-import { CanCreatePortalResponse } from "../new-portal/_services/can-create-portal";
 
 interface PortalsColumns {
   key: string;
@@ -37,12 +36,8 @@ interface PortalsRows {
   conversion_rate?: string; // Optional, as it may not be present in all rows
 }
 
-export default function PortalsTable({
-  canCreate,
-}: {
-  canCreate: CanCreatePortalResponse;
-}) {
-  const { captivePortals: rows, isLoading } = useCaptivePortals();
+export default function PortalsTable() {
+  const { captivePortals: rows, isLoading, canCreate } = useCaptivePortals();
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState<SortDescriptor>({
     column: "name",
@@ -125,7 +120,7 @@ export default function PortalsTable({
           }}
           startContent={<Search className="pl-2" />}
         />
-        <NewPortal canCreate={canCreate} portalsCount={rows.length} />
+        <NewPortal canCreate={canCreate} />
       </div>
 
       <div className="bg-[#ffffff] dark:bg-[#191c1d] rounded-[30px] pb-8">

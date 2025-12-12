@@ -7,11 +7,10 @@ export const metadata: Metadata = {
 };
 
 export default async function CaptivePortal() {
-  const canCreate = await canCreatePortal();
   return (
     <div>
       <h1 className="text-2xl font-normal pb-4">Captive portal</h1>
-      <PortalsTable canCreate={canCreate} />
+      <PortalsTable />
     </div>
   );
 }

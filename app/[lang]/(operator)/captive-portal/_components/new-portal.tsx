@@ -9,27 +9,21 @@ import { CanCreatePortalResponse } from "../new-portal/_services/can-create-port
 
 interface NewPortalProps {
   canCreate: CanCreatePortalResponse;
-  portalsCount: number;
 }
-export default function NewPortal({ canCreate, portalsCount }: NewPortalProps) {
+export default function NewPortal({ canCreate }: NewPortalProps) {
   const handleClick = useCallback(() => {
     redirect("/captive-portal/new-portal");
   }, []);
-
-  const create = useMemo(
-    () => canCreate.maxPortals >= portalsCount,
-    [canCreate, portalsCount]
-  );
 
   return (
     <Tooltip
       placement="top"
       color="warning"
-      isDisabled={create}
+      isDisabled={canCreate.able}
       content="You have reached the maximum number of portals."
     >
       <div>
-        <Button isDisabled={!create} onPress={handleClick}>
+        <Button isDisabled={!canCreate.able} onPress={handleClick}>
           <Plus />
           Create new portal
         </Button>

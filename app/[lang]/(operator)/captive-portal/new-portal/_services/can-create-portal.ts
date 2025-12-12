@@ -26,7 +26,7 @@ export async function canCreatePortal(): Promise<CanCreatePortalResponse> {
     where: { user_id: session.userId },
   });
 
-  if (portals >= hotspotCount) {
+  if (portals == hotspotCount) {
     return { able: false, maxPortals: hotspotCount };
   }
 
