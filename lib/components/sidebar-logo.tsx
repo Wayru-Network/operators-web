@@ -39,7 +39,7 @@ export default function SidebarLogo() {
               : "text-[10px] font-medium -mb-0.5 self-end ml-2 text-[#838383]"
           }
         >
-          v.01
+          v.02
         </p>
       </div>
     </div>
