@@ -46,8 +46,10 @@ export interface NewPortalConfig {
 
 export default function CreateCaptivePortal({
   hotspots,
+  subStatus,
 }: {
   hotspots: Hotspot[];
+  subStatus: boolean;
 }) {
   // Step 1 - Branding states
   const [selected, setSelected] = useState("step1");
@@ -96,9 +98,7 @@ export default function CreateCaptivePortal({
     }
   };
 
-  // @TODO: Update hasValidSubscription logic when subscription context is ready
-  // Due to STRIPE REMOVAL
-  const hasValidSubscription = false;
+  const hasValidSubscription = subStatus;
   const newConfig: NewPortalConfig = {
     colors,
     logo: {
