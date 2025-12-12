@@ -16,19 +16,19 @@ export async function canCreatePortal(): Promise<CanCreatePortalResponse> {
   }
 
   const hotspots = await getHotspots(1, 150);
-  if (hotspots.meta.total === 0) {
+
+  const hotspotCount = hotspots.meta.total;
+  if (hotspotCount === 0) {
     return { able: false, maxPortals: 0 };
   }
 
   const portals = await Prisma.portal_config.count({
-    where: {
-      user_id: session.userId,
-    },
+    where: { user_id: session.userId },
   });
 
-  if (portals >= hotspots.meta.total) {
-    return { able: false, maxPortals: 0 };
+  if (portals >= hotspotCount) {
+    return { able: false, maxPortals: hotspotCount };
   }
 
-  return { able: true, maxPortals: hotspots.meta.total };
+  return { able: true, maxPortals: hotspotCount };
 }
