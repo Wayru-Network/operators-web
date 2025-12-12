@@ -8,134 +8,72 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model customer {
-  id            Int     @id @default(autoincrement())
-  customer_uuid String  @unique @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  full_name     String
-  email         String? @db.VarChar(150)
-
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-
-  companies    company[]
-  subscription subscription?
-  hotspots     hotspot[]
-  ads          ad[]
-}
-
-model company {
-  id          Int            @id @default(autoincrement())
-  customer_id Int
-  name        String
-  email       String
-  tax_id      String?
-  vat_number  String?
-  industry    industry_type?
-
-  created_at DateTime @default(now())
-  updated_at DateTime @default(now())
-
-  customer customer @relation(fields: [customer_id], references: [id], onDelete: Cascade)
-}
-
-model subscription {
-  id          Int @id @default(autoincrement())
-  customer_id Int @unique
-
-  hotspot_limit Int
-  expiry_date   DateTime
-  is_valid      Boolean  @default(false)
-
-  addons       subscription_addon[]
-  transactions transaction[]
-
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-
-  customer customer  @relation(fields: [customer_id], references: [id], onDelete: Cascade)
-  hotspots hotspot[]
-}
-
-model subscription_addon {
-  id              Int        @id @default(autoincrement())
-  subscription_id Int
-  addon           addon_type
-
-  subscription subscription @relation(fields: [subscription_id], references: [id], onDelete: Cascade)
-
-  @@unique([subscription_id, addon])
-}
-
-enum addon_type {
-  ad
-  voucher
-  form
-}
-
-model transaction {
-  id              Int      @id @default(autoincrement())
-  subscription_id Int
-  amount          Decimal  @db.Decimal(10, 2)
-  currency        String   @default("WAYRU")
-  created_at      DateTime @default(now())
-
-  subscription subscription @relation(fields: [subscription_id], references: [id], onDelete: Cascade)
-}
-
 model hotspot {
-  id              Int     @id @default(autoincrement())
-  wayru_device_id String  @unique @db.Uuid
-  name            String? @unique
-  customer_id     Int
-  location_name   String?
+  id               Int     @id @default(autoincrement())
+  wayru_device_id  String  @unique @db.Uuid
+  name             String? @unique
+  location_name    String?
+  portal_config_id Int?
+  subscription_id  Int?
 
-  subscription subscription? @relation(fields: [subscription_id], references: [id])
+  portal_config portal_config? @relation(fields: [portal_config_id], references: [id], onDelete: SetNull)
+  subscription  subscriptions? @relation(fields: [subscription_id], references: [id], onDelete: SetNull)
 
-  portal_config   portal_config?
   network_configs network_config[]
-
-  customer        customer @relation(fields: [customer_id], references: [id], onDelete: Cascade)
-  subscription_id Int?
 }
 
 model portal_config {
   id                Int     @id @default(autoincrement())
-  hotspot_id        Int     @unique
+  user_id           String
   portal_name       String
   welcome_message   String?
   background_color  String?
   text_color        String?
   button_color      String?
   button_text_color String?
-  redirect_url      String
-  ad_access         Boolean
-  voucher_access    Boolean
-  form_access       Boolean
 
   logo_asset_id   Int
   banner_asset_id Int
 
+  ad_access      Boolean @default(false)
+  voucher_access Boolean @default(false)
+  form_access    Boolean @default(false)
+
+  redirect_url String?
+
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 
-  hotspot hotspot @relation(fields: [hotspot_id], references: [id], onDelete: Cascade)
-  logo    asset   @relation("logo_asset", fields: [logo_asset_id], references: [id])
-  banner  asset   @relation("banner_asset", fields: [banner_asset_id], references: [id])
-  ads     ad[]
+  ads      ad[]
+  hotspots hotspot[]
+
+  banner asset @relation("banner_asset", fields: [banner_asset_id], references: [id])
+  logo   asset @relation("logo_asset", fields: [logo_asset_id], references: [id])
+}
+
+model network_config {
+  id               Int               @id @default(autoincrement())
+  device_config    Json
+  type             networkConfigType
+  device_config_id Int
+  hotspot_id       Int?
+
+  hotspot hotspot? @relation(fields: [hotspot_id], references: [id], onDelete: SetNull)
 }
 
 model ad {
   id               Int      @id @default(autoincrement())
   portal_config_id Int?
-  ad_asset_id      Int?
-  format           adFormat
   interaction_time Int
+  format           adFormat
 
-  customer_uuid String? @db.Uuid
+  ad_asset_id Int?
+  asset       asset? @relation(fields: [ad_asset_id], references: [id])
 
-  asset         asset?         @relation(fields: [ad_asset_id], references: [id])
-  portal_config portal_config? @relation(fields: [portal_config_id], references: [id])
-  customer      customer?      @relation(fields: [customer_uuid], references: [customer_uuid])
+  portal_config portal_config? @relation(fields: [portal_config_id], references: [id], onDelete: Cascade)
+
+  customer_uuid String?    @db.Uuid
+  customer      customers? @relation(fields: [customer_uuid], references: [customer_uuid], onDelete: SetNull)
 }
 
 model asset {
@@ -147,13 +85,63 @@ model asset {
   logo_portal_config   portal_config[] @relation("logo_asset")
 }
 
-model network_config {
-  id            Int               @id @default(autoincrement())
-  hotspot_id    Int?
-  device_config Json
-  type          networkConfigType
+model companies {
+  id          Int            @id @default(autoincrement())
+  customer_id Int?
+  name        String         @db.VarChar(255)
+  email       String         @db.VarChar(255)
+  tax_id      String?        @db.VarChar(100)
+  vat_number  String?        @db.VarChar(100)
+  industry    industry_type?
+  created_at  DateTime?      @default(now()) @db.Timestamp(6)
+  updated_at  DateTime?      @default(now()) @db.Timestamp(6)
 
-  hotspot hotspot? @relation(fields: [hotspot_id], references: [id])
+  customers customers? @relation(fields: [customer_id], references: [id], onDelete: Cascade)
+}
+
+model customers {
+  id            Int    @id @default(autoincrement())
+  customer_uuid String @unique @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+
+  full_name String  @db.VarChar(255)
+  email     String? @db.VarChar(150)
+
+  created_at DateTime? @default(now()) @db.Timestamp(6)
+  updated_at DateTime? @default(now()) @db.Timestamp(6)
+
+  companies     companies[]
+  subscriptions subscriptions?
+  ads           ad[]
+}
+
+model subscriptions {
+  id            Int      @id @default(autoincrement())
+  customer_id   Int      @unique
+  hotspot_limit Int
+  is_valid      Boolean  @default(true)
+  expiry_date   DateTime @db.Timestamp(6)
+
+  created_at DateTime @default(now()) @db.Timestamp(6)
+  updated_at DateTime @updatedAt @db.Timestamp(6)
+
+  customer customers            @relation(fields: [customer_id], references: [id], onDelete: Cascade)
+  hotspots hotspot[]
+  addons   subscription_addon[]
+}
+
+model subscription_addon {
+  id              Int       @id @default(autoincrement())
+  subscription_id Int
+  addon_type      AddonType
+  created_at      DateTime  @default(now())
+
+  subscription subscriptions @relation(fields: [subscription_id], references: [id], onDelete: Cascade)
+}
+
+enum AddonType {
+  AD
+  VOUCHER
+  FORM
 }
 
 enum adFormat {
