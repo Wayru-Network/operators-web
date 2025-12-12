@@ -4,7 +4,6 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { getUserInfo } from "./_services/token-service";
 import { env } from "@/lib/infra/env";
-//import { logout } from "@/lib/services/logout-service";
 import { getOrCreateCustomer } from "./_services/customer-service";
 
 interface AddressResponse {
@@ -18,34 +17,12 @@ const REDIRECT = env.APP_URL + "/api/auth/callback";
 
 const TOKEN_ENDPOINT = `${KC_BASE}/realms/${KC_REALM}/protocol/openid-connect/token`;
 
-// const valid_emails = [
-//   "daniel.velasquez@wayru.org",
-//   "velasmo3@gmail.com",
-//   "diego@wayru.org",
-//   "diegoserranor@gmail.com",
-//   "charvel@wayru.org",
-//   "wayru.deployer.ecuador@gmail.com",
-//   "charvel.chedraui@gmail.com",
-//   "paula@wayru.org",
-//   "alejandrocamacaro91@gmail.com",
-//   "carlosfelixmarin@gmail.com",
-//   "david@wayru.org",
-//   "jironulload@gmail.com",
-//   "testlaura@gmail.com",
-//   "laura1.vizcaino@gmail.com",
-//   "djiron612@gmail.com"
-// ];
-
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const fallbackUrl = new URL("/login", env.APP_URL);
   const code = searchParams.get("code");
   const state = searchParams.get("state");
   const err = searchParams.get("error");
-
-  console.log("code:", code);
-  console.log("state:", state);
-  console.log("err:", err);
 
   if (err) {
     console.log("AUTH FAILURE: Error parameter present:", err);
@@ -69,9 +46,6 @@ export async function GET(req: Request) {
   if (!CLIENT_ID) {
     throw new Error("KEYCLOAK_CLIENT_ID is not defined");
   }
-
-  console.log("CLIENT_ID:", CLIENT_ID);
-  console.log("REDIRECT:", REDIRECT);
 
   const body = new URLSearchParams({
     grant_type: "authorization_code",
@@ -108,14 +82,6 @@ export async function GET(req: Request) {
   const tokenData = await getUserInfo(tokens.access_token);
   let email = tokenData.email || "";
   const sub = tokenData.sub || "";
-
-  // if (!valid_emails.includes(email || "")) {
-  //   console.log("auth failure: Email not in valid list");
-  //   console.log("- Email:", email);
-  //   console.log("- Valid emails:", valid_emails);
-  //   logout(tokens.refresh_token);
-  //   return NextResponse.redirect(fallbackUrl);
-  // }
 
   if (email === "velasmo3@gmail.com") email = "danvelc6@gmail.com";
   if (email === "diego@wayru.org") email = "diegoserranor@gmail.com";
@@ -163,7 +129,6 @@ export async function GET(req: Request) {
     userId: sub || "",
     email: email || "",
     wallet: walletAddress || "",
-    stripeCustomerId: customer.stripe_customer_id,
   });
 
   console.log("User logged in:", email, "wallet: ", walletAddress);
