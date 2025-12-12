@@ -18,34 +18,12 @@ const REDIRECT = env.APP_URL + "/api/auth/callback";
 
 const TOKEN_ENDPOINT = `${KC_BASE}/realms/${KC_REALM}/protocol/openid-connect/token`;
 
-// const valid_emails = [
-//   "daniel.velasquez@wayru.org",
-//   "velasmo3@gmail.com",
-//   "diego@wayru.org",
-//   "diegoserranor@gmail.com",
-//   "charvel@wayru.org",
-//   "wayru.deployer.ecuador@gmail.com",
-//   "charvel.chedraui@gmail.com",
-//   "paula@wayru.org",
-//   "alejandrocamacaro91@gmail.com",
-//   "carlosfelixmarin@gmail.com",
-//   "david@wayru.org",
-//   "jironulload@gmail.com",
-//   "testlaura@gmail.com",
-//   "laura1.vizcaino@gmail.com",
-//   "djiron612@gmail.com"
-// ];
-
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const fallbackUrl = new URL("/login", env.APP_URL);
   const code = searchParams.get("code");
   const state = searchParams.get("state");
   const err = searchParams.get("error");
-
-  console.log("code:", code);
-  console.log("state:", state);
-  console.log("err:", err);
 
   if (err) {
     console.log("AUTH FAILURE: Error parameter present:", err);
