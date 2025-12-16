@@ -36,7 +36,7 @@ export async function GET(request: Request) {
   if (!hotspot.subscription) {
     valid_sub = false;
   } else {
-    valid_sub = hotspot.subscription?.is_valid ?? false;
+    valid_sub = hotspot.subscription?.status == "ACTIVE" ? true : false;
   }
 
   const portalConfig = hotspot.portal_config;

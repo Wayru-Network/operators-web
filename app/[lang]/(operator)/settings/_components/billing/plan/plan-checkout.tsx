@@ -3,6 +3,7 @@ import { useBilling } from "@/app/[lang]/(operator)/settings/contexts/BillingCon
 import { Steps } from "../../billing-tab";
 import CheckoutBillingDetails from "./checkout-billing-details";
 import { calculateDiscountSummary } from "@/lib/helpers/stripe-helper";
+
 import PaymentAndBillingMethod from "../payment-method/payment-and-billing-method";
 import CheckoutForm from "./checkout/checkout-form";
 import { Elements } from "@stripe/react-stripe-js";
@@ -18,25 +19,20 @@ interface CheckoutFormProps {
  * Return a checkout for customer, conditional render depends on customer context
  */
 export default function PlanCheckout({ setSelected }: CheckoutFormProps) {
-  const { hotspotsToAdd, products, customerContext } = useBilling();
-  const product = products.find((product) => product.type === "hotspots");
-  const productPriceDetails = product?.priceDetails[0];
-  const productPriceFee = productPriceDetails?.price_with_fee ?? 0;
-  const productPriceNotFee = productPriceDetails?.price_without_fee ?? 0;
+  const { hotspotsToAdd, customerContext, pricings } = useBilling();
   const summaryWithFee = calculateDiscountSummary(
     hotspotsToAdd,
-    productPriceFee
+    (pricings?.plans[0].base_price_cents ?? 0) / 100
   );
   const summaryNotFee = calculateDiscountSummary(
     hotspotsToAdd,
-    productPriceNotFee
+    (pricings?.plans[0].base_price_cents ?? 0) / 100
   );
   const fee =
     summaryWithFee.totalPriceWithDiscount -
     summaryNotFee.unitPriceWithDiscount * hotspotsToAdd;
 
   const RenderPaymentBilling = () => {
-    console.log("customerContext", customerContext);
     if (!customerContext?.requiresPaymentMethod) {
       return (
         <PaymentAndBillingMethod
@@ -92,7 +88,7 @@ export default function PlanCheckout({ setSelected }: CheckoutFormProps) {
             <div className="flex flex-row">
               <p className="text-xs font-semibold">Fee:</p>
               <p className="text-xs font-medium dark:text-gray-300 text-gray-700 ml-1">
-                ${fee.toFixed(2)}
+                SOLANA?? ${fee.toFixed(2)}
               </p>
             </div>
             <div className="flex flex-row">

@@ -13,10 +13,10 @@ import { useState } from "react";
 import { CardBrand } from "@stripe/stripe-js";
 import {
   confirmPaymentMethodSetupIntent,
-  createCustomerSubscription,
+  //createCustomerSubscription,
   createPaymentIntent,
   createPaymentMethodSetupIntent,
-  deleteAllCustomerPaymentMethods,
+  //deleteAllCustomerPaymentMethods,
   reactivateSubscription,
 } from "@/lib/services/stripe-service";
 import { PaymentIcon, PaymentType } from "react-svg-credit-card-payment-icons";
@@ -38,7 +38,7 @@ export default function CheckoutForm({
   const { theme } = useTheme();
   const {
     hotspotsToAdd,
-    products,
+    pricings,
     customerContext,
     newHotspotsToAddAmount,
     getProratedPrice,
@@ -49,10 +49,8 @@ export default function CheckoutForm({
   const [cardBrand, setCardBrand] = useState<CardBrand | undefined>("unknown");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const product = products.find((product) => product.type === "hotspots");
-  const productPriceDetails = product?.priceDetails[0];
-  const productPriceFee = productPriceDetails?.price_with_fee ?? 0;
-  const productPriceNotFee = productPriceDetails?.price_without_fee ?? 0;
+  const productPriceFee = (pricings?.plans[0].base_price_cents ?? 0) / 100;
+  const productPriceNotFee = (pricings?.plans[0].base_price_cents ?? 0) / 100;
   const [cardNumberComplete, setCardNumberComplete] = useState(false);
   const [cardExpiryComplete, setCardExpiryComplete] = useState(false);
   const [cardCvcComplete, setCardCvcComplete] = useState(false);
@@ -169,42 +167,42 @@ export default function CheckoutForm({
           }
         }
         // Create subscription on backend
-        const subscription = await createCustomerSubscription({
-          price_id: productPriceDetails?.id || "",
-          plan_id: product?.id || "",
-          quantity: hotspotsToAdd,
-          base_price_with_fee: productPriceFee,
-          trial_period_days: isTrialPeriodUsed ? 0 : 7,
-        });
-        if (subscription?.error) {
-          // abort the process, and delete all payment methods that previous created
-          await deleteAllCustomerPaymentMethods();
-          throw new Error(
-            subscription?.message || "No payment intent client secret received"
-          );
-        }
+        // const subscription = await createCustomerSubscription({
+        //   price_id: productPriceDetails?.id || "",
+        //   plan_id: product?.id || "",
+        //   quantity: hotspotsToAdd,
+        //   base_price_with_fee: productPriceFee,
+        //   trial_period_days: isTrialPeriodUsed ? 0 : 7,
+        // });
+        // if (subscription?.error) {
+        //   // abort the process, and delete all payment methods that previous created
+        //   await deleteAllCustomerPaymentMethods();
+        //   throw new Error(
+        //     subscription?.message || "No payment intent client secret received"
+        //   );
+        // }
 
         // Confirm the card setup for the subscription if not need to create a payment method
-        if (
-          !needToCreatePreviousPaymentMethod &&
-          subscription?.payment_intent_client_secret
-        ) {
-          const { error: confirmError } = await stripe.confirmCardSetup(
-            subscription.payment_intent_client_secret,
-            {
-              payment_method: {
-                card: elements.getElement(CardNumberElement)!,
-                billing_details: {
-                  // Add billing details if needed
-                },
-              },
-            }
-          );
+        // if (
+        //   !needToCreatePreviousPaymentMethod &&
+        //   subscription?.payment_intent_client_secret
+        // ) {
+        //   const { error: confirmError } = await stripe.confirmCardSetup(
+        //     subscription.payment_intent_client_secret,
+        //     {
+        //       payment_method: {
+        //         card: elements.getElement(CardNumberElement)!,
+        //         billing_details: {
+        //           // Add billing details if needed
+        //         },
+        //       },
+        //     }
+        //   );
 
-          if (confirmError) {
-            throw new Error(confirmError.message || "Payment failed");
-          }
-        }
+        //   if (confirmError) {
+        //     throw new Error(confirmError.message || "Payment failed");
+        //   }
+        // }
 
         // Payment successful
         const sub = await refreshSubscriptionState();

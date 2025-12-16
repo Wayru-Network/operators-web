@@ -2,22 +2,11 @@ import { useBilling } from "../../../../contexts/BillingContext";
 import { calculateDiscountSummary } from "@/lib/helpers/stripe-helper";
 
 export default function ProratedOneTimeDetails() {
-  const { hotspotsToAdd, products, getProratedPrice } = useBilling();
-  // STRIPE REMOVAL
-  const product = products.find((product) => product.type === "hotspots");
-  const productPriceDetails = product?.priceDetails[0];
-  const productPriceNotFee = productPriceDetails?.price_without_fee ?? 0;
-  const productPriceWithFee = productPriceDetails?.price_with_fee ?? 0;
+  const { hotspotsToAdd, getProratedPrice } = useBilling();
   const newHotspotsToAddAmount = hotspotsToAdd;
   const daysUntilNextBilling = 0;
-  const summaryNotFee = calculateDiscountSummary(
-    newHotspotsToAddAmount,
-    productPriceNotFee
-  );
-  const summaryWithFee = calculateDiscountSummary(
-    newHotspotsToAddAmount,
-    productPriceWithFee
-  );
+  const summaryNotFee = calculateDiscountSummary(newHotspotsToAddAmount, 0);
+  const summaryWithFee = calculateDiscountSummary(newHotspotsToAddAmount, 0);
   const fee =
     summaryWithFee.totalPriceWithDiscount -
     summaryNotFee.unitPriceWithDiscount * newHotspotsToAddAmount;

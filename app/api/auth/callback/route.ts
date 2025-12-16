@@ -118,7 +118,7 @@ export async function GET(req: Request) {
   }
 
   // save customer in db
-  const customer = await getOrCreateCustomer(sub, {
+  await getOrCreateCustomer(sub, {
     email: email,
   });
 

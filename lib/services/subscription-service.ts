@@ -33,8 +33,33 @@ export async function getSubscriptionStatus(): Promise<boolean> {
 
   const currentDate = new Date();
   let subscriptionStatus = false;
-  if (sub && sub.is_valid && sub.expiry_date > currentDate) {
+  if (sub && sub.status === "ACTIVE" && sub.expiry_date > currentDate) {
     subscriptionStatus = true;
   }
   return subscriptionStatus;
+}
+
+export async function getCustomerSubscription() {
+  const session = await getSession();
+  if (!session?.userId) {
+    return null;
+  }
+  const userId = session.userId;
+
+  const customer = await Prisma.customers.findFirst({
+    where: {
+      customer_uuid: userId,
+    },
+  });
+
+  if (!customer) {
+    return null;
+  }
+  const subscription = await Prisma.subscriptions.findFirst({
+    where: {
+      customer_id: customer.id,
+    },
+  });
+
+  return subscription;
 }

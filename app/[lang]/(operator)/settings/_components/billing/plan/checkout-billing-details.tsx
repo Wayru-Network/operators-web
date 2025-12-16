@@ -1,10 +1,8 @@
 import moment from "moment";
-import { useBilling } from "../../../contexts/BillingContext";
 import { Switch, Spinner } from "@heroui/react";
 import { useTransition } from "react";
 import { Steps } from "../../billing-tab";
 import { addToast } from "@heroui/toast";
-import { createTrialSubscription } from "@/lib/services/stripe-service";
 import { dateConstants } from "@/lib/constants/date";
 
 interface Props {
@@ -12,13 +10,7 @@ interface Props {
 }
 
 export default function CheckoutBillingDetails({ setSelected }: Props) {
-  const { products } = useBilling();
   const { formatDate } = dateConstants;
-  const product = products.find((product) => product.type === "hotspots");
-  const productPriceDetails = product?.priceDetails[0];
-  const recurring = productPriceDetails?.recurring;
-  // STRIPE REMOVAL
-  const { hotspotsToAdd } = useBilling();
   //const { is_trial_period_used } = subscription as CustomerSubscription;
   const is_trial_period_used = true;
   // get next billing date
@@ -32,23 +24,9 @@ export default function CheckoutBillingDetails({ setSelected }: Props) {
 
   const onStartTrialPeriod = () => {
     startTransition(async () => {
-      const response = await createTrialSubscription({
-        price_id: productPriceDetails?.id || "",
-        plan_id: product?.id || "",
-        quantity: hotspotsToAdd,
-        base_price_with_fee: productPriceDetails?.price_with_fee ?? 0,
-      });
-      if (response.error) {
-        addToast({
-          title: "Error",
-          description: response.message,
-          color: "danger",
-        });
-        return;
-      }
       addToast({
         title: "Success",
-        description: response.message,
+        description: "Trial period started successfully.",
         color: "default",
       });
       // await refreshSubscriptionState();
@@ -56,16 +34,16 @@ export default function CheckoutBillingDetails({ setSelected }: Props) {
     });
   };
 
-  const getRecurringInterval = (interval: string) => {
-    switch (interval) {
-      case "month":
-        return "Monthly";
-      case "year":
-        return "Yearly";
-      default:
-        return "Monthly";
-    }
-  };
+  // const getRecurringInterval = (interval: string) => {
+  //   switch (interval) {
+  //     case "month":
+  //       return "Monthly";
+  //     case "year":
+  //       return "Yearly";
+  //     default:
+  //       return "Monthly";
+  //   }
+  // };
 
   // if trial subscription was already used return only the next billing data!!
   if (is_trial_period_used) {
@@ -74,13 +52,13 @@ export default function CheckoutBillingDetails({ setSelected }: Props) {
         <div className="flex flex-row">
           <p className="text-xs font-semibold">Billing cycle:</p>
           <p className="text-xs font-medium dark:text-gray-300 text-gray-700 ml-1">
-            {getRecurringInterval(recurring?.interval ?? "month")}
+            Recurring INTERVAL goes here
           </p>
         </div>
         <div className="flex flex-row">
           <p className="text-xs font-semibold">Next billing date:</p>
           <p className="text-xs font-medium dark:text-gray-300 text-gray-700 ml-1">
-            {/* {nextBillingDate} */}
+            Next BILLING DATE goes here
           </p>
         </div>
       </div>

@@ -30,13 +30,7 @@ const ACTIONS_TO_ACTIVATE_LABEL: CustomerContext["action"][] = [
  * @returns
  */
 export default function NonFormActionButtons({ setSelected }: Props) {
-  const { customerContext, products, hotspotsToAdd, getProratedPrice } =
-    useBilling();
-  // STRIPE REMOVAL
-  const product = products.find((product) => product.type === "hotspots");
-  const productPriceDetails = product?.priceDetails[0];
-  const productPriceNotFee = productPriceDetails?.price_without_fee ?? 0;
-  const productPriceWithFee = productPriceDetails?.price_with_fee ?? 0;
+  const { customerContext, hotspotsToAdd, getProratedPrice } = useBilling();
   const currentHotspotsAmount = 0;
   const [isLoading, setIsLoading] = useState(false);
   const newHotspotsToAddAmount =
@@ -44,14 +38,8 @@ export default function NonFormActionButtons({ setSelected }: Props) {
       ? hotspotsToAdd - currentHotspotsAmount
       : 0;
   const daysUntilNextBilling = 0;
-  const summaryNotFee = calculateDiscountSummary(
-    newHotspotsToAddAmount,
-    productPriceNotFee
-  );
-  const summaryWithFee = calculateDiscountSummary(
-    newHotspotsToAddAmount,
-    productPriceWithFee
-  );
+  const summaryNotFee = calculateDiscountSummary(newHotspotsToAddAmount, 0);
+  const summaryWithFee = calculateDiscountSummary(newHotspotsToAddAmount, 0);
   const fee =
     summaryWithFee.totalPriceWithDiscount -
     summaryNotFee.unitPriceWithDiscount * newHotspotsToAddAmount;
@@ -101,7 +89,7 @@ export default function NonFormActionButtons({ setSelected }: Props) {
     if (false) {
       const result = await updateHotspotAmountSubscription({
         quantity: hotspotsToAdd,
-        basePrice: productPriceWithFee,
+        basePrice: summaryWithFee.unitPriceWithDiscount,
       });
       if (result.error) {
         addToast({
@@ -143,7 +131,7 @@ export default function NonFormActionButtons({ setSelected }: Props) {
         console.log("paymentIntent done", paymentIntent);
         await updateHotspotAmountSubscription({
           quantity: hotspotsToAdd,
-          basePrice: productPriceWithFee,
+          basePrice: summaryWithFee.unitPriceWithDiscount,
         });
         //await refreshSubscriptionState();
         addToast({

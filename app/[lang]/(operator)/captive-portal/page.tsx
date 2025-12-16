@@ -1,6 +1,5 @@
 import { Metadata } from "next";
 import PortalsTable from "./_components/portals-table";
-import { canCreatePortal } from "./new-portal/_services/can-create-portal";
 
 export const metadata: Metadata = {
   title: "Captive portal - Wayru",

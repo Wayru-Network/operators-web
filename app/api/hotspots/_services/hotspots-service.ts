@@ -19,7 +19,7 @@ export async function getHotspotBySubscription() {
     const sub = await Prisma.subscriptions.findFirst({
       where: {
         customer_id: customer?.id,
-        is_valid: true,
+        status: "ACTIVE",
       },
     });
     if (!sub) {

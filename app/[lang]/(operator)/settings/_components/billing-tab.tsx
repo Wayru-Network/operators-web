@@ -8,33 +8,13 @@ import PlanCheckout from "./billing/plan/plan-checkout";
 import ChangePaymentMethod from "./billing/payment-method/change-payment-method";
 import { Tab, Tabs } from "@heroui/tabs";
 import EaseInOutContent from "@/lib/components/ease-in-out-content";
-import { Spinner } from "@heroui/react";
-// import { useCustomerSubscription } from "@/lib/contexts/customer-subscription-context";
+import { useBilling } from "../contexts/BillingContext";
+//import { Spinner } from "@heroui/react"
 
 export type Steps = "step1" | "step2" | "step3" | "step4";
 const BillingTab = () => {
-  // STRIPE REMOVAL
-  const { subscription, isGettingSubscription } = {
-    subscription: {
-      stripe_subscription: { status: "active" },
-    },
-    isGettingSubscription: false,
-  }; // useCustomerSubscription();
   const [selected, setSelected] = useState<Steps>("step1");
-  const stripeSubscription =
-    subscription?.stripe_subscription &&
-    subscription?.stripe_subscription?.status !== "canceled";
-
-  if (isGettingSubscription) {
-    return (
-      <div className="w-full flex flew-col justify-center align-items">
-        <div className="flex flex-col ">
-          <p className="text-lg w-full mb-8 font-semibold">Loading..</p>
-          <Spinner size="lg" />
-        </div>
-      </div>
-    );
-  }
+  const billingContext = useBilling();
 
   return (
     <Tabs
@@ -47,7 +27,7 @@ const BillingTab = () => {
     >
       <Tab key="step1" title="My subscriptions">
         <EaseInOutContent>
-          {stripeSubscription ? (
+          {billingContext.subscription ? (
             <PlanDetails setSelected={setSelected} />
           ) : (
             <PlanNotSelected setSelected={setSelected} />

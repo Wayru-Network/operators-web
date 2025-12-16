@@ -6,7 +6,6 @@ import {
 } from "@heroui/react";
 import { ChevronDown, Router, Search } from "lucide-react";
 import React, { useState, useRef, useTransition } from "react";
-import { useBilling } from "../../../contexts/BillingContext";
 import { Hotspot } from "@/app/[lang]/(operator)/hotspots/_services/get-hotspots";
 import AssignedHotspotsList from "./assigned-hotspots-list";
 import {
@@ -18,7 +17,14 @@ import { isMinimumVersionMet } from "@/lib/helpers/operators";
 
 export default function AssignPlanHotspots() {
   // STRIPE REMOVAL
-  const { hotspots, addHotspot } = useBilling();
+  // const { hotspots, addHotspot } = useBilling();
+  // const { hotspots, addHotspot } = {
+  //   hotspots: [] as Hotspot[],
+  //   addHotspot: async () => {},
+  // };
+  const { hotspots } = {
+    hotspots: [] as Hotspot[],
+  };
   const [filteredHotspots, setFilteredHotspots] = useState(hotspots);
   const [isSearching, setIsSearching] = useState(false);
   const [isSearchInProgress, setIsSearchInProgress] = useState(false);
@@ -87,7 +93,7 @@ export default function AssignPlanHotspots() {
       ]);
       if (deletedDuplicates.length > 0) {
         setFilteredHotspots(deletedDuplicates);
-        addHotspot(data);
+        // addHotspot(data);
       }
     }
     setIsSearching(false);

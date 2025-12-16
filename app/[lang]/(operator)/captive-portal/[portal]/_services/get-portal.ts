@@ -19,7 +19,7 @@ export default async function getPortal(portalId: number) {
           id: true,
           asset: {
             select: {
-              ad_asset_id: true,
+              ad_asset: true,
               asset_url: true,
             },
           },

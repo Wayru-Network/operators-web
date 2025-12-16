@@ -16,15 +16,12 @@ const BillingContext = createContext<BillingContextType | null>(null);
 
 export const BillingProvider = ({
   children,
-  products,
+  subscription,
+  pricings,
   hotspots: hotspotsProps,
 }: BillingProviderProps) => {
   const [hotspotsToAdd, setHotspotsToAdd] = useState(0);
   const [hotspots, setHotspots] = useState(hotspotsProps);
-  // STRIPE REMOVAL
-  // const { subscription } = useCustomerSubscription();
-  // const stripeSubscription = subscription?.stripe_subscription;
-  //const currentHotspotsAmount = stripeSubscription?.products_amount ?? 0;
   const newHotspotsToAddAmount =
     1 > 0 && hotspotsToAdd > 1 ? hotspotsToAdd - 1 : 0;
 
@@ -100,7 +97,8 @@ export const BillingProvider = ({
   return (
     <BillingContext.Provider
       value={{
-        products,
+        subscription,
+        pricings,
         hotspotsToAdd,
         handleHotspotsToAdd,
         hotspots,

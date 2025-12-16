@@ -7,39 +7,34 @@ import { Steps } from "../../billing-tab";
 import { useSubscriptionHotspots } from "@/lib/hooks/use-hotspots";
 import { calculateDiscountSummary } from "@/lib/helpers/stripe-helper";
 import { AnimatePresence, motion } from "framer-motion";
+import PlanNotFound from "./plan-not-found";
 
 interface SelectAPlanProps {
   setSelected: (key: Steps) => void;
 }
 
 const BillingPlanHotspotsStep = ({ setSelected }: SelectAPlanProps) => {
-  const { products, handleHotspotsToAdd, hotspotsToAdd } = useBilling();
-  const hotspotProduct = products.find(
-    (product) => product.type === "hotspots"
-  );
-  // STRIPE REMOVAL
-  const hotspotPriceWithFee =
-    hotspotProduct?.priceDetails[0].price_with_fee ?? 0;
-  // const { totalPriceWithDiscount: currentMonthlyCost } =
-  //   calculateDiscountSummary(currentHotspotsAmount, hotspotPriceWithFee);
+  const { handleHotspotsToAdd, hotspotsToAdd, pricings, subscription } =
+    useBilling();
+  const currentHotspotsAmount = subscription?.hotspot_limit ?? 0;
+  const { totalPriceWithDiscount: currentMonthlyCost } =
+    calculateDiscountSummary(
+      currentHotspotsAmount,
+      (pricings?.plans[0].base_price_cents ?? 0) / 100
+    );
   const { hotspots: assignedHotspots } = useSubscriptionHotspots();
   const assignedHotspotsAmount = assignedHotspots?.length;
   const { totalPriceWithDiscount } = calculateDiscountSummary(
     hotspotsToAdd,
-    hotspotPriceWithFee
+    (pricings?.plans[0].base_price_cents ?? 0) / 100
   );
-  const isNewMonthlyCost = 0 != hotspotsToAdd;
+  const isNewMonthlyCost = currentHotspotsAmount != hotspotsToAdd;
   const isButtonDisabled = () => {
-    // switch (true) {
-    //   case !!stripeSub?.cancel_at && stripeSub?.status != "canceled":
-    //     return false;
-    //   case currentHotspotsAmount > 0:
-    //     return hotspotsToAdd === currentHotspotsAmount;
-    //   case hotspotsToAdd <= 0:
-    //     return true;
-    //   default:
-    //     return false;
-    // }
+    if (currentHotspotsAmount > 0) {
+      console.log("comparing", hotspotsToAdd, currentHotspotsAmount);
+      return hotspotsToAdd === currentHotspotsAmount;
+    }
+    if (hotspotsToAdd <= 0) return true;
     return false;
   };
   const newHotspotsToAddAmount =
@@ -61,10 +56,9 @@ const BillingPlanHotspotsStep = ({ setSelected }: SelectAPlanProps) => {
     }
   };
 
-  // STRIPE REMOVAL
-  // if (!hotspotProduct) {
-  //   return <PlanNotFound />;
-  // }
+  if (pricings?.plans.length === 0) {
+    return <PlanNotFound />;
+  }
 
   return (
     <div className=" flex flex-row gap-8 w-full">
@@ -79,20 +73,20 @@ const BillingPlanHotspotsStep = ({ setSelected }: SelectAPlanProps) => {
               <div className="flex flex-row">
                 <p className="text-xs font-semibold">Active hotspots:</p>
                 <p className="text-xs font-medium dark:text-gray-300 text-gray-700 ml-1">
-                  {0}
+                  {assignedHotspotsAmount}
                 </p>
               </div>
               <div className="flex flex-row">
                 <p className="text-xs font-semibold">Monthly cost:</p>
                 <p className="text-xs font-medium dark:text-gray-300 text-gray-700 ml-1">
-                  ${0}
+                  ${currentMonthlyCost.toFixed(2)}
                 </p>
               </div>
-              {true && (
+              {subscription && (
                 <div className="flex flex-row">
                   <p className="text-xs font-semibold">Status:</p>
                   <p className="text-xs font-medium dark:text-gray-300 text-gray-700 ml-1">
-                    cancelled
+                    {subscription?.status ?? "N/A"}
                   </p>
                 </div>
               )}
@@ -141,7 +135,8 @@ const BillingPlanHotspotsStep = ({ setSelected }: SelectAPlanProps) => {
             <div className="flex flex-row w-full">
               <div className="flex flex-col w-full ml-4 gap-1">
                 <AnimatePresence>
-                  {false ? (
+                  {currentHotspotsAmount > 0 &&
+                  currentHotspotsAmount != hotspotsToAdd ? (
                     <motion.div
                       key="reason-details"
                       initial={{ height: 0, opacity: 0 }}

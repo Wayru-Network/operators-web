@@ -11,17 +11,18 @@ export default function PlanActiveDetails({
   setSelected,
   openCancelModal,
 }: Props) {
-  // STRIPE REMOVAL
-  const { handleHotspotsToAdd, products } = useBilling();
-  const product = products.find((product) => product.type === "hotspots");
-  const productPriceDetails = product?.priceDetails[0];
-  const productPriceFee = productPriceDetails?.price_with_fee ?? 0;
-  const productPriceNotFee = productPriceDetails?.price_without_fee ?? 0;
-  const summaryWithFee = calculateDiscountSummary(0, productPriceFee);
-  const summaryNotFee = calculateDiscountSummary(0, productPriceNotFee);
+  const { handleHotspotsToAdd, pricings, hotspotsToAdd } = useBilling();
+  const summaryWithFee = calculateDiscountSummary(
+    hotspotsToAdd,
+    (pricings?.plans[0].base_price_cents ?? 0) / 100
+  );
+  const summaryNotFee = calculateDiscountSummary(
+    hotspotsToAdd,
+    (pricings?.plans[0].base_price_cents ?? 0) / 100
+  );
   const fee =
     summaryWithFee.totalPriceWithDiscount -
-    summaryNotFee.unitPriceWithDiscount * 0;
+    summaryNotFee.unitPriceWithDiscount * hotspotsToAdd;
 
   return (
     <div className="flex flex-col w-full">
@@ -85,7 +86,7 @@ export default function PlanActiveDetails({
       <div className="flex flex-row w-full justify-start mt-3">
         <Button
           onPress={() => {
-            handleHotspotsToAdd(0);
+            handleHotspotsToAdd(hotspotsToAdd ?? 0);
             setSelected("step2");
           }}
           className="w-1/2 bg-[#000] dark:bg-[#fff] text-white dark:text-black"
