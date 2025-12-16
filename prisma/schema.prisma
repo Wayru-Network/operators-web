@@ -85,6 +85,22 @@ model asset {
   logo_portal_config   portal_config[] @relation("logo_asset")
 }
 
+model customers {
+  id            Int    @id @default(autoincrement())
+  customer_uuid String @unique @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+
+  full_name String  @db.VarChar(255)
+  email     String? @db.VarChar(150)
+
+  created_at DateTime? @default(now()) @db.Timestamp(6)
+  updated_at DateTime? @default(now()) @db.Timestamp(6)
+
+  companies                companies[]
+  subscriptions            subscriptions?
+  ads                      ad[]
+  subscription_transaction subscription_transaction[]
+}
+
 model companies {
   id          Int            @id @default(autoincrement())
   customer_id Int?
@@ -99,49 +115,121 @@ model companies {
   customers customers? @relation(fields: [customer_id], references: [id], onDelete: Cascade)
 }
 
-model customers {
-  id            Int    @id @default(autoincrement())
-  customer_uuid String @unique @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+model subscription_plan {
+  id               Int    @id @default(autoincrement())
+  name             String
+  base_price_cents Int
+  currency         String @default("USD")
 
-  full_name String  @db.VarChar(255)
-  email     String? @db.VarChar(150)
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now()) @updatedAt
 
-  created_at DateTime? @default(now()) @db.Timestamp(6)
-  updated_at DateTime? @default(now()) @db.Timestamp(6)
-
-  companies     companies[]
-  subscriptions subscriptions?
-  ads           ad[]
+  subscriptions subscriptions[]
 }
 
 model subscriptions {
-  id            Int      @id @default(autoincrement())
-  customer_id   Int      @unique
+  id          Int @id @default(autoincrement())
+  customer_id Int @unique
+  plan_id     Int
+
   hotspot_limit Int
-  is_valid      Boolean  @default(true)
-  expiry_date   DateTime @db.Timestamp(6)
+
+  status SubscriptionStatus @default(ACTIVE)
+
+  is_trial      Boolean   @default(false)
+  trial_ends_at DateTime?
+
+  cancel_at_period_end Boolean   @default(false)
+  canceled_at          DateTime?
+
+  expiry_date DateTime @db.Timestamp(6)
+
+  base_price_cents Int
+  currency         String @default("USD")
 
   created_at DateTime @default(now()) @db.Timestamp(6)
   updated_at DateTime @updatedAt @db.Timestamp(6)
 
-  customer customers            @relation(fields: [customer_id], references: [id], onDelete: Cascade)
-  hotspots hotspot[]
-  addons   subscription_addon[]
+  customer customers         @relation(fields: [customer_id], references: [id], onDelete: Cascade)
+  plan     subscription_plan @relation(fields: [plan_id], references: [id])
+
+  hotspots         hotspot[]
+  premium_features subscription_premium_feature[]
+  transactions     subscription_transaction[]
 }
 
-model subscription_addon {
-  id              Int       @id @default(autoincrement())
+model premium_feature {
+  id           Int                @id @default(autoincrement())
+  feature_type PremiumFeatureType
+  price_cents  Int
+  currency     String             @default("USD")
+  is_active    Boolean            @default(true)
+
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now()) @updatedAt
+
+  subscriptions subscription_premium_feature[]
+}
+
+model subscription_premium_feature {
+  id                 Int @id @default(autoincrement())
+  subscription_id    Int
+  premium_feature_id Int
+
+  price_cents Int
+  currency    String @default("USD")
+
+  created_at DateTime @default(now())
+
+  subscription    subscriptions   @relation(fields: [subscription_id], references: [id], onDelete: Cascade)
+  premium_feature premium_feature @relation(fields: [premium_feature_id], references: [id])
+}
+
+model subscription_transaction {
+  id              Int @id @default(autoincrement())
   subscription_id Int
-  addon_type      AddonType
-  created_at      DateTime  @default(now())
+  customer_id     Int
+
+  type         SubscriptionTransactionType
+  amount_cents Int
+  currency     String                      @default("USD")
+  description  String?
+
+  created_at DateTime @default(now())
 
   subscription subscriptions @relation(fields: [subscription_id], references: [id], onDelete: Cascade)
+  customer     customers     @relation(fields: [customer_id], references: [id], onDelete: Cascade)
 }
 
-enum AddonType {
+enum PremiumFeatureType {
   AD
   VOUCHER
   FORM
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELED
+  EXPIRED
+  PAUSED
+}
+
+enum SubscriptionTransactionType {
+  PLAN_PURCHASE
+  PLAN_RENEWAL
+  PLAN_UPGRADE
+  PLAN_DOWNGRADE
+
+  PREMIUM_FEATURE_ADD
+  PREMIUM_FEATURE_REMOVE
+
+  TRIAL_START
+  TRIAL_END
+
+  SUBSCRIPTION_CANCELED
+  SUBSCRIPTION_REACTIVATED
+
+  MANUAL_ADJUSTMENT
 }
 
 enum adFormat {
