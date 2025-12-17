@@ -1,9 +1,6 @@
 "use server";
-//import saveHotspotNetworks from "@/app/[lang]/(operator)/hotspots/[hotspot]/_services/save-hotspot-networks";
-//import { HotspotNetworksFormData } from "@/app/[lang]/(operator)/hotspots/[hotspot]/_types/hotspot-networks";
 import { Prisma } from "@/lib/infra/prisma";
 import { getHotspotBySubscription } from "@/app/api/hotspots/_services/hotspots-service";
-// import { env } from "@/lib/infra/env";
 
 interface setDefaultProps {
   hotspot_name: string;
@@ -14,28 +11,6 @@ interface setDefaultResponse {
   message?: string;
   error?: string;
 }
-
-interface pauseSubscriptionResponse {
-  success: boolean;
-  error?: string;
-}
-
-interface resumeSubscriptionResponse {
-  success: boolean;
-  error?: string;
-}
-
-// const defaultSettings: HotspotNetworksFormData = {
-//   locationName: "Unknown",
-//   name: "Default Hotspot",
-//   openNetwork: {
-//     ssid: ".Wayru Wifi",
-//   },
-//   privateNetwork: {
-//     ssid: "Wayru Operator",
-//     password: env.DEFAULT_PRIVATE_SSID_PW || "admin",
-//   },
-// };
 
 export default async function setHotspotsDefaultSettings(): Promise<setDefaultResponse> {
   const hotspots = await getHotspotBySubscription();
@@ -94,99 +69,4 @@ async function setDefaultSettings({
   }
 
   return { success: true, message: "Default settings applied successfully" };
-}
-
-interface revokeSubscriptionResponse {
-  success: boolean;
-  error?: string;
-}
-
-export async function revokeSubscription(
-  sub_id: string
-): Promise<revokeSubscriptionResponse> {
-  try {
-    const subscription = await Prisma.subscriptions.findUnique({
-      where: { stripe_subscription_id: sub_id },
-    });
-    if (subscription) {
-      await Prisma.subscriptions.delete({
-        where: { id: subscription.id },
-      });
-      const customer = await Prisma.customers.findUnique({
-        where: { id: subscription.customer_id },
-        select: { customer_uuid: true },
-      });
-
-      if (!customer?.customer_uuid) {
-        return { success: false, error: "Not found" };
-      }
-
-      const portals = await Prisma.portal_config.findMany({
-        where: { user_id: customer?.customer_uuid },
-        select: { id: true },
-      });
-
-      for (const portal of portals) {
-        await Prisma.ad.updateMany({
-          where: { portal_config_id: portal.id },
-          data: { portal_config_id: null },
-        });
-      }
-      return { success: true };
-    } else {
-      console.warn(`Subscription with id ${sub_id} not found.`);
-      return {
-        success: false,
-        error: `Sub not found`,
-      };
-    }
-  } catch (error) {
-    console.error("Error revoking subscription:", error);
-    throw new Error(`Failed to revoke subscription: ${error}`);
-  }
-}
-
-export async function pauseSubscription(
-  sub_id: string
-): Promise<pauseSubscriptionResponse> {
-  try {
-    const subscription = await Prisma.subscriptions.findUnique({
-      where: { stripe_subscription_id: sub_id },
-    });
-    if (!subscription) {
-      return { success: false, error: "Not found" };
-    }
-
-    await Prisma.subscriptions.update({
-      where: { id: subscription.id },
-      data: { is_valid: false },
-    });
-
-    return { success: true };
-  } catch (error) {
-    console.error("Error pausing subscription:", error);
-    throw new Error(`Failed to pause subscription: ${error}`);
-  }
-}
-
-export async function resumeSubscription(
-  sub_id: string
-): Promise<resumeSubscriptionResponse> {
-  try {
-    const subscription = await Prisma.subscriptions.findUnique({
-      where: { stripe_subscription_id: sub_id },
-    });
-    if (!subscription) {
-      return { success: false, error: "Not found" };
-    }
-    await Prisma.subscriptions.update({
-      where: { id: subscription.id },
-      data: { is_valid: true },
-    });
-
-    return { success: true };
-  } catch (error) {
-    console.error("Error resuming subscription:", error);
-    throw new Error(`Failed to resume subscription: ${error}`);
-  }
 }
