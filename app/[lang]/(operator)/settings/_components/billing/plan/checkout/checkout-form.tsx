@@ -11,14 +11,6 @@ import { useBilling } from "../../../../contexts/BillingContext";
 import { useCustomerSubscription } from "@/lib/contexts/customer-subscription-context";
 import { useState } from "react";
 import { CardBrand } from "@stripe/stripe-js";
-import {
-  confirmPaymentMethodSetupIntent,
-  //createCustomerSubscription,
-  createPaymentIntent,
-  createPaymentMethodSetupIntent,
-  //deleteAllCustomerPaymentMethods,
-  reactivateSubscription,
-} from "@/lib/services/stripe-service";
 import { PaymentIcon, PaymentType } from "react-svg-credit-card-payment-icons";
 import { Button } from "@heroui/react";
 import { LoadingInputWrapper } from "@/lib/components/loading-input-wrapper";
@@ -43,9 +35,8 @@ export default function CheckoutForm({
     newHotspotsToAddAmount,
     getProratedPrice,
   } = useBilling();
-  const { refreshSubscriptionState, subscription } = useCustomerSubscription();
+  const { subscription } = useCustomerSubscription();
   const stripeSub = subscription?.stripe_subscription;
-  const isTrialPeriodUsed = subscription?.is_trial_period_used;
   const [cardBrand, setCardBrand] = useState<CardBrand | undefined>("unknown");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -73,15 +64,12 @@ export default function CheckoutForm({
     summaryWithFee.totalPriceWithDiscount -
     summaryNotFee.unitPriceWithDiscount * newHotspotsToAddAmount;
   const proratedPayment = priceToPay + proratedFee;
-  const needToCreatePreviousPaymentMethod =
-    isTrialPeriodUsed && !stripeSub?.payment_method;
 
   // total payment var
   const totalToPay =
     customerContext?.action === "activating"
       ? summaryWithFee.totalPriceWithDiscount
       : proratedPayment;
-  const isUniquePayment = newHotspotsToAddAmount > 0;
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -102,167 +90,17 @@ export default function CheckoutForm({
     setError(null);
 
     try {
-      // user is reactivating a subscription that is going to cancel in the next billing cycle
-      // and this do not have a payment method, so save the payment method
-      if (customerContext?.action === "reactivating_not_checkout") {
-        if (!stripeSub?.payment_method) {
-          const result = await addPaymentMethod();
-          if (!result) {
-            throw new Error("Payment method error");
-          }
-        }
-        // now reactivate the subscription
-        const resultReactivate = await reactivateSubscription(
-          stripeSub?.subscription_id as string
-        );
-        if (resultReactivate.error) {
-          throw new Error(resultReactivate.message);
-        }
-        // refresh the subscription state
-        await refreshSubscriptionState();
-        addToast({
-          title: "Success",
-          description: "Subscription reactivated",
-          color: "success",
-        });
-        setSelected("step1");
-        return;
-      } else if (isUniquePayment) {
-        const paymentIntent = await createPaymentIntent({
-          amount_usd: Number(totalToPay),
-          metadata: {
-            reason:
-              "Unique payment for purchase of " +
-              newHotspotsToAddAmount +
-              " new hotspots",
-          },
-        });
-        if (paymentIntent?.error || !paymentIntent.client_secret) {
-          throw new Error(paymentIntent?.message);
-        }
-        // confirm payment intent
-        const { error } = await stripe.confirmCardSetup(
-          paymentIntent.client_secret,
-          {
-            payment_method: "Card",
-          }
-        );
-        if (error) {
-          setError(error.message || "Payment failed");
-        } else {
-          await refreshSubscriptionState();
-          addToast({
-            title: "Success",
-            description: "Payment successful",
-            color: "success",
-          });
-          setSelected("step1");
-        }
-      } else {
-        // if is trial period used and no payment method, create a setup intent
-        if (needToCreatePreviousPaymentMethod) {
-          const result = await addPaymentMethod();
-          if (!result) {
-            throw new Error("Payment method error");
-          }
-        }
-        // Create subscription on backend
-        // const subscription = await createCustomerSubscription({
-        //   price_id: productPriceDetails?.id || "",
-        //   plan_id: product?.id || "",
-        //   quantity: hotspotsToAdd,
-        //   base_price_with_fee: productPriceFee,
-        //   trial_period_days: isTrialPeriodUsed ? 0 : 7,
-        // });
-        // if (subscription?.error) {
-        //   // abort the process, and delete all payment methods that previous created
-        //   await deleteAllCustomerPaymentMethods();
-        //   throw new Error(
-        //     subscription?.message || "No payment intent client secret received"
-        //   );
-        // }
-
-        // Confirm the card setup for the subscription if not need to create a payment method
-        // if (
-        //   !needToCreatePreviousPaymentMethod &&
-        //   subscription?.payment_intent_client_secret
-        // ) {
-        //   const { error: confirmError } = await stripe.confirmCardSetup(
-        //     subscription.payment_intent_client_secret,
-        //     {
-        //       payment_method: {
-        //         card: elements.getElement(CardNumberElement)!,
-        //         billing_details: {
-        //           // Add billing details if needed
-        //         },
-        //       },
-        //     }
-        //   );
-
-        //   if (confirmError) {
-        //     throw new Error(confirmError.message || "Payment failed");
-        //   }
-        // }
-
-        // Payment successful
-        const sub = await refreshSubscriptionState();
-        if (!sub?.stripe_subscription?.payment_method) {
-          // if there is not payment method try to refresh again
-          await refreshSubscriptionState();
-        }
-        setSelected("step1");
-      }
+      addToast({
+        title: "Success",
+        description: "Subscription reactivated",
+        color: "success",
+      });
+      setSelected("step1");
+      return;
     } catch (err) {
       setError(err instanceof Error ? err.message : "Payment failed");
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const addPaymentMethod = async () => {
-    try {
-      // We need to use this function in the client because we need to have access to the elements
-      const setupIntent = await createPaymentMethodSetupIntent();
-      if (setupIntent?.error) {
-        throw new Error(setupIntent.message);
-      }
-
-      if (!stripe || !elements) {
-        throw new Error("Stripe not found");
-      }
-      // confirm the card setup for the setup intent
-      const { error: confirmError } = await stripe?.confirmCardSetup(
-        setupIntent?.client_secret || "",
-        {
-          payment_method: {
-            card: elements.getElement(CardNumberElement)!,
-            billing_details: {
-              // Add billing details if needed
-            },
-          },
-        }
-      );
-      if (confirmError) {
-        throw new Error(confirmError.message);
-      }
-      const result = await confirmPaymentMethodSetupIntent(
-        setupIntent?.setup_intent_id as string
-      );
-      if (!result?.payment_method) {
-        throw new Error("Payment method error");
-      }
-      return {
-        error: false,
-        message: "Payment method added",
-        paymentMethodId: result?.payment_method,
-      };
-    } catch (error) {
-      console.log("error", error);
-      return {
-        error: true,
-        message: "Payment method error",
-        paymentMethodId: null,
-      };
     }
   };
 

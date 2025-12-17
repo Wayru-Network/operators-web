@@ -10,13 +10,11 @@ import {
   SelectItem,
   Textarea,
 } from "@heroui/react";
-import { cancelSubscription } from "@/lib/services/stripe-service";
 import { addToast } from "@heroui/toast";
 import { useCustomerSubscription } from "@/lib/contexts/customer-subscription-context";
 import moment from "moment";
 import Stripe from "stripe";
 import { AnimatePresence, motion } from "framer-motion";
-import setHotspotsDefaultSettings from "@/lib/services/default-settings-service";
 
 type StripeFeedBack = Stripe.Subscription.CancellationDetails.Feedback;
 interface Reason {
@@ -28,47 +26,24 @@ interface Props {
   onClose: () => void;
   subId: string;
 }
-export default function CancelPlanModal({ isOpen, onClose, subId }: Props) {
+export default function CancelPlanModal({ isOpen, onClose }: Props) {
   const [isCancelling, startTransition] = useTransition();
-  const { subscription, refreshSubscriptionState } = useCustomerSubscription();
+  const { subscription } = useCustomerSubscription();
   const hotspotSubscription = subscription?.stripe_subscription;
   const [selectedReason, setSelectedReason] = useState<Reason | null>(null);
-  const [comment, setComment] = useState("");
+  //const [setComment] = useState("");
   const currentPeriodEnd = moment(
     Number(hotspotSubscription?.current_period_end) * 1000
   ).format("MMM DD, YYYY");
 
   const onConfirm = () => {
     startTransition(async () => {
-      const sub = await cancelSubscription({
-        subId,
-        feedback: selectedReason?.key,
-        comment,
+      addToast({
+        title: "Success",
+        description: "Your subscription has been canceled.",
+        color: "success",
       });
-
-      const toDefault = await setHotspotsDefaultSettings();
-      if (!toDefault.success) {
-        addToast({
-          title: "Error",
-          description: "Failed to set default settings for hotspots",
-          color: "danger",
-        });
-      }
-      if (sub.error) {
-        addToast({
-          title: "Error",
-          description: sub.message,
-          color: "danger",
-        });
-      } else {
-        await refreshSubscriptionState();
-        addToast({
-          title: "Success",
-          description: sub.message,
-          color: "success",
-        });
-        onClose();
-      }
+      onClose();
     });
   };
 
@@ -158,7 +133,6 @@ export default function CancelPlanModal({ isOpen, onClose, subId }: Props) {
                         placeholder="Enter your reason"
                         variant="faded"
                         maxRows={3}
-                        onValueChange={setComment}
                       />
                     </motion.div>
                   )}

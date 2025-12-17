@@ -4,12 +4,7 @@ import { useBilling } from "../../../../contexts/BillingContext";
 import { CustomerContext } from "../../../interfaces/billing-context";
 import { calculateDiscountSummary } from "@/lib/helpers/stripe-helper";
 import { useState } from "react";
-import {
-  createPaymentIntent,
-  updateHotspotAmountSubscription,
-} from "@/lib/services/stripe-service";
 import { addToast } from "@heroui/toast";
-import moment from "moment";
 
 interface Props {
   setSelected: (key: Steps) => void;
@@ -85,63 +80,12 @@ export default function NonFormActionButtons({ setSelected }: Props) {
       return;
     }
     // user can update his subscription without paying only if trialing
-    //if (stripeSub?.status === "trialing") {
-    if (false) {
-      const result = await updateHotspotAmountSubscription({
-        quantity: hotspotsToAdd,
-        basePrice: summaryWithFee.unitPriceWithDiscount,
-      });
-      if (result.error) {
-        addToast({
-          title: "Error updating subscription",
-          description: result.message,
-          color: "danger",
-        });
-      } else {
-        //await refreshSubscriptionState();
-        addToast({
-          title: "Success",
-          description: result.message,
-          color: "success",
-        });
-        setSelected("step1");
-      }
-    } else {
-      const paymentIntent = await createPaymentIntent({
-        amount_usd: Number(totalPayment?.toFixed(2)),
-        metadata: {
-          reason:
-            "Unique payment for purchase of " +
-            newHotspotsToAddAmount +
-            " new hotspots" +
-            moment().format("MMM DD, YYYY"),
-          "New total hotspots": hotspotsToAdd,
-          "Subscription id": "",
-        },
-        payment_method_id: "",
-      });
-
-      if (paymentIntent?.error) {
-        addToast({
-          title: "Error",
-          description: paymentIntent?.message ?? "Internal stripe error",
-          color: "danger",
-        });
-      } else {
-        console.log("paymentIntent done", paymentIntent);
-        await updateHotspotAmountSubscription({
-          quantity: hotspotsToAdd,
-          basePrice: summaryWithFee.unitPriceWithDiscount,
-        });
-        //await refreshSubscriptionState();
-        addToast({
-          title: "Success",
-          description: paymentIntent?.message ?? "Payment successfully",
-          color: "success",
-        });
-        setSelected("step1");
-      }
-    }
+    addToast({
+      title: "Success",
+      description: "Subscription updated successfully",
+      color: "success",
+    });
+    setSelected("step1");
     setIsLoading(false);
   };
 

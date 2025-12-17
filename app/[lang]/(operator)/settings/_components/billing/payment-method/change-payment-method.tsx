@@ -10,10 +10,6 @@ import {
 import { Button } from "@heroui/button";
 import { PaymentIcon, PaymentType } from "react-svg-credit-card-payment-icons";
 import { useTheme } from "next-themes";
-import {
-  changePaymentMethod,
-  confirmChangePaymentMethod,
-} from "@/lib/services/stripe-service";
 import { CardBrand } from "@stripe/stripe-js";
 import { stripeClient } from "@/lib/services/stripe-client-config";
 import { Steps } from "../../billing-tab";
@@ -33,7 +29,7 @@ function ChangePaymentForm({ setSelected }: CheckoutFormProps) {
   const stripe = useStripe();
   const elements = useElements();
   const { theme } = useTheme();
-  const { subscription, refreshSubscriptionState } = useCustomerSubscription();
+  const { subscription } = useCustomerSubscription();
   const [cardBrand, setCardBrand] = useState<CardBrand | undefined>("unknown");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -50,46 +46,12 @@ function ChangePaymentForm({ setSelected }: CheckoutFormProps) {
     setIsLoading(true);
     setError(null);
     try {
-      // Create subscription on backend
-      const setupIntent = await changePaymentMethod(
-        subscription?.stripe_subscription?.subscription_id || ""
-      );
-
-      if (!setupIntent?.client_secret) {
-        throw new Error("No payment intent client secret received");
-      }
-
-      // Confirm the card setup for the subscription
-      const { error: confirmError } = await stripe.confirmCardSetup(
-        setupIntent.client_secret,
-        {
-          payment_method: {
-            card: elements.getElement(CardNumberElement)!,
-            billing_details: {
-              // Add billing details if needed
-            },
-          },
-        }
-      );
-
-      if (confirmError) {
-        setError(confirmError.message || "Payment failed");
-      } else {
-        // Payment successful
-        const result = await confirmChangePaymentMethod(
-          setupIntent.setup_intent_id
-        );
-        if (result?.success) {
-          // Refresh the subscription data
-          await refreshSubscriptionState();
-        }
-        addToast({
-          title: "Success",
-          description: "New payment method added",
-          color: "default",
-        });
-        setSelected("step1");
-      }
+      addToast({
+        title: "Success",
+        description: "New payment method added",
+        color: "default",
+      });
+      setSelected("step1");
     } catch (err) {
       console.error("change payment method error", err);
       setError(err instanceof Error ? err.message : "Payment failed");

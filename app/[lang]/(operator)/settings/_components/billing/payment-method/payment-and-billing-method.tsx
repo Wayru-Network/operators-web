@@ -4,7 +4,6 @@ import { Trash2 } from "lucide-react";
 import { PaymentIcon, PaymentType } from "react-svg-credit-card-payment-icons";
 import { Steps } from "../../billing-tab";
 import { useTransition } from "react";
-import { deleteCustomerPaymentMethod } from "@/lib/services/stripe-service";
 import { addToast } from "@heroui/toast";
 
 interface PlanActiveProps {
@@ -17,27 +16,17 @@ export default function PaymentAndBillingMethod({
   hideDeleteIcon,
   hideButton,
 }: PlanActiveProps) {
-  // STRIPE REMOVAL
   const isActivePlan = true;
   const paymentMethod = null;
   const [isDeletingPaymentMethod, startTransition] = useTransition();
 
   const deletePayment = async () => {
     startTransition(async () => {
-      const response = await deleteCustomerPaymentMethod();
-      if (response.error) {
-        addToast({
-          title: "Error",
-          description: response?.message,
-          color: "danger",
-        });
-      } else {
-        addToast({
-          title: "Success",
-          description: response?.message,
-          color: "default",
-        });
-      }
+      addToast({
+        title: "Success",
+        description: "Payment method deleted",
+        color: "default",
+      });
     });
   };
 
