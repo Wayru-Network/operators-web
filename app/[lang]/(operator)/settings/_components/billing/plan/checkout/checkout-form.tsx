@@ -1,17 +1,7 @@
-import {
-  CardCvcElement,
-  CardExpiryElement,
-  CardNumberElement,
-} from "@stripe/react-stripe-js";
 import { Steps } from "../../../billing-tab";
-import { useTheme } from "next-themes";
 import { useBilling } from "../../../../contexts/BillingContext";
-import { useCustomerSubscription } from "@/lib/contexts/customer-subscription-context";
 import { useState } from "react";
-import { CardBrand } from "@stripe/stripe-js";
-import { PaymentIcon, PaymentType } from "react-svg-credit-card-payment-icons";
 import { Button } from "@heroui/react";
-import { LoadingInputWrapper } from "@/lib/components/loading-input-wrapper";
 import { addToast } from "@heroui/toast";
 import { calculateDiscountSummary } from "@/lib/helpers/stripe-helper";
 import { createInitialSubscription } from "@/lib/services/subscription-service";
@@ -62,8 +52,12 @@ export default function CheckoutForm({ setSelected }: CheckoutFormProps) {
     setError(null);
 
     try {
+      const planId = pricings?.plans[0].id;
+      if (!planId) {
+        throw new Error("Plan ID is not available");
+      }
       const result = await createInitialSubscription({
-        planId: pricings?.plans[0].id!,
+        planId,
         hotspotLimit: hotspotsToAdd,
         expiryDate: new Date(
           new Date().setFullYear(new Date().getFullYear() + 1)

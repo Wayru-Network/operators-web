@@ -16,7 +16,7 @@ interface CheckoutFormProps {
  * Return a checkout for customer, conditional render depends on customer context
  */
 export default function PlanCheckout({ setSelected }: CheckoutFormProps) {
-  const { hotspotsToAdd, customerContext, pricings } = useBilling();
+  const { hotspotsToAdd, pricings } = useBilling();
   const summaryWithFee = calculateDiscountSummary(
     hotspotsToAdd,
     (pricings?.plans[0].base_price_cents ?? 0) / 100
