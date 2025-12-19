@@ -4,10 +4,7 @@ import { Steps } from "../../billing-tab";
 import CheckoutBillingDetails from "./checkout-billing-details";
 import { calculateDiscountSummary } from "@/lib/helpers/stripe-helper";
 
-import PaymentAndBillingMethod from "../payment-method/payment-and-billing-method";
 import CheckoutForm from "./checkout/checkout-form";
-import { Elements } from "@stripe/react-stripe-js";
-import { stripeClient } from "@/lib/services/stripe-client-config";
 import ProratedOneTimeDetails from "./checkout/prorated-one-time-details";
 import NonFormActionButtons from "./checkout/non-form-action-buttons";
 
@@ -33,26 +30,14 @@ export default function PlanCheckout({ setSelected }: CheckoutFormProps) {
     summaryNotFee.unitPriceWithDiscount * hotspotsToAdd;
 
   const RenderPaymentBilling = () => {
-    if (!customerContext?.requiresPaymentMethod) {
-      return (
-        <PaymentAndBillingMethod
-          setSelected={setSelected}
-          hideDeleteIcon
-          hideButton
-        />
-      );
-    } else if (customerContext?.requiresPaymentMethod) {
-      return (
-        <div className="flex flex-col w-full mt-3 gap-1">
-          <p className="text-lg font-semibold w-full align-left">
-            Add your payment method to complete your purchase.
-          </p>
-          <Elements stripe={stripeClient}>
-            <CheckoutForm setSelected={setSelected} isRequired />
-          </Elements>
-        </div>
-      );
-    }
+    return (
+      <div className="flex flex-col w-full mt-3 gap-1">
+        <p className="text-lg font-semibold w-full align-left">
+          Add your payment method to complete your purchase.
+        </p>
+        <CheckoutForm setSelected={setSelected} isRequired />
+      </div>
+    );
   };
 
   return (
